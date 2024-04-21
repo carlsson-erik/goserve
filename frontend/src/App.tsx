@@ -1,5 +1,6 @@
 import tw from 'twin.macro'
-import { Button, Logo } from './components'
+import { Logo } from './components'
+import Navbar from './components/navbar'
 
 const styles = {
   // Move long class sets out of jsx to keep it scannable
@@ -11,10 +12,8 @@ const styles = {
 
 const App = () => (
   <div css={styles.container({ hasBackground: true })}>
-    <div tw="flex flex-col justify-center h-full gap-y-5">
-      <Button $variant="primary">Submit</Button>
-      <Button $variant="secondary">Cancel</Button>
-      <Button $isSmall>Close</Button>
+    <div tw="flex flex-col h-full gap-y-5">
+        <Navbar />
     </div>
     <Logo />
   </div>
