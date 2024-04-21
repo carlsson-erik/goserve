@@ -1,22 +1,34 @@
 import tw from 'twin.macro'
 import { Logo } from './components'
-import Navbar from './components/navbar'
+import Navbar from './components/Navbar'
+import HomeScreen from './screens/HomeScreen'
+import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import paths from './utils/paths'
+import DashboardScreen from './screens/dashboard/DashboardScreen'
+import DashboardCreateScreen from './screens/dashboard/DashboardCreateScreen'
 
-const styles = {
-  // Move long class sets out of jsx to keep it scannable
-  container: ({ hasBackground }: { hasBackground: boolean }) => [
-    tw`flex flex-col items-center justify-center h-screen`,
-    hasBackground && tw`bg-gradient-to-b from-electric to-ribbon`,
-  ],
-}
-
-const App = () => (
-  <div css={styles.container({ hasBackground: true })}>
-    <div tw="flex flex-col h-full gap-y-5">
-        <Navbar />
+const App = () => {
+  const router = createBrowserRouter([
+    {
+      path: paths.root,
+      element: <HomeScreen />,
+      children: [
+        {
+          path: paths.dashboard.root,
+          element: <DashboardScreen />,
+        },
+        {
+          path: paths.dashboard.create,
+          element: <DashboardCreateScreen />,
+        },
+      ],
+    },
+  ])
+  return (
+    <div>
+      <RouterProvider router={router} />
     </div>
-    <Logo />
-  </div>
-)
+  )
+}
 
 export default App

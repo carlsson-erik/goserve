@@ -4,10 +4,11 @@ module.exports = function webpackConfig(env, args) {
   return {
     entry: path.join(__dirname, 'src/index.tsx'),
     output: {
+      publicPath: '/',
       filename: 'main.js',
       path: path.join(__dirname, 'public'),
     },
-    resolve: { extensions: ['.tsx', '.js'] },
+    resolve: { extensions: ['.tsx', '.js', '.ts'] },
     module: {
       rules: [
         {
