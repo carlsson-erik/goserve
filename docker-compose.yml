@@ -1,0 +1,48 @@
+# Use postgres/example user/password credentials
+version: '3.9'
+
+name: goserve
+services:
+  frontend:
+    image: node:latest
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command:
+      - npm install yarn
+      - yarn
+      - yarn dev
+    ports:
+      - 3000:3000
+
+  backend:
+    image: golang:latest
+    volumes:
+      - ./backend:/go/src/app
+    working_dir: /go/src/app
+    command: go run server.go
+    ports:
+      - 8081:8081
+    depends_on:
+      - postgres
+
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    # or set shared memory limit when deploy via swarm stack
+    #volumes:
+    #  - type: tmpfs
+    #    target: /dev/shm
+    #    tmpfs:
+    #      size: 134217728 # 128*2^20 bytes = 128Mb
+    environment:
+      POSTGRES_PASSWORD: example
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
