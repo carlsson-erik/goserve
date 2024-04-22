@@ -1,7 +1,7 @@
-import Button from '../../components/Button'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import paths from '../../utils/paths'
+import Button from 'components/input/Button'
 
 const DashboardScreen = () => {
   const name = React.useState('')

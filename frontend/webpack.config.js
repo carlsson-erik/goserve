@@ -8,7 +8,13 @@ module.exports = function webpackConfig(env, args) {
       filename: 'main.js',
       path: path.join(__dirname, 'public'),
     },
-    resolve: { extensions: ['.tsx', '.js', '.ts'] },
+    resolve: {
+      extensions: ['.tsx', '.js', '.ts'],
+      modules: [
+        path.resolve(__dirname, 'src'),
+        'node_modules'
+      ]
+    },
     module: {
       rules: [
         {
@@ -28,6 +34,7 @@ module.exports = function webpackConfig(env, args) {
     devServer: {
       hot: true,
       open: true,
+      historyApiFallback: true,
       static: { directory: path.join(__dirname, 'public') },
     },
   }

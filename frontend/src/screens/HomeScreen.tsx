@@ -1,11 +1,8 @@
-import Navbar from '../components/Navbar'
+import Navbar from 'components/Navbar'
 import React from 'react'
 import {
   Route,
-  RouterProvider,
   Routes,
-  createBrowserRouter,
-  redirect,
 } from 'react-router-dom'
 import DashboardCreateScreen from './dashboard/DashboardCreateScreen'
 import DashboardScreen from './dashboard/DashboardScreen'

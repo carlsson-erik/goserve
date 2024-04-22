@@ -25,7 +25,7 @@ const App = () => {
     },
   ])
   return (
-    <div>
+    <div tw="h-screen w-screen bg-gray-800 text-gray-100">
       <RouterProvider router={router} />
     </div>
   )

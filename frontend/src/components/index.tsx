@@ -1,2 +1,2 @@
-export { default as Button } from './Button'
-export { default as Logo } from './Logo'
+export { default as Button } from './input/Button'
+export { default as Logo } from '../assets/Logo'
