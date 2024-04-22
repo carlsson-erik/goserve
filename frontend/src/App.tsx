@@ -1,11 +1,11 @@
 import tw from 'twin.macro'
 import { Logo } from './components'
 import Navbar from './components/Navbar'
-import HomeScreen from './screens/HomeScreen'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import paths from './utils/paths'
 import DashboardScreen from './screens/dashboard/DashboardScreen'
 import DashboardCreateScreen from './screens/dashboard/DashboardCreateScreen'
+import HomeScreen from 'screens/HomeScreen'
 
 const App = () => {
   const router = createBrowserRouter([
