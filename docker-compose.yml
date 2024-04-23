@@ -15,16 +15,17 @@ services:
     ports:
       - 3000:3000
 
-  backend:
-    image: golang:latest
-    volumes:
-      - ./backend:/go/src/app
-    working_dir: /go/src/app
-    command: go run server.go
-    ports:
-      - 8081:8081
-    depends_on:
-      - postgres
+  # backend:
+  #   image: golang:latest
+  #   volumes:
+  #     - ./backend:/go/src/app
+  #   working_dir: /go/src/app
+  #   command: go run server.go
+    
+  #   ports:
+  #     - 8081:8081
+  #   depends_on:
+  #     - postgres
 
 
   postgres:

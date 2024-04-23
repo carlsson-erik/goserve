@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS dashboard;
+DROP TABLE IF EXISTS tiles;
