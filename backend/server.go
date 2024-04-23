@@ -1,6 +1,7 @@
 package main
 
 import (
+	"goserve/db"
 	"goserve/graph"
 	"log"
 	"net/http"
@@ -8,12 +9,21 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/joho/godotenv"
 )
 
 const defaultPort = "8080"
 
 func main() {
-	port := os.Getenv("PORT")
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db.MigrateDB()
+
+	port := os.Getenv("DB_PORT")
 	if port == "" {
 		port = defaultPort
 	}

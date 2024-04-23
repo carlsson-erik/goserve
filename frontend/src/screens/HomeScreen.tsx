@@ -1,9 +1,6 @@
 import Navbar from 'components/Navbar'
 import React from 'react'
-import {
-  Route,
-  Routes,
-} from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import DashboardCreateScreen from './dashboard/DashboardCreateScreen'
 import DashboardScreen from './dashboard/DashboardScreen'
 import paths from '../utils/paths'
