@@ -28,3 +28,6 @@ migrate create -dir db/migrations -seq -digits 4 -ext .sql <Name>
 
 Apply all new migrations
 Apply migrations at restart of the go server
+
+Revert all migrations
+migrate -path db/migrations --database "postgresql://postgres:postgres@localhost:5432/v1?sslmode=disable" -verbose down
