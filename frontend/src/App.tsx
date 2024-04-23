@@ -6,6 +6,7 @@ import paths from './utils/paths'
 import DashboardScreen from './screens/dashboard/DashboardScreen'
 import DashboardCreateScreen from './screens/dashboard/DashboardCreateScreen'
 import HomeScreen from 'screens/HomeScreen'
+import AboutScreen from 'screens/AboutScreen'
 
 const App = () => {
   const router = createBrowserRouter([
@@ -20,6 +21,10 @@ const App = () => {
         {
           path: paths.dashboard.create,
           element: <DashboardCreateScreen />,
+        },
+        {
+          path: paths.dashboard.about,
+          element: <AboutScreen />,
         },
       ],
     },
