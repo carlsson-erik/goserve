@@ -20,3 +20,11 @@ We use GraphQL in our go backend instead of a REST API, mostly for fun. Pros are
 Install:
 Golang-migrate CLI
 https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
+
+Migrate commands(Must be in backend folder goserve/backend):
+
+Create a new migration
+migrate create -dir db/migrations -seq -digits 4 -ext .sql <Name>
+
+Apply all new migrations
+Apply migrations at restart of the go server
