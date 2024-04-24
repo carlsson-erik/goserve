@@ -45,3 +45,6 @@ Generate jet types:
 cd backend/
 jet -dsn="postgresql://postgres:postgres@localhost:5432/v1?sslmode=disable" -schema=public -path=./gen
 
+Regenerate graphql:
+go run github.com/99designs/gqlgen generate
+
