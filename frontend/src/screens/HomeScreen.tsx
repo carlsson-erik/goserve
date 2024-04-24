@@ -4,7 +4,7 @@ import { Route, Routes } from 'react-router-dom'
 import DashboardCreateScreen from './dashboard/DashboardCreateScreen'
 import DashboardScreen from './dashboard/DashboardScreen'
 import paths from '../utils/paths'
-import AboutScreen from './AboutScreen'
+import AboutScreen from './Misc/AboutScreen'
 
 const HomeScreen = () => {
   return (

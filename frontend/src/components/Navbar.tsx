@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import paths from 'utils/paths'
-import Button from './input/Button'
+import EditTilesButton from './input/EditTilesButton'
 
 const Navbar = () => {
   return (
@@ -8,8 +8,8 @@ const Navbar = () => {
       <Link to={paths.root} tw="p-2 font-medium text-2xl text-gray-100">
         <span>Go Serve</span>
       </Link>
-      <div>
-        <Button>hej</Button>
+      <div tw='flex items-center'>
+        <EditTilesButton />
         <Link to={paths.dashboard.about}>
           <button tw="text-white hover:bg-gray-600 p-2">
             About
