@@ -43,7 +43,7 @@ migrate -path db/migrations --database "postgresql://postgres:postgres@localhost
 
 Generate jet types:
 cd backend/
-jet -dsn="postgresql://postgres:postgres@localhost:5432/v1?sslmode=disable" -schema=public -path=./gen
+jet -dsn="postgresql://postgres:postgres@localhost:5432/v1?sslmode=disable" -schema=public -path="./.gen"
 
 Regenerate graphql:
 go run github.com/99designs/gqlgen generate
