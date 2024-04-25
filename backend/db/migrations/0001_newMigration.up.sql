@@ -1,24 +1,20 @@
 CREATE TABLE public.dashboard (
-	id serial NOT NULL,
-	"name" varchar NOT NULL,
+	id serial primary key,
+	"name" varchar NOT NULL UNIQUE,
+	"description" varchar NULL,
 	"rows" int NOT NULL,
 	cols int NOT NULL
 );
 
 
 CREATE TABLE public.tile (
-	id serial NOT NULL,
-	"name" varchar NOT NULL,
+	id serial primary key,
+	"name" varchar NOT NULL UNIQUE,
+	"description" varchar NULL,
 	"row" int NOT NULL,
 	col int NOT NULL,
 	width int NOT NULL,
-	height int NOT NULL
+	height int NOT NULL,
+	dashboard_id serial,
+	CONSTRAINT fk_tile_dashboard FOREIGN KEY(dashboard_id) REFERENCES dashboard(id)
 );
-
-ALTER TABLE public.tile ADD CONSTRAINT tile_pk PRIMARY KEY (id);
-
-ALTER TABLE public.dashboard ADD CONSTRAINT dashboard_pk PRIMARY KEY (id);
-
-ALTER TABLE public.dashboard ADD CONSTRAINT dashboard_tile_fk FOREIGN KEY (id) REFERENCES public.tile(id);
-
-

@@ -21,11 +21,12 @@ func MigrateDB() {
 		"file://db/migrations",
 		"postgres://postgres:postgres@"+db_url+":"+db_port+"/"+db_database+"?sslmode=disable")
 	if err != nil {
+		log.Println("1")
 		log.Fatal(err)
 	}
 
 	if err := m.Up(); err != nil {
-		log.Fatal((err))
+		log.Printf("Migration: %s", err)
 	}
 
 	log.Println("Successfully migrated")
