@@ -1,9 +1,18 @@
-import { IconEdit } from '@tabler/icons-react'
+import { IconEditOff, IconEyeEdit } from '@tabler/icons-react'
+import { useState } from 'react'
 
-const EditTilesButton = () => {
+const EditTilesButton = ({ onEditModeChange }: { onEditModeChange: (editMode: boolean) => void }) => {
+    const [editMode, setEditMode] = useState<boolean>(false)
+
+    const toggleEditMode = () => 
+    {
+        setEditMode(!editMode)
+        onEditModeChange(!editMode)
+    }
+
     return (
-    <button tw="text-white hover:bg-gray-600 p-2">
-        <IconEdit tw=''/>
+    <button onClick={toggleEditMode} tw="text-white hover:bg-gray-600 p-2">
+        {editMode ? <IconEyeEdit /> : <IconEditOff />}
     </button>
     )
 }
