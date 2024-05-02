@@ -5,6 +5,7 @@ import DashboardCreateScreen from './dashboard/DashboardCreateScreen'
 import DashboardScreen from './dashboard/DashboardScreen'
 import paths from '../utils/paths'
 import AboutScreen from './Misc/AboutScreen'
+import TileGrid from './dashboard/TileGrid'
 
 const HomeScreen = () => {
   return (
@@ -16,6 +17,7 @@ const HomeScreen = () => {
           path={paths.dashboard.create}
           element={<DashboardCreateScreen />}
         />
+        <Route path={paths.dashboard.testtilegrid} element={<TileGrid />} />
         <Route path={paths.dashboard.about} element={<AboutScreen />} />
         <Route path={'/*'} element={<DashboardScreen />} />
       </Routes>

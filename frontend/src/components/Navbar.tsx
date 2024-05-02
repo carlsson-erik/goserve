@@ -17,7 +17,7 @@ const Navbar = () => {
       </Link>
       <div tw='flex items-center'>
         <EditTilesButton onEditModeChange={handleEditModeChange} />
-        <Link to={paths.dashboard.about}>
+        <Link to={paths.dashboard.testtilegrid}>
           <button tw="text-white hover:bg-gray-600 p-2">
             {editMode ? <p>Edit</p> : <p>About</p> }
           </button>

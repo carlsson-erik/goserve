@@ -3,6 +3,7 @@ const paths = {
   dashboard: {
     root: '/dashboard',
     create: '/dashboard/create',
+    testtilegrid: '/dashboard/testtilegrid',
     about: '/dashboard/about',
   },
 }

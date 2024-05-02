@@ -4,6 +4,7 @@ import DashboardScreen from './screens/dashboard/DashboardScreen'
 import DashboardCreateScreen from './screens/dashboard/DashboardCreateScreen'
 import HomeScreen from 'screens/HomeScreen'
 import AboutScreen from 'screens/Misc/AboutScreen'
+import TileGrid from 'screens/dashboard/TileGrid'
 
 const App = () => {
   const router = createBrowserRouter([
@@ -18,6 +19,10 @@ const App = () => {
         {
           path: paths.dashboard.create,
           element: <DashboardCreateScreen />,
+        },
+        {
+          path: paths.dashboard.testtilegrid,
+          element: <TileGrid />,
         },
         {
           path: paths.dashboard.about,
