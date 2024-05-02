@@ -2,25 +2,46 @@
 
 package model
 
+type Dashboard struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	Rows        int     `json:"rows"`
+	Cols        int     `json:"cols"`
+	Tiles       []*Tile `json:"tiles"`
+}
+
 type Mutation struct {
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type NewDashboard struct {
+	Name string `json:"name"`
+}
+
+type NewTile struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	Row         int     `json:"row"`
+	Col         int     `json:"col"`
 }
 
 type Query struct {
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type Tile struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	Row         int     `json:"row"`
+	Col         int     `json:"col"`
+	Width       int     `json:"width"`
+	Height      int     `json:"height"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID         string       `json:"id"`
+	Name       string       `json:"name"`
+	Email      string       `json:"email"`
+	Password   string       `json:"password"`
+	Dashboards []*Dashboard `json:"dashboards"`
 }

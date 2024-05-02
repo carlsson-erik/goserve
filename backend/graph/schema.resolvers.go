@@ -6,18 +6,116 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	. "goserve/.gen/v1/public/table"
 	"goserve/graph/model"
+	"log"
+
+	"github.com/go-jet/jet/v2/postgres"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// CreateDashboard is the resolver for the createDashboard field.
+func (r *mutationResolver) CreateDashboard(ctx context.Context, input model.NewDashboard) (*model.Dashboard, error) {
+	newDashboard := model.Dashboard{
+		Name: input.Name,
+		Rows: 6,
+		Cols: 8,
+	}
+	insertQuery := Dashboard.INSERT(Dashboard.Name, Dashboard.Rows, Dashboard.Cols).MODEL(newDashboard)
+
+	var newRows struct{}
+
+	err := insertQuery.Query(r.DB, &newRows)
+
+	if err != nil {
+		log.Printf("Insert error: %v", err)
+		return nil, err
+	}
+
+	var getDest struct {
+		model.Dashboard
+	}
+	getQuery := postgres.SELECT(Dashboard.AllColumns).FROM(Dashboard)
+
+	err = getQuery.Query(r.DB, &getDest)
+
+	return &getDest.Dashboard, err
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// CreateTile is the resolver for the createTile field.
+func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) (*model.Tile, error) {
+	newTile := model.Tile{
+		Name:        input.Name,
+		Description: input.Description,
+		Row:         input.Row,
+		Col:         input.Col,
+		Width:       1,
+		Height:      1,
+	}
+	insertQuery := Tile.INSERT(Tile.AllColumns).MODEL(newTile)
+
+	var err error = nil
+
+	var newRows struct{}
+
+	err = insertQuery.Query(r.DB, &newRows)
+
+	if err != nil {
+		log.Printf("Insert failed: %v", err)
+		return nil, err
+	}
+
+	var getDest struct {
+		model.Tile
+	}
+	getQuery := postgres.SELECT(Tile.AllColumns).FROM(Tile)
+
+	err = getQuery.Query(r.DB, &getDest)
+
+	return &getDest.Tile, err
+}
+
+// Dashboards is the resolver for the dashboards field.
+func (r *queryResolver) Dashboards(ctx context.Context) ([]*model.Dashboard, error) {
+	var getDest []*model.Dashboard
+
+	getQuery := postgres.SELECT(Dashboard.AllColumns).FROM(Dashboard)
+
+	err := getQuery.Query(r.DB, &getDest)
+
+	return getDest, err
+}
+
+// Dashboard is the resolver for the dashboard field.
+func (r *queryResolver) Dashboard(ctx context.Context, id int) (*model.Dashboard, error) {
+	var res *model.Dashboard
+
+	getQuery := postgres.SELECT(Dashboard.AllColumns).FROM(Dashboard).WHERE(Dashboard.ID.EQ(postgres.Int(int64(id))))
+
+	err := getQuery.Query(r.DB, &res)
+
+	return res, err
+}
+
+// Tiles is the resolver for the tiles field.
+func (r *queryResolver) Tiles(ctx context.Context) ([]*model.Tile, error) {
+	var res []*model.Tile
+
+	getQuery := postgres.SELECT(Tile.AllColumns).FROM(Tile)
+
+	err := getQuery.Query(r.DB, &res)
+
+	return res, err
+}
+
+// Tile is the resolver for the tile field.
+func (r *queryResolver) Tile(ctx context.Context, id int) (*model.Tile, error) {
+	var res *model.Tile
+
+	getQuery := postgres.SELECT(Tile.AllColumns).FROM(Tile).WHERE(Tile.ID.EQ(postgres.Int(int64(id))))
+
+	err := getQuery.Query(r.DB, &res)
+
+	return res, err
 }
 
 // Mutation returns MutationResolver implementation.

@@ -2,19 +2,6 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
-}
-
-input NewTodo {
-  text: String!
-  userId: String!
-}
-
-
 type User {
   id: ID!
   name: String!
@@ -23,23 +10,48 @@ type User {
   dashboards: [Dashboard!]!
 }
 
+
 type Dashboard {
   id: ID!
-  user: User!
   name: String!
+  description: String
   rows: Int!
-  columns: Int!
+  cols: Int!
+  tiles: [Tile!]!
 }
 
 input NewDashboard {
   name: String!
-  userId: String!
 }
+
+type Tile {
+  id: ID!
+  name: String!
+  description: String
+  row: Int!
+  col: Int!
+  width: Int!
+  height: Int!
+}
+
+input NewTile {
+  name: String!
+  description: String
+  row: Int!
+  col: Int!
+}
+
+
 
 type Mutation {
   createDashboard(input: NewDashboard!): Dashboard!
+  createTile(input: NewTile!): Tile!
 }
 
 type Query {
   dashboards: [Dashboard!]!
+  dashboard(id: Int!) : Dashboard
+
+  tiles: [Tile!]!
+  tile(id: Int!) : Tile
 }
