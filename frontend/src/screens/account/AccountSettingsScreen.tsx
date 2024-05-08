@@ -1,13 +1,15 @@
-import React from 'react'
+import React from "react";
 
 const AccountSettingsScreen = () => {
-  const name = React.useState('')
+  const name = React.useState("");
+
+  console.log(name);
 
   return (
     <div>
-      <span tw="text-2xl">Account settings screen</span>
+      <span className="text-2xl">Account settings screen</span>
     </div>
-  )
-}
+  );
+};
 
-export default AccountSettingsScreen
+export default AccountSettingsScreen;
