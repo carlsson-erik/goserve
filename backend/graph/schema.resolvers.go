@@ -51,7 +51,7 @@ func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) 
 		Width:       1,
 		Height:      1,
 	}
-	insertQuery := Tile.INSERT(Tile.AllColumns).MODEL(newTile)
+	insertQuery := Tile.INSERT(Tile.AllColumns).MODEL(newTile).RETURNING(Tile.AllColumns)
 
 	var err error = nil
 

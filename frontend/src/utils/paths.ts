@@ -1,10 +1,11 @@
 const paths = {
-  root: '/',
+  root: "/",
   dashboard: {
-    root: '/dashboard',
-    create: '/dashboard/create',
-    about: '/dashboard/about',
+    root: "/dashboard",
+    id: "/dashboard:dashboardId",
+    create: "/dashboard/create",
+    about: "/dashboard/about",
   },
-}
+};
 
-export default paths
+export default paths;
