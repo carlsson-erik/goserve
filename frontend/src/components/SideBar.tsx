@@ -6,9 +6,10 @@ import { Dashboard } from "../hooks/useDashboardQuery";
 
 export interface SideBarProps {
   dashboards?: Dashboard[];
+  onDeleteDashboard: (id: number) => void;
 }
 
-const SideBar: React.FC<SideBarProps> = ({ dashboards }) => {
+const SideBar: React.FC<SideBarProps> = ({ dashboards, onDeleteDashboard }) => {
   if (!dashboards) {
     return <div>loading...</div>;
   }
@@ -19,12 +20,15 @@ const SideBar: React.FC<SideBarProps> = ({ dashboards }) => {
         <Button>New</Button>
       </Link>
       {dashboards.map((d) => (
-        <Link
-          to={generatePath(paths.dashboard.id, { dashboardId: d.id })}
-          key={d.id}
-        >
-          <Button>{d.name}</Button>
-        </Link>
+        <div>
+          <Link
+            to={generatePath(paths.dashboard.id, { dashboardId: d.id })}
+            key={d.id}
+          >
+            <Button>{d.name}</Button>
+          </Link>
+          <Button onClick={() => onDeleteDashboard(d.id)}>Delete</Button>
+        </div>
       ))}
     </div>
   );

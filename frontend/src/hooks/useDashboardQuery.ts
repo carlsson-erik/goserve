@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Tile } from "./useTileQuery";
 
 export interface Dashboard {
-  id: string;
+  id: number;
   name: string;
   description: string;
   rows: number;

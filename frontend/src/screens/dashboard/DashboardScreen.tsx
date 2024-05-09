@@ -12,7 +12,7 @@ const DashboardScreen = () => {
 
   const { data } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
 
-  const dashboard = data?.dashboards.find((d) => d.id === dashboardId);
+  const dashboard = data?.dashboards.find((d) => d.id === Number(dashboardId));
   if (!dashboard || !dashboardId) {
     return (
       <div>

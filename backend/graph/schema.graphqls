@@ -47,7 +47,10 @@ input NewTile {
 
 type Mutation {
   createDashboard(input: NewDashboard!): Dashboard!
+  deleteDashboard(id: Int!): Dashboard!
   createTile(input: NewTile!): Tile!
+  deleteTile(id: Int!): Tile!
+  
 }
 
 type Query {

@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	. "goserve/.gen/v1/public/table"
 	"goserve/graph/model"
 	"log"
@@ -34,6 +35,22 @@ func (r *mutationResolver) CreateDashboard(ctx context.Context, input model.NewD
 	return &res, err
 }
 
+// DeleteDashboard is the resolver for the deleteDashboard field.
+func (r *mutationResolver) DeleteDashboard(ctx context.Context, id int) (*model.Dashboard, error) {
+	deleteQuery := Dashboard.DELETE().WHERE(Dashboard.ID.EQ(postgres.Int(int64(id)))).RETURNING(Dashboard.AllColumns)
+
+	res := model.Dashboard{}
+
+	err := deleteQuery.Query(r.DB, &res)
+
+	if err != nil {
+		log.Printf("Insert failed: %v", err)
+		return nil, err
+	}
+
+	return &res, err
+}
+
 // CreateTile is the resolver for the createTile field.
 func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) (*model.Tile, error) {
 	newTile := model.Tile{
@@ -56,6 +73,11 @@ func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) 
 	}
 
 	return &res, err
+}
+
+// DeleteTile is the resolver for the deleteTile field.
+func (r *mutationResolver) DeleteTile(ctx context.Context, id int) (*model.Tile, error) {
+	panic(fmt.Errorf("not implemented: DeleteTile - deleteTile"))
 }
 
 // Dashboards is the resolver for the dashboards field.
