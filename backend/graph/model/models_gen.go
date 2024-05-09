@@ -3,7 +3,7 @@
 package model
 
 type Dashboard struct {
-	ID          string  `json:"id"`
+	ID          int     `json:"id"`
 	Name        string  `json:"name"`
 	Description *string `json:"description,omitempty"`
 	Rows        int     `json:"rows"`
@@ -30,7 +30,7 @@ type Query struct {
 }
 
 type Tile struct {
-	ID          string     `json:"id"`
+	ID          int        `json:"id"`
 	Dashboard   *Dashboard `json:"dashboard"`
 	Name        string     `json:"name"`
 	Description *string    `json:"description,omitempty"`

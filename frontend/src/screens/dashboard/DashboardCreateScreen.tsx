@@ -15,7 +15,7 @@ const DashboardCreateScreen = () => {
   };
 
   return (
-    <div className="w-full flex justify-center items-center p-8 bg-gray-900">
+    <div className="w-full flex justify-center items-center p-8">
       <span className="text-2xl">Create new dashboard</span>
       <div>
         <input

@@ -12,7 +12,7 @@ type User {
 
 
 type Dashboard {
-  id: ID!
+  id: Int!
   name: String!
   description: String
   rows: Int!
@@ -25,7 +25,7 @@ input NewDashboard {
 }
 
 type Tile {
-  id: ID!
+  id: Int!
   dashboard: Dashboard!
   name: String!
   description: String

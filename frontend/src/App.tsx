@@ -15,17 +15,10 @@ const App = () => {
   return (
     <ApolloProvider client={client}>
       <BrowserRouter>
-        <div className="h-full">
+        <div className="h-screen w-screen flex flex-col bg-gray-500 text-gray-100">
           <Navbar />
           <Routes>
-            <Route
-              path="/*"
-              element={
-                <div className="h-screen w-screen bg-gray-800 text-gray-100">
-                  <HomeScreen />
-                </div>
-              }
-            />
+            <Route path="/*" element={<HomeScreen />} />
           </Routes>
         </div>
       </BrowserRouter>

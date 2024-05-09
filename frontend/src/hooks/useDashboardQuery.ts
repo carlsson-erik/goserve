@@ -15,6 +15,8 @@ export const GET_DASHBOARDS = gql`
     dashboards {
       id
       name
+      rows
+      cols
     }
   }
 `;

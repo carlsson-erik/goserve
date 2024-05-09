@@ -8,36 +8,26 @@ import {
   GET_DASHBOARDS,
   GetDashboardsResult,
 } from "../hooks/useDashboardQuery";
-import React from "react";
-import useDeleteDashboard from "../hooks/useDeleteDashboard";
 
 export const HomeScreen = () => {
   const { data } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
 
-  const [deleteDashboard] = useDeleteDashboard();
-
-  const onDeleteDashboard = React.useCallback(
-    (id: number) => {
-      deleteDashboard(id);
-    },
-    [deleteDashboard]
-  );
-
   return (
     <div className="w-full h-full flex">
       <SideBar
+        className="h-full w-36 overflow-hidden shrink-0"
         dashboards={data?.dashboards}
-        onDeleteDashboard={onDeleteDashboard}
       />
-
-      <Routes>
-        <Route
-          path={paths.dashboard.create}
-          element={<DashboardCreateScreen />}
-        />
-        <Route path={paths.dashboard.id} element={<DashboardScreen />} />
-        <Route path={"*"} element={<DashboardScreen />} />
-      </Routes>
+      <div className="grow">
+        <Routes>
+          <Route
+            path={paths.dashboard.create}
+            element={<DashboardCreateScreen />}
+          />
+          <Route path={paths.dashboard.id} element={<DashboardScreen />} />
+          <Route path={"*"} element={<DashboardScreen />} />
+        </Routes>
+      </div>
     </div>
   );
 };
