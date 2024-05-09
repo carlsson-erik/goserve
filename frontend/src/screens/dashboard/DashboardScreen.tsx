@@ -1,27 +1,33 @@
-import React from "react";
 import { Link, useParams } from "react-router-dom";
-import useDashboardQuery from "../../hooks/useDashboardQuery";
 import paths from "../../utils/paths";
 import Button from "../../components/input/Button";
+import { useQuery } from "@apollo/client";
+import {
+  GET_DASHBOARDS,
+  GetDashboardsResult,
+} from "../../hooks/useDashboardQuery";
 
 const DashboardScreen = () => {
-  const name = React.useState("");
-
   const { dashboardId } = useParams();
 
-  const { data } = useDashboardQuery(dashboardId ?? "skip");
+  const { data } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
 
-  console.log(name, data);
-
+  const dashboard = data?.dashboards.find((d) => d.id === dashboardId);
+  if (!dashboard || !dashboardId) {
+    return (
+      <div>
+        <div className="text-black">
+          <span className="text-2xl">Create new dashboard</span>
+          <Link to={paths.dashboard.create}>
+            <Button>Create dashboard</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
   return (
     <div>
-      <div className="text-black">
-        <span>No dasboard created</span>
-        <Link to={paths.dashboard.create}>
-          <Button>Create dashboard</Button>
-        </Link>
-      </div>
-      <span className="text-2xl">Create new dashboard</span>
+      <span>{dashboard.name}</span>
     </div>
   );
 };

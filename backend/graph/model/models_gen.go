@@ -20,6 +20,7 @@ type NewDashboard struct {
 
 type NewTile struct {
 	Name        string  `json:"name"`
+	Dashboard   int     `json:"dashboard"`
 	Description *string `json:"description,omitempty"`
 	Row         int     `json:"row"`
 	Col         int     `json:"col"`
@@ -29,13 +30,14 @@ type Query struct {
 }
 
 type Tile struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-	Row         int     `json:"row"`
-	Col         int     `json:"col"`
-	Width       int     `json:"width"`
-	Height      int     `json:"height"`
+	ID          string     `json:"id"`
+	Dashboard   *Dashboard `json:"dashboard"`
+	Name        string     `json:"name"`
+	Description *string    `json:"description,omitempty"`
+	Row         int        `json:"row"`
+	Col         int        `json:"col"`
+	Width       int        `json:"width"`
+	Height      int        `json:"height"`
 }
 
 type User struct {

@@ -1,9 +1,10 @@
 import { ButtonHTMLAttributes } from "react";
 
-const Button: React.FC<ButtonHTMLAttributes<HTMLButtonElement>> = ({
-  children,
-  ...props
-}) => {
-  return <button {...props}>{children}</button>;
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  loading?: boolean;
+}
+
+const Button: React.FC<ButtonProps> = ({ children, loading, ...props }) => {
+  return <button {...props}>{loading ? "loading" : children}</button>;
 };
 export default Button;

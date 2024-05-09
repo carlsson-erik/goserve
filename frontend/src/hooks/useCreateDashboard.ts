@@ -1,41 +1,59 @@
-import { gql } from "@apollo/client";
+import { FetchResult, MutationResult, gql, useMutation } from "@apollo/client";
 import React from "react";
-import { Tile } from "./useTileQuery";
-import { FetchContext } from "../App";
-
-export interface Dashboard {
-  id: string;
-  name: string;
-  description: string;
-  rows: number;
-  cols: number;
-  tiles: Tile[];
-}
+import {
+  Dashboard,
+  GET_DASHBOARDS,
+  GetDashboardsResult,
+} from "./useDashboardQuery";
 
 export interface CreateDashboardData {
   name: string;
   description?: string;
 }
 
-const useCreateDashboard = () => {
-  const client = React.useContext(FetchContext);
+export interface CreateDashboardResult {
+  createDashboard: Dashboard;
+}
+
+const useCreateDashboard = (): [
+  (
+    createData: CreateDashboardData
+  ) => Promise<FetchResult<CreateDashboardResult>>,
+  MutationResult<{ createDashboard: Dashboard }>
+] => {
+  const [createDashboardGQL, other] = useMutation<CreateDashboardResult>(gql`
+    mutation CreateDashboard($name: String!) {
+      createDashboard(input: { name: $name }) {
+        id
+        name
+      }
+    }
+  `);
 
   const createDashboard = React.useCallback(
     (createData: CreateDashboardData) => {
-      return client.mutate<Dashboard>({
-        mutation: gql`
-            mutation {
-              createDashboard(input: { name: "${createData.name}"  }) {
-                id
-              }
-            }
-          `,
+      return createDashboardGQL({
+        variables: { name: createData.name },
+        update: (cache, { data: addDashboard }) => {
+          const data: GetDashboardsResult | null = cache.readQuery({
+            query: GET_DASHBOARDS,
+          });
+
+          if (data === null || !addDashboard) return;
+
+          cache.writeQuery<GetDashboardsResult>({
+            query: GET_DASHBOARDS,
+            data: {
+              dashboards: [...data.dashboards, addDashboard.createDashboard],
+            },
+          });
+        },
       });
     },
-    [client]
+    [createDashboardGQL]
   );
 
-  return createDashboard;
+  return [createDashboard, other];
 };
 
 export default useCreateDashboard;

@@ -20,25 +20,18 @@ func (r *mutationResolver) CreateDashboard(ctx context.Context, input model.NewD
 		Rows: 6,
 		Cols: 8,
 	}
-	insertQuery := Dashboard.INSERT(Dashboard.Name, Dashboard.Rows, Dashboard.Cols).MODEL(newDashboard)
+	insertQuery := Dashboard.INSERT(Dashboard.Name, Dashboard.Rows, Dashboard.Cols).MODEL(newDashboard).RETURNING(Dashboard.AllColumns)
 
-	var newRows struct{}
+	res := model.Dashboard{}
 
-	err := insertQuery.Query(r.DB, &newRows)
+	err := insertQuery.Query(r.DB, &res)
 
 	if err != nil {
 		log.Printf("Insert error: %v", err)
 		return nil, err
 	}
 
-	var getDest struct {
-		model.Dashboard
-	}
-	getQuery := postgres.SELECT(Dashboard.AllColumns).FROM(Dashboard)
-
-	err = getQuery.Query(r.DB, &getDest)
-
-	return &getDest.Dashboard, err
+	return &res, err
 }
 
 // CreateTile is the resolver for the createTile field.
@@ -53,25 +46,16 @@ func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) 
 	}
 	insertQuery := Tile.INSERT(Tile.AllColumns).MODEL(newTile).RETURNING(Tile.AllColumns)
 
-	var err error = nil
+	res := model.Tile{}
 
-	var newRows struct{}
-
-	err = insertQuery.Query(r.DB, &newRows)
+	err := insertQuery.Query(r.DB, &res)
 
 	if err != nil {
 		log.Printf("Insert failed: %v", err)
 		return nil, err
 	}
 
-	var getDest struct {
-		model.Tile
-	}
-	getQuery := postgres.SELECT(Tile.AllColumns).FROM(Tile)
-
-	err = getQuery.Query(r.DB, &getDest)
-
-	return &getDest.Tile, err
+	return &res, err
 }
 
 // Dashboards is the resolver for the dashboards field.

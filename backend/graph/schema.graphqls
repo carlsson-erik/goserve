@@ -26,6 +26,7 @@ input NewDashboard {
 
 type Tile {
   id: ID!
+  dashboard: Dashboard!
   name: String!
   description: String
   row: Int!
@@ -36,6 +37,7 @@ type Tile {
 
 input NewTile {
   name: String!
+  dashboard: Int!
   description: String
   row: Int!
   col: Int!

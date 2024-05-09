@@ -1,7 +1,8 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { HomeScreen } from "./screens/HomeScreen";
+import Navbar from "./components/Navbar";
 
 const client = new ApolloClient({
   uri: "http://localhost:8081/query",
@@ -12,20 +13,23 @@ export const FetchContext = React.createContext(client);
 
 const App = () => {
   return (
-    <FetchContext.Provider value={client}>
+    <ApolloProvider client={client}>
       <BrowserRouter>
-        <Routes>
-          <Route
-            path="/*"
-            element={
-              <div className="h-screen w-screen bg-gray-800 text-gray-100">
-                <HomeScreen />
-              </div>
-            }
-          />
-        </Routes>
+        <div className="h-full">
+          <Navbar />
+          <Routes>
+            <Route
+              path="/*"
+              element={
+                <div className="h-screen w-screen bg-gray-800 text-gray-100">
+                  <HomeScreen />
+                </div>
+              }
+            />
+          </Routes>
+        </div>
       </BrowserRouter>
-    </FetchContext.Provider>
+    </ApolloProvider>
   );
 };
 

@@ -5,14 +5,13 @@ import Button from "../../components/input/Button";
 const DashboardCreateScreen = () => {
   const [name, setName] = React.useState("");
 
-  const createDashboard = useCreateDashboard();
+  const [createDashboard, { data, loading }] = useCreateDashboard();
 
-  const onSubmit = () => {
-    createDashboard({ name: name })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => console.log(err));
+  const onSubmit = async () => {
+    console.log("hej");
+    const res = await createDashboard({ name: name });
+
+    console.log(res, data);
   };
 
   return (
@@ -24,7 +23,9 @@ const DashboardCreateScreen = () => {
           placeholder="Name"
           onChange={(e) => setName(e.target.value)}
         />
-        <Button onClick={onSubmit}>Create</Button>
+        <Button loading={loading} onClick={onSubmit}>
+          Create
+        </Button>
       </div>
     </div>
   );
