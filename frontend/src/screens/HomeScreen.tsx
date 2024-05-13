@@ -8,6 +8,7 @@ import {
   GET_DASHBOARDS,
   GetDashboardsResult,
 } from "../hooks/useDashboardQuery";
+import TileCreateScreen from "./tile/TileCreateScreen";
 
 export const HomeScreen = () => {
   const { data } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
@@ -18,13 +19,14 @@ export const HomeScreen = () => {
         className="h-full w-36 overflow-hidden shrink-0"
         dashboards={data?.dashboards}
       />
-      <div className="grow">
+      <div className="grow h-full">
         <Routes>
           <Route
             path={paths.dashboard.create}
             element={<DashboardCreateScreen />}
           />
           <Route path={paths.dashboard.id} element={<DashboardScreen />} />
+          <Route path={paths.tile.create} element={<TileCreateScreen />} />
           <Route path={"*"} element={<DashboardScreen />} />
         </Routes>
       </div>

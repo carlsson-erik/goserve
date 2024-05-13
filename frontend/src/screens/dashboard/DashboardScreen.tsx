@@ -8,13 +8,19 @@ import {
 } from "../../hooks/useDashboardQuery";
 import useDeleteDashboard from "../../hooks/useDeleteDashboard";
 import React from "react";
+import Tile from "../../components/Tile";
+import { IconEdit, IconEditOff } from "@tabler/icons-react";
 
 const DashboardScreen = () => {
+  const [editing, setEditing] = React.useState(false);
+
   const { dashboardId } = useParams();
 
   const { data } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
 
   const [deleteDashboard] = useDeleteDashboard();
+
+  const onTileEditClick = React.useCallback((id: string) => {}, []);
 
   const onDeleteDashboard = React.useCallback(
     (id: number) => {
@@ -45,18 +51,29 @@ const DashboardScreen = () => {
     <div className="h-full flex flex-col">
       <div className="p-2 flex justify-between">
         <span>{dashboard.name}</span>
-        <Button
-          className="text-red-400"
-          onClick={() => onDeleteDashboard(dashboard.id)}
-        >
-          Delete
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={() => setEditing(!editing)}>
+            {editing ? <IconEditOff /> : <IconEdit />}
+          </Button>
+          <Button
+            className="text-red-400"
+            onClick={() => onDeleteDashboard(dashboard.id)}
+          >
+            Delete
+          </Button>
+        </div>
       </div>
       <div
         className={`w-full h-full bg-gray-600 grid grid-cols-8 justify-stretch`}
       >
         {tiles.map((t, index) => {
-          return <div className="border">{index} </div>;
+          return (
+            <Tile
+              className="border"
+              editing={editing}
+              onEditClick={onTileEditClick}
+            />
+          );
         })}
       </div>
     </div>

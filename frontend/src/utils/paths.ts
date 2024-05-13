@@ -6,6 +6,10 @@ const paths = {
     create: "/dashboard/create",
     about: "/dashboard/about",
   },
+  tile: {
+    root: "/tile",
+    create: "/tile/create",
+  },
 };
 
 export default paths;

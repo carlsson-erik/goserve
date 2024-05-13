@@ -1,4 +1,4 @@
-import { FetchResult, MutationResult, gql, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import React from "react";
 import {
   Dashboard,
@@ -10,10 +10,7 @@ export interface DeleteDashboardResult {
   deleteDashboard: Dashboard;
 }
 
-const useDeleteDashboard = (): [
-  (id: number) => Promise<FetchResult<DeleteDashboardResult>>,
-  MutationResult<DeleteDashboardResult>
-] => {
+const useDeleteDashboard = () => {
   const [deleteDashboardGQL, other] = useMutation<DeleteDashboardResult>(gql`
     mutation DeleteDashboard($id: Int!) {
       deleteDashboard(id: $id) {
@@ -25,7 +22,7 @@ const useDeleteDashboard = (): [
   const deleteDashboard = React.useCallback(
     (id: number) => {
       return deleteDashboardGQL({
-        variables: { id: id },
+        variables: { id },
         update: (cache, { data: addDashboard }) => {
           const data: GetDashboardsResult | null = cache.readQuery({
             query: GET_DASHBOARDS,
@@ -45,7 +42,7 @@ const useDeleteDashboard = (): [
     [deleteDashboardGQL]
   );
 
-  return [deleteDashboard, other];
+  return [deleteDashboard, other] as const;
 };
 
 export default useDeleteDashboard;

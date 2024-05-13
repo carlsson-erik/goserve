@@ -7,6 +7,11 @@ import Navbar from "./components/Navbar";
 const client = new ApolloClient({
   uri: "http://localhost:8081/query",
   cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: "cache-and-network",
+    },
+  },
 });
 
 export const FetchContext = React.createContext(client);
