@@ -22,14 +22,14 @@ const Tile: React.FC<TileProps> = ({
   return (
     <div className={className}>
       {editing ? (
-        <div
-          className="w-full h-full flex justify-center items-center hover:bg-gray-500 hover:cursor-pointer"
-          onClick={() => onEditClick}
-        >
-          <Link to={paths.tile.create}>
+        <Link to={paths.tile.create}>
+          <div
+            className="w-full h-full flex justify-center items-center hover:bg-gray-500 hover:cursor-pointer"
+            onClick={() => onEditClick}
+          >
             <IconPlus />
-          </Link>
-        </div>
+          </div>
+        </Link>
       ) : (
         <div>
           Tile
