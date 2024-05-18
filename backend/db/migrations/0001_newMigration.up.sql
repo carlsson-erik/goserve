@@ -1,15 +1,15 @@
 CREATE TABLE public.dashboard (
 	id serial primary key,
-	"name" varchar NOT NULL UNIQUE,
+	"name" varchar NOT NULL UNIQUE CHECK (name <> ''),
 	"description" varchar NULL,
 	"rows" int NOT NULL,
-	cols int NOT NULL
+	"cols" int NOT NULL
 );
 
 
 CREATE TABLE public.tile (
 	id serial primary key,
-	"name" varchar NOT NULL UNIQUE,
+	"name" varchar NOT NULL UNIQUE CHECK (name <> ''),
 	"description" varchar NULL,
 	"row" int NOT NULL,
 	col int NOT NULL,

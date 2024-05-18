@@ -35,6 +35,12 @@ const useCreateDashboard = (): [
       return createDashboardGQL({
         variables: { name: createData.name },
         update: (cache, { data: addDashboard }) => {
+
+          console.log(addDashboard)
+          if (!addDashboard) return
+
+          console.log(addDashboard)
+
           const data: GetDashboardsResult | null = cache.readQuery({
             query: GET_DASHBOARDS,
           });

@@ -1,9 +1,9 @@
-import React from 'react'
+import React from "react";
 
 export interface DashboardViewportProps {}
 
 const DashboardViewport: React.FC = () => {
-  return <div>hej</div>
-}
+  return <div>hej</div>;
+};
 
-export default DashboardViewport
+export default DashboardViewport;
