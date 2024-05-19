@@ -13,6 +13,7 @@ type Tile struct {
 	Description *string
 	Row         int32
 	Col         int32
+	Data        string
 	Width       int32
 	Height      int32
 	DashboardID int32

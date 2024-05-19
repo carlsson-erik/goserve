@@ -6,6 +6,9 @@ export interface Tile {
   id: string;
   name: string;
   description: string;
+  data: string;
+  row: number;
+  col: number;
   width: number;
   height: number;
 }
@@ -15,8 +18,10 @@ export const GET_TILES = gql`
     tiles {
       id
       name
-      x
-      y
+      row
+      col
+      width
+      height
       data
     }
   }

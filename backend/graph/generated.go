@@ -73,6 +73,7 @@ type ComplexityRoot struct {
 	Tile struct {
 		Col         func(childComplexity int) int
 		Dashboard   func(childComplexity int) int
+		Data        func(childComplexity int) int
 		Description func(childComplexity int) int
 		Height      func(childComplexity int) int
 		ID          func(childComplexity int) int
@@ -263,6 +264,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tile.Dashboard(childComplexity), true
+
+	case "Tile.data":
+		if e.complexity.Tile.Data == nil {
+			break
+		}
+
+		return e.complexity.Tile.Data(childComplexity), true
 
 	case "Tile.description":
 		if e.complexity.Tile.Description == nil {
@@ -874,6 +882,8 @@ func (ec *executionContext) fieldContext_Dashboard_tiles(ctx context.Context, fi
 				return ec.fieldContext_Tile_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Tile_description(ctx, field)
+			case "data":
+				return ec.fieldContext_Tile_data(ctx, field)
 			case "row":
 				return ec.fieldContext_Tile_row(ctx, field)
 			case "col":
@@ -1074,6 +1084,8 @@ func (ec *executionContext) fieldContext_Mutation_createTile(ctx context.Context
 				return ec.fieldContext_Tile_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Tile_description(ctx, field)
+			case "data":
+				return ec.fieldContext_Tile_data(ctx, field)
 			case "row":
 				return ec.fieldContext_Tile_row(ctx, field)
 			case "col":
@@ -1147,6 +1159,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteTile(ctx context.Context
 				return ec.fieldContext_Tile_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Tile_description(ctx, field)
+			case "data":
+				return ec.fieldContext_Tile_data(ctx, field)
 			case "row":
 				return ec.fieldContext_Tile_row(ctx, field)
 			case "col":
@@ -1344,6 +1358,8 @@ func (ec *executionContext) fieldContext_Query_tiles(ctx context.Context, field 
 				return ec.fieldContext_Tile_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Tile_description(ctx, field)
+			case "data":
+				return ec.fieldContext_Tile_data(ctx, field)
 			case "row":
 				return ec.fieldContext_Tile_row(ctx, field)
 			case "col":
@@ -1403,6 +1419,8 @@ func (ec *executionContext) fieldContext_Query_tile(ctx context.Context, field g
 				return ec.fieldContext_Tile_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Tile_description(ctx, field)
+			case "data":
+				return ec.fieldContext_Tile_data(ctx, field)
 			case "row":
 				return ec.fieldContext_Tile_row(ctx, field)
 			case "col":
@@ -1733,6 +1751,50 @@ func (ec *executionContext) _Tile_description(ctx context.Context, field graphql
 }
 
 func (ec *executionContext) fieldContext_Tile_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tile",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Tile_data(ctx context.Context, field graphql.CollectedField, obj *model.Tile) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tile_data(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tile_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Tile",
 		Field:      field,
@@ -3962,7 +4024,7 @@ func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "dashboard", "description", "row", "col"}
+	fieldsInOrder := [...]string{"name", "dashboard_id", "description", "data", "row", "col", "width", "height"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3976,13 +4038,13 @@ func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Name = data
-		case "dashboard":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dashboard"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+		case "dashboard_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dashboard_id"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Dashboard = data
+			it.DashboardID = data
 		case "description":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -3990,6 +4052,13 @@ func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Description = data
+		case "data":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Data = data
 		case "row":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("row"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
@@ -4004,6 +4073,20 @@ func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Col = data
+		case "width":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("width"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Width = data
+		case "height":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("height"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Height = data
 		}
 	}
 
@@ -4309,6 +4392,11 @@ func (ec *executionContext) _Tile(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "description":
 			out.Values[i] = ec._Tile_description(ctx, field, obj)
+		case "data":
+			out.Values[i] = ec._Tile_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "row":
 			out.Values[i] = ec._Tile_row(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

@@ -22,6 +22,7 @@ type tileTable struct {
 	Description postgres.ColumnString
 	Row         postgres.ColumnInteger
 	Col         postgres.ColumnInteger
+	Data        postgres.ColumnString
 	Width       postgres.ColumnInteger
 	Height      postgres.ColumnInteger
 	DashboardID postgres.ColumnInteger
@@ -70,11 +71,12 @@ func newTileTableImpl(schemaName, tableName, alias string) tileTable {
 		DescriptionColumn = postgres.StringColumn("description")
 		RowColumn         = postgres.IntegerColumn("row")
 		ColColumn         = postgres.IntegerColumn("col")
+		DataColumn        = postgres.StringColumn("data")
 		WidthColumn       = postgres.IntegerColumn("width")
 		HeightColumn      = postgres.IntegerColumn("height")
 		DashboardIDColumn = postgres.IntegerColumn("dashboard_id")
-		allColumns        = postgres.ColumnList{IDColumn, NameColumn, DescriptionColumn, RowColumn, ColColumn, WidthColumn, HeightColumn, DashboardIDColumn}
-		mutableColumns    = postgres.ColumnList{NameColumn, DescriptionColumn, RowColumn, ColColumn, WidthColumn, HeightColumn, DashboardIDColumn}
+		allColumns        = postgres.ColumnList{IDColumn, NameColumn, DescriptionColumn, RowColumn, ColColumn, DataColumn, WidthColumn, HeightColumn, DashboardIDColumn}
+		mutableColumns    = postgres.ColumnList{NameColumn, DescriptionColumn, RowColumn, ColColumn, DataColumn, WidthColumn, HeightColumn, DashboardIDColumn}
 	)
 
 	return tileTable{
@@ -86,6 +88,7 @@ func newTileTableImpl(schemaName, tableName, alias string) tileTable {
 		Description: DescriptionColumn,
 		Row:         RowColumn,
 		Col:         ColColumn,
+		Data:        DataColumn,
 		Width:       WidthColumn,
 		Height:      HeightColumn,
 		DashboardID: DashboardIDColumn,

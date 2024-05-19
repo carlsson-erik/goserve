@@ -8,15 +8,20 @@ import {
 } from "../../hooks/useDashboardQuery";
 import useDeleteDashboard from "../../hooks/useDeleteDashboard";
 import React from "react";
-import Tile from "../../components/Tile";
+import TileCard from "../../components/TileCard";
 import { IconEdit, IconEditOff } from "@tabler/icons-react";
+import { GET_TILES, GetTilesResult, Tile } from "../../hooks/useTileQuery";
 
 const DashboardScreen = () => {
-  const [editing, setEditing] = React.useState(false);
+  const [editing, setEditing] = React.useState(true);
 
   const { dashboardId } = useParams();
 
-  const { data } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
+  const { data: dashboardData } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
+
+  const { data: tileData } = useQuery<GetTilesResult>(GET_TILES);
+
+  console.log(tileData);
 
   const [deleteDashboard] = useDeleteDashboard();
 
@@ -29,13 +34,26 @@ const DashboardScreen = () => {
     [deleteDashboard]
   );
 
-  const dashboard = data?.dashboards.find((d) => d.id === Number(dashboardId));
+  const dashboard = dashboardData?.dashboards.find(
+    (d) => d.id === Number(dashboardId)
+  );
 
-  const tiles = React.useMemo(() => {
+  const tiles: (Tile | undefined)[] = React.useMemo(() => {
     const numberOfTiles = dashboard ? dashboard?.cols * dashboard?.rows : 0;
 
-    return new Array(numberOfTiles).fill(undefined);
-  }, [dashboard]);
+    const tmpTiles = Array(numberOfTiles).fill(undefined);
+
+    if (tileData && tileData.tiles.length > 0) {
+      setEditing(false);
+    }
+
+    tileData?.tiles.forEach((tile) => {
+      tmpTiles[tile.row * tile.col] = tile;
+    });
+
+    tmpTiles.map((t) => {});
+    return tmpTiles;
+  }, [dashboard, tileData]);
 
   if (!dashboard || !dashboardId) {
     return (
@@ -64,17 +82,60 @@ const DashboardScreen = () => {
         </div>
       </div>
       <div
-        className={`w-full h-full bg-gray-600 grid grid-cols-8 justify-stretch`}
+        className={`w-full h-full bg-gray-600 grid grid-rows-4 auto-rows-fr justify-stretch`}
       >
-        {tiles.map((t, index) => {
-          return (
-            <Tile
-              className="border"
-              editing={editing}
-              onEditClick={onTileEditClick}
-            />
-          );
-        })}
+        <div className="grid grid-cols-subgrid col-span-6">
+          {tiles.slice(0, 6).map((t, index) => {
+            return (
+              <TileCard
+                key={t ? t.id + index : index}
+                className="w-full h-full"
+                editing={editing}
+                tile={t}
+                onEditClick={onTileEditClick}
+              />
+            );
+          })}
+        </div>
+        <div className="grid grid-cols-subgrid col-span-6">
+          {tiles.slice(6, 12).map((t, index) => {
+            return (
+              <TileCard
+                key={t ? t.id + index : index}
+                className="w-full h-full"
+                editing={editing}
+                tile={t}
+                onEditClick={onTileEditClick}
+              />
+            );
+          })}
+        </div>
+        <div className="grid grid-cols-subgrid col-span-6">
+          {tiles.slice(12, 18).map((t, index) => {
+            return (
+              <TileCard
+                key={t ? t.id + index : index}
+                className="w-full h-full"
+                editing={editing}
+                tile={t}
+                onEditClick={onTileEditClick}
+              />
+            );
+          })}
+        </div>
+        <div className="grid grid-cols-subgrid col-span-6">
+          {tiles.slice(18, 24).map((t, index) => {
+            return (
+              <TileCard
+                key={t ? t.id + index : index}
+                className="w-full h-full"
+                editing={editing}
+                tile={t}
+                onEditClick={onTileEditClick}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );

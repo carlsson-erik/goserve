@@ -20,10 +20,13 @@ type NewDashboard struct {
 
 type NewTile struct {
 	Name        string  `json:"name"`
-	Dashboard   int     `json:"dashboard"`
+	DashboardID string  `json:"dashboard_id"`
 	Description *string `json:"description,omitempty"`
+	Data        string  `json:"data"`
 	Row         int     `json:"row"`
 	Col         int     `json:"col"`
+	Width       int     `json:"width"`
+	Height      int     `json:"height"`
 }
 
 type Query struct {
@@ -34,6 +37,7 @@ type Tile struct {
 	Dashboard   *Dashboard `json:"dashboard"`
 	Name        string     `json:"name"`
 	Description *string    `json:"description,omitempty"`
+	Data        string     `json:"data"`
 	Row         int        `json:"row"`
 	Col         int        `json:"col"`
 	Width       int        `json:"width"`

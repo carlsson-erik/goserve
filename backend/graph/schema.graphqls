@@ -29,6 +29,7 @@ type Tile {
   dashboard: Dashboard!
   name: String!
   description: String
+  data: String!
   row: Int!
   col: Int!
   width: Int!
@@ -37,10 +38,13 @@ type Tile {
 
 input NewTile {
   name: String!
-  dashboard: Int!
+  dashboard_id: Int!
   description: String
+  data: String!
   row: Int!
   col: Int!
+  width: Int!
+  height: Int!
 }
 
 

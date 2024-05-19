@@ -53,15 +53,17 @@ func (r *mutationResolver) DeleteDashboard(ctx context.Context, id int) (*model.
 
 // CreateTile is the resolver for the createTile field.
 func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) (*model.Tile, error) {
-	newTile := model.Tile{
+	newTile := model.NewTile{
 		Name:        input.Name,
 		Description: input.Description,
+		DashboardID: input.DashboardID,
 		Row:         input.Row,
 		Col:         input.Col,
+		Data:        input.Data,
 		Width:       1,
 		Height:      1,
 	}
-	insertQuery := Tile.INSERT(Tile.AllColumns).MODEL(newTile).RETURNING(Tile.AllColumns)
+	insertQuery := Tile.INSERT(Tile.Name, Tile.Description, Tile.DashboardID, Tile.Row, Tile.Col, Tile.Data, Tile.Width, Tile.Height).MODEL(newTile).RETURNING(Tile.AllColumns)
 
 	res := model.Tile{}
 

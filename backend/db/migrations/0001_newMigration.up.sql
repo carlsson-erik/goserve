@@ -12,9 +12,10 @@ CREATE TABLE public.tile (
 	"name" varchar NOT NULL UNIQUE CHECK (name <> ''),
 	"description" varchar NULL,
 	"row" int NOT NULL,
-	col int NOT NULL,
-	width int NOT NULL,
-	height int NOT NULL,
-	dashboard_id serial,
+	"col" int NOT NULL,
+	"data" varchar NOT NULL,
+	"width" int NOT NULL,
+	"height" int NOT NULL,
+	"dashboard_id" serial,
 	CONSTRAINT fk_tile_dashboard FOREIGN KEY(dashboard_id) REFERENCES dashboard(id)
 );

@@ -1,5 +1,5 @@
 import React, { HtmlHTMLAttributes } from "react";
-import { apply, tw } from "twind";
+import { tw } from "twind";
 
 const Card: React.FC<HtmlHTMLAttributes<HTMLDivElement>> = ({
   className,
