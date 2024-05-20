@@ -47,9 +47,11 @@ const DashboardScreen = () => {
       setEditing(false);
     }
 
-    tileData?.tiles.forEach((tile) => {
-      tmpTiles[tile.row * tile.col] = tile;
-    });
+    tileData?.tiles
+      .filter((t) => t.dashboard_id === dashboard?.id)
+      .forEach((tile) => {
+        tmpTiles[tile.row * tile.col] = tile;
+      });
 
     tmpTiles.map((t) => {});
     return tmpTiles;
