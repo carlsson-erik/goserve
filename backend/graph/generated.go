@@ -39,8 +39,10 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Dashboard() DashboardResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
+	Tile() TileResolver
 }
 
 type DirectiveRoot struct {
@@ -91,6 +93,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type DashboardResolver interface {
+	Tiles(ctx context.Context, obj *model.Dashboard) ([]*model.Tile, error)
+}
 type MutationResolver interface {
 	CreateDashboard(ctx context.Context, input model.NewDashboard) (*model.Dashboard, error)
 	DeleteDashboard(ctx context.Context, id int) (*model.Dashboard, error)
@@ -102,6 +107,9 @@ type QueryResolver interface {
 	Dashboard(ctx context.Context, id int) (*model.Dashboard, error)
 	Tiles(ctx context.Context) ([]*model.Tile, error)
 	Tile(ctx context.Context, id int) (*model.Tile, error)
+}
+type TileResolver interface {
+	Dashboard(ctx context.Context, obj *model.Tile) (*model.Dashboard, error)
 }
 
 type executableSchema struct {
@@ -849,7 +857,7 @@ func (ec *executionContext) _Dashboard_tiles(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Tiles, nil
+		return ec.resolvers.Dashboard().Tiles(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -870,8 +878,8 @@ func (ec *executionContext) fieldContext_Dashboard_tiles(ctx context.Context, fi
 	fc = &graphql.FieldContext{
 		Object:     "Dashboard",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -1634,7 +1642,7 @@ func (ec *executionContext) _Tile_dashboard(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Dashboard, nil
+		return ec.resolvers.Tile().Dashboard(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1655,8 +1663,8 @@ func (ec *executionContext) fieldContext_Tile_dashboard(ctx context.Context, fie
 	fc = &graphql.FieldContext{
 		Object:     "Tile",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -4040,7 +4048,7 @@ func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj inter
 			it.Name = data
 		case "dashboard_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dashboard_id"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4115,30 +4123,61 @@ func (ec *executionContext) _Dashboard(ctx context.Context, sel ast.SelectionSet
 		case "id":
 			out.Values[i] = ec._Dashboard_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Dashboard_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "description":
 			out.Values[i] = ec._Dashboard_description(ctx, field, obj)
 		case "rows":
 			out.Values[i] = ec._Dashboard_rows(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "cols":
 			out.Values[i] = ec._Dashboard_cols(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "tiles":
-			out.Values[i] = ec._Dashboard_tiles(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Dashboard_tiles(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4378,44 +4417,75 @@ func (ec *executionContext) _Tile(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._Tile_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "dashboard":
-			out.Values[i] = ec._Tile_dashboard(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Tile_dashboard(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "name":
 			out.Values[i] = ec._Tile_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "description":
 			out.Values[i] = ec._Tile_description(ctx, field, obj)
 		case "data":
 			out.Values[i] = ec._Tile_data(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "row":
 			out.Values[i] = ec._Tile_row(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "col":
 			out.Values[i] = ec._Tile_col(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "width":
 			out.Values[i] = ec._Tile_width(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "height":
 			out.Values[i] = ec._Tile_height(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

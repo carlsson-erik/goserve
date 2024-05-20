@@ -17,6 +17,16 @@ export const GET_DASHBOARDS = gql`
       name
       rows
       cols
+      tiles {
+        id
+        name
+        description
+        row
+        col
+        width
+        height
+        data
+      }
     }
   }
 `;

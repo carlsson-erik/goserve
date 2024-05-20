@@ -1,5 +1,6 @@
 import React from "react";
 import { LiveEditor, LiveError, LivePreview, LiveProvider } from "react-live";
+import { useParams } from "react-router-dom";
 import Button from "../../components/input/Button";
 import { tw } from "twind";
 import useCreateTile from "../../hooks/useCreateTile";
@@ -19,7 +20,7 @@ const TileCreateScreen: React.FC = () => {
 
   const [data, setData] = React.useState(DefaultCode);
 
-  const [dashboard, setDashboard] = React.useState(1);
+  const { dashboardId, col, row } = useParams();
 
   const [createTile] = useCreateTile();
 
@@ -27,13 +28,13 @@ const TileCreateScreen: React.FC = () => {
     createTile({
       name: name,
       data: data,
-      col: 1,
-      row: 1,
-      dashboard_id: dashboard,
+      col: col,
+      row: row,
+      dashboard_id: dashboardId,
       width: width,
       height: 1,
     });
-  }, [createTile, dashboard, data, name, width]);
+  }, [col, createTile, dashboardId, data, name, row, width]);
   return (
     <div className="p-2 h-full flex flex-col overflow-hidden">
       {/* <Editor /> */}
@@ -57,10 +58,6 @@ const TileCreateScreen: React.FC = () => {
               type="text"
               placeholder="Name..."
               onChange={(v) => setName(v.target.value)}
-            />
-            <input
-              type="number"
-              onChange={(v) => setDashboard(Number(v.target.value))}
             />
             <LiveEditor className="tile-editor h-full" />
           </div>

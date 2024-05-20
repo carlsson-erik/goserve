@@ -19,10 +19,6 @@ const DashboardScreen = () => {
 
   const { data: dashboardData } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
 
-  const { data: tileData } = useQuery<GetTilesResult>(GET_TILES);
-
-  console.log(tileData);
-
   const [deleteDashboard] = useDeleteDashboard();
 
   const onTileEditClick = React.useCallback((id: string) => {}, []);
@@ -39,23 +35,22 @@ const DashboardScreen = () => {
   );
 
   const tiles: (Tile | undefined)[] = React.useMemo(() => {
-    const numberOfTiles = dashboard ? dashboard?.cols * dashboard?.rows : 0;
+    if (!dashboard) return;
+    const numberOfTiles = dashboard.cols * dashboard.rows;
 
     const tmpTiles = Array(numberOfTiles).fill(undefined);
 
-    if (tileData && tileData.tiles.length > 0) {
+    if (dashboard.tiles.length > 0) {
       setEditing(false);
     }
 
-    tileData?.tiles
-      .filter((t) => t.dashboard_id === dashboard?.id)
-      .forEach((tile) => {
-        tmpTiles[tile.row * tile.col] = tile;
-      });
+    dashboard.tiles.forEach((tile) => {
+      tmpTiles[tile.row * tile.col] = tile;
+    });
 
     tmpTiles.map((t) => {});
     return tmpTiles;
-  }, [dashboard, tileData]);
+  }, [dashboard]);
 
   if (!dashboard || !dashboardId) {
     return (
@@ -90,8 +85,10 @@ const DashboardScreen = () => {
           {tiles.slice(0, 6).map((t, index) => {
             return (
               <TileCard
+                col={index}
+                row={1}
                 key={t ? t.id + index : index}
-                className="w-full h-full"
+                className="w-full h-full "
                 editing={editing}
                 tile={t}
                 onEditClick={onTileEditClick}
@@ -103,6 +100,8 @@ const DashboardScreen = () => {
           {tiles.slice(6, 12).map((t, index) => {
             return (
               <TileCard
+                col={index}
+                row={2}
                 key={t ? t.id + index : index}
                 className="w-full h-full"
                 editing={editing}
@@ -116,6 +115,8 @@ const DashboardScreen = () => {
           {tiles.slice(12, 18).map((t, index) => {
             return (
               <TileCard
+                col={index}
+                row={3}
                 key={t ? t.id + index : index}
                 className="w-full h-full"
                 editing={editing}
@@ -129,6 +130,8 @@ const DashboardScreen = () => {
           {tiles.slice(18, 24).map((t, index) => {
             return (
               <TileCard
+                col={index}
+                row={4}
                 key={t ? t.id + index : index}
                 className="w-full h-full"
                 editing={editing}

@@ -5,10 +5,10 @@ const paths = {
     id: "/dashboard/:dashboardId",
     create: "/dashboard/create",
     about: "/dashboard/about",
-  },
-  tile: {
-    root: "/tile",
-    create: "/tile/create",
+    tile: {
+      root: "/dashboard/tile",
+      create: "/dashboard/:dashboardId/tile/create/:col/:row",
+    },
   },
 };
 

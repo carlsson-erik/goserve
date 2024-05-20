@@ -20,7 +20,7 @@ type NewDashboard struct {
 
 type NewTile struct {
 	Name        string  `json:"name"`
-	DashboardID string  `json:"dashboard_id"`
+	DashboardID int     `json:"dashboard_id"`
 	Description *string `json:"description,omitempty"`
 	Data        string  `json:"data"`
 	Row         int     `json:"row"`

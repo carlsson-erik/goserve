@@ -85,3 +85,20 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  Dashboard:
+    fields:
+      tiles:
+        resolver: true
+  Dashboards:
+    fields:
+      tiles:
+        resolver: true
+  Tile:
+    fields:
+      dashboard:
+        resolver: true
+  Tiles:
+    fields:
+      dashboard:
+        resolver: true
+

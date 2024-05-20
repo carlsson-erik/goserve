@@ -14,6 +14,17 @@ import (
 	"github.com/go-jet/jet/v2/postgres"
 )
 
+// Tiles is the resolver for the tiles field.
+func (r *dashboardResolver) Tiles(ctx context.Context, obj *model.Dashboard) ([]*model.Tile, error) {
+	var res []*model.Tile
+
+	getQuery := postgres.SELECT(Tile.AllColumns).FROM(Tile).WHERE(Tile.DashboardID.EQ(postgres.Int64(int64(obj.ID))))
+
+	err := getQuery.Query(r.DB, &res)
+
+	return res, err
+}
+
 // CreateDashboard is the resolver for the createDashboard field.
 func (r *mutationResolver) CreateDashboard(ctx context.Context, input model.NewDashboard) (*model.Dashboard, error) {
 	newDashboard := model.Dashboard{
@@ -126,11 +137,30 @@ func (r *queryResolver) Tile(ctx context.Context, id int) (*model.Tile, error) {
 	return res, err
 }
 
+// Dashboard is the resolver for the dashboard field.
+func (r *tileResolver) Dashboard(ctx context.Context, obj *model.Tile) (*model.Dashboard, error) {
+	var res model.Dashboard
+
+	getQuery := postgres.SELECT(Dashboard.AllColumns).FROM(Dashboard).WHERE(Dashboard.ID.EQ(postgres.Int(int64(obj.ID))))
+
+	err := getQuery.Query(r.DB, &res)
+
+	return &res, err
+}
+
+// Dashboard returns DashboardResolver implementation.
+func (r *Resolver) Dashboard() DashboardResolver { return &dashboardResolver{r} }
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// Tile returns TileResolver implementation.
+func (r *Resolver) Tile() TileResolver { return &tileResolver{r} }
+
+type dashboardResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type tileResolver struct{ *Resolver }

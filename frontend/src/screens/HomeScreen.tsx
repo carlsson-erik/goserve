@@ -25,8 +25,12 @@ export const HomeScreen = () => {
             path={paths.dashboard.create}
             element={<DashboardCreateScreen />}
           />
+          <Route
+            path={paths.dashboard.tile.create}
+            element={<TileCreateScreen />}
+          />
           <Route path={paths.dashboard.id} element={<DashboardScreen />} />
-          <Route path={paths.tile.create} element={<TileCreateScreen />} />
+
           <Route path={"*"} element={<DashboardScreen />} />
         </Routes>
       </div>
