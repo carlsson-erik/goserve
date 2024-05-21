@@ -10,7 +10,8 @@ import useDeleteDashboard from "../../hooks/useDeleteDashboard";
 import React from "react";
 import TileCard from "../../components/TileCard";
 import { IconEdit, IconEditOff } from "@tabler/icons-react";
-import { GET_TILES, GetTilesResult, Tile } from "../../hooks/useTileQuery";
+import { Tile } from "../../hooks/useTileQuery";
+import useDeleteTile from "../../hooks/useDeleteTile";
 
 const DashboardScreen = () => {
   const [editing, setEditing] = React.useState(true);
@@ -21,13 +22,24 @@ const DashboardScreen = () => {
 
   const [deleteDashboard] = useDeleteDashboard();
 
-  const onTileEditClick = React.useCallback((id: string) => {}, []);
+  const [deleteTile] = useDeleteTile();
+
+  const onTileEditClick = React.useCallback((id: number) => {}, []);
 
   const onDeleteDashboard = React.useCallback(
     (id: number) => {
       deleteDashboard(id);
     },
     [deleteDashboard]
+  );
+
+  const onDeleteTile = React.useCallback(
+    (id?: number) => {
+      if (!id) return;
+
+      deleteTile(id);
+    },
+    [deleteTile]
   );
 
   const dashboard = dashboardData?.dashboards.find(
@@ -48,7 +60,6 @@ const DashboardScreen = () => {
       tmpTiles[tile.row * tile.col] = tile;
     });
 
-    tmpTiles.map((t) => {});
     return tmpTiles;
   }, [dashboard]);
 
@@ -65,7 +76,7 @@ const DashboardScreen = () => {
   return (
     <div className="h-full flex flex-col">
       <div className="p-2 flex justify-between">
-        <span>{dashboard.name}</span>
+        <span className="text-2xl">{dashboard.name}</span>
         <div className="flex items-center gap-2">
           <Button onClick={() => setEditing(!editing)}>
             {editing ? <IconEditOff /> : <IconEdit />}
@@ -79,19 +90,24 @@ const DashboardScreen = () => {
         </div>
       </div>
       <div
-        className={`w-full h-full bg-gray-600 grid grid-rows-4 auto-rows-fr justify-stretch`}
+        className={`w-full h-full bg-gray-600 grid grid-rows-4 justify-stretch`}
       >
-        <div className="grid grid-cols-subgrid col-span-6">
+        <div className="grid grid-cols-subgrid grid-flow-col col-span-6">
           {tiles.slice(0, 6).map((t, index) => {
             return (
               <TileCard
                 col={index}
                 row={1}
                 key={t ? t.id + index : index}
-                className="w-full h-full "
+                className={
+                  t && t.width > 1
+                    ? "w-full h-full col-span-2"
+                    : "w-full h-full"
+                }
                 editing={editing}
                 tile={t}
                 onEditClick={onTileEditClick}
+                onDelete={onDeleteTile}
               />
             );
           })}
@@ -107,6 +123,7 @@ const DashboardScreen = () => {
                 editing={editing}
                 tile={t}
                 onEditClick={onTileEditClick}
+                onDelete={onDeleteTile}
               />
             );
           })}
@@ -122,6 +139,7 @@ const DashboardScreen = () => {
                 editing={editing}
                 tile={t}
                 onEditClick={onTileEditClick}
+                onDelete={onDeleteTile}
               />
             );
           })}
@@ -137,6 +155,7 @@ const DashboardScreen = () => {
                 editing={editing}
                 tile={t}
                 onEditClick={onTileEditClick}
+                onDelete={onDeleteTile}
               />
             );
           })}

@@ -1,11 +1,10 @@
 import React from "react";
 import { LiveEditor, LiveError, LivePreview, LiveProvider } from "react-live";
-import { useParams } from "react-router-dom";
+import { generatePath, useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/input/Button";
 import { tw } from "twind";
 import useCreateTile from "../../hooks/useCreateTile";
-import { useQuery } from "@apollo/client";
-import { GET_DASHBOARDS } from "../../hooks/useDashboardQuery";
+import paths from "../../utils/paths";
 
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
@@ -20,21 +19,33 @@ const TileCreateScreen: React.FC = () => {
 
   const [data, setData] = React.useState(DefaultCode);
 
+  const [error, setError] = React.useState<string | undefined>();
+
   const { dashboardId, col, row } = useParams();
 
   const [createTile] = useCreateTile();
 
-  const onCreate = React.useCallback(() => {
-    createTile({
-      name: name,
-      data: data,
-      col: col,
-      row: row,
-      dashboard_id: dashboardId,
-      width: width,
-      height: 1,
-    });
-  }, [col, createTile, dashboardId, data, name, row, width]);
+  const navigate = useNavigate();
+
+  const onCreate = React.useCallback(async () => {
+    try {
+      const res = await createTile({
+        name: name,
+        data: data,
+        col: Number(col) ?? 1,
+        row: Number(row) ?? 1,
+        dashboard_id: Number(dashboardId) ?? 1,
+        width: width,
+        height: 1,
+      });
+      if (res.data) {
+        navigate(generatePath(paths.dashboard.id, { dashboardId }));
+      }
+    } catch (error) {
+      console.log(error);
+      setError(error.message);
+    }
+  }, [col, createTile, dashboardId, data, name, navigate, row, width]);
   return (
     <div className="p-2 h-full flex flex-col overflow-hidden">
       {/* <Editor /> */}
@@ -81,9 +92,10 @@ const TileCreateScreen: React.FC = () => {
                 Create
               </Button>
             </div>
+            <span>{error}</span>
             <div className="h-full flex justify-center items-center">
               <LivePreview
-                class="h-48 border rounded bg-gray-700"
+                className="h-48 border rounded bg-gray-700"
                 style={{ aspectRatio: width }}
               />
             </div>

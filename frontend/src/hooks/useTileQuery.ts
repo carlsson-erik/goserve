@@ -3,7 +3,7 @@ import React from "react";
 import { FetchContext } from "../App";
 
 export interface Tile {
-  id: string;
+  id: number;
   name: string;
   description: string;
   dashboard_id: number;
