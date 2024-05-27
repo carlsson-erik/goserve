@@ -24,6 +24,47 @@ func (r *dashboardResolver) Tiles(ctx context.Context, obj *model.Dashboard) ([]
 	return res, err
 }
 
+// CreateTemplate is the resolver for the createTemplate field.
+func (r *mutationResolver) CreateTemplate(ctx context.Context, input model.NewTemplate) (*model.Template, error) {
+	newTemplate := model.Template{
+		Name:   input.Name,
+		Width:  *input.Width,
+		Height: *input.Height,
+		Data:   input.Data,
+	}
+	insertQuery := Template.INSERT(Template.Name, Template.Width, Template.Height, Template.Data).MODEL(newTemplate).RETURNING(Template.AllColumns)
+
+	templateRes := model.Template{}
+
+	err := insertQuery.Query(r.DB, &templateRes)
+
+	if err != nil {
+		log.Printf("Insert error: %v", err)
+		return nil, err
+	}
+
+	var variablesRes []*model.Variable
+
+	newVariables := []*model.NewVariable{}
+
+	for _, variable := range input.Variables {
+		newVariables = append(newVariables, &model.NewVariable{Name: variable.Name, Default: variable.Default, Value: variable.Value, TemplateID: &templateRes.ID})
+	}
+
+	insertVariableQuery := Variable.INSERT(Variable.Name, Variable.Default, Variable.Value, Variable.TemplateID).MODELS(newVariables).RETURNING(Variable.AllColumns)
+
+	err = insertVariableQuery.Query(r.DB, &variablesRes)
+
+	if err != nil {
+		log.Printf("Insert error: %v", err)
+		return nil, err
+	}
+
+	templateRes.Variables = variablesRes
+
+	return &templateRes, err
+}
+
 // CreateDashboard is the resolver for the createDashboard field.
 func (r *mutationResolver) CreateDashboard(ctx context.Context, input model.NewDashboard) (*model.Dashboard, error) {
 	newDashboard := model.Dashboard{
@@ -65,26 +106,43 @@ func (r *mutationResolver) DeleteDashboard(ctx context.Context, id int) (*model.
 func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) (*model.Tile, error) {
 	newTile := model.NewTile{
 		Name:        input.Name,
-		Description: input.Description,
 		DashboardID: input.DashboardID,
 		Row:         input.Row,
 		Col:         input.Col,
-		Data:        input.Data,
 		Width:       input.Width,
 		Height:      input.Height,
 	}
-	insertQuery := Tile.INSERT(Tile.Name, Tile.Description, Tile.DashboardID, Tile.Row, Tile.Col, Tile.Data, Tile.Width, Tile.Height).MODEL(newTile).RETURNING(Tile.AllColumns)
+	insertQuery := Tile.INSERT(Tile.Name, Tile.DashboardID, Tile.Row, Tile.Col, Tile.Width, Tile.Height).MODEL(newTile).RETURNING(Tile.AllColumns)
 
-	res := model.Tile{}
+	tileRes := model.Tile{}
 
-	err := insertQuery.Query(r.DB, &res)
+	err := insertQuery.Query(r.DB, &tileRes)
 
 	if err != nil {
 		log.Printf("Insert failed: %v", err)
 		return nil, err
 	}
 
-	return &res, err
+	variablesRes := []*model.Variable{}
+
+	newVariables := []*model.NewVariable{}
+
+	for _, variable := range input.Variables {
+		newVariables = append(newVariables, &model.NewVariable{Name: variable.Name, Default: variable.Default, Value: variable.Value, TileID: &tileRes.ID})
+	}
+
+	insertVariableQuery := Variable.INSERT(Variable.Name, Variable.Default, Variable.Value).MODELS(newVariables).RETURNING(Variable.AllColumns)
+
+	err = insertVariableQuery.Query(r.DB, &variablesRes)
+
+	if err != nil {
+		log.Printf("Insert error: %v", err)
+		return nil, err
+	}
+
+	tileRes.Variables = variablesRes
+
+	return &tileRes, err
 }
 
 // DeleteTile is the resolver for the deleteTile field.

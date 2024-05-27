@@ -50,16 +50,16 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Dashboard struct {
-		Cols        func(childComplexity int) int
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Name        func(childComplexity int) int
-		Rows        func(childComplexity int) int
-		Tiles       func(childComplexity int) int
+		Cols  func(childComplexity int) int
+		ID    func(childComplexity int) int
+		Name  func(childComplexity int) int
+		Rows  func(childComplexity int) int
+		Tiles func(childComplexity int) int
 	}
 
 	Mutation struct {
 		CreateDashboard func(childComplexity int, input model.NewDashboard) int
+		CreateTemplate  func(childComplexity int, input model.NewTemplate) int
 		CreateTile      func(childComplexity int, input model.NewTile) int
 		DeleteDashboard func(childComplexity int, id int) int
 		DeleteTile      func(childComplexity int, id int) int
@@ -72,24 +72,34 @@ type ComplexityRoot struct {
 		Tiles      func(childComplexity int) int
 	}
 
-	Tile struct {
-		Col         func(childComplexity int) int
-		Dashboard   func(childComplexity int) int
-		Data        func(childComplexity int) int
-		Description func(childComplexity int) int
-		Height      func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Name        func(childComplexity int) int
-		Row         func(childComplexity int) int
-		Width       func(childComplexity int) int
+	Template struct {
+		Data      func(childComplexity int) int
+		Height    func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Variables func(childComplexity int) int
+		Width     func(childComplexity int) int
 	}
 
-	User struct {
-		Dashboards func(childComplexity int) int
-		Email      func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Name       func(childComplexity int) int
-		Password   func(childComplexity int) int
+	Tile struct {
+		Col       func(childComplexity int) int
+		Dashboard func(childComplexity int) int
+		Height    func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Row       func(childComplexity int) int
+		Template  func(childComplexity int) int
+		Variables func(childComplexity int) int
+		Width     func(childComplexity int) int
+	}
+
+	Variable struct {
+		Default  func(childComplexity int) int
+		ID       func(childComplexity int) int
+		Name     func(childComplexity int) int
+		Template func(childComplexity int) int
+		Tile     func(childComplexity int) int
+		Value    func(childComplexity int) int
 	}
 }
 
@@ -97,6 +107,7 @@ type DashboardResolver interface {
 	Tiles(ctx context.Context, obj *model.Dashboard) ([]*model.Tile, error)
 }
 type MutationResolver interface {
+	CreateTemplate(ctx context.Context, input model.NewTemplate) (*model.Template, error)
 	CreateDashboard(ctx context.Context, input model.NewDashboard) (*model.Dashboard, error)
 	DeleteDashboard(ctx context.Context, id int) (*model.Dashboard, error)
 	CreateTile(ctx context.Context, input model.NewTile) (*model.Tile, error)
@@ -138,13 +149,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Dashboard.Cols(childComplexity), true
 
-	case "Dashboard.description":
-		if e.complexity.Dashboard.Description == nil {
-			break
-		}
-
-		return e.complexity.Dashboard.Description(childComplexity), true
-
 	case "Dashboard.id":
 		if e.complexity.Dashboard.ID == nil {
 			break
@@ -184,6 +188,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateDashboard(childComplexity, args["input"].(model.NewDashboard)), true
+
+	case "Mutation.createTemplate":
+		if e.complexity.Mutation.CreateTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateTemplate(childComplexity, args["input"].(model.NewTemplate)), true
 
 	case "Mutation.createTile":
 		if e.complexity.Mutation.CreateTile == nil {
@@ -259,6 +275,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Tiles(childComplexity), true
 
+	case "Template.data":
+		if e.complexity.Template.Data == nil {
+			break
+		}
+
+		return e.complexity.Template.Data(childComplexity), true
+
+	case "Template.height":
+		if e.complexity.Template.Height == nil {
+			break
+		}
+
+		return e.complexity.Template.Height(childComplexity), true
+
+	case "Template.id":
+		if e.complexity.Template.ID == nil {
+			break
+		}
+
+		return e.complexity.Template.ID(childComplexity), true
+
+	case "Template.name":
+		if e.complexity.Template.Name == nil {
+			break
+		}
+
+		return e.complexity.Template.Name(childComplexity), true
+
+	case "Template.variables":
+		if e.complexity.Template.Variables == nil {
+			break
+		}
+
+		return e.complexity.Template.Variables(childComplexity), true
+
+	case "Template.width":
+		if e.complexity.Template.Width == nil {
+			break
+		}
+
+		return e.complexity.Template.Width(childComplexity), true
+
 	case "Tile.col":
 		if e.complexity.Tile.Col == nil {
 			break
@@ -272,20 +330,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tile.Dashboard(childComplexity), true
-
-	case "Tile.data":
-		if e.complexity.Tile.Data == nil {
-			break
-		}
-
-		return e.complexity.Tile.Data(childComplexity), true
-
-	case "Tile.description":
-		if e.complexity.Tile.Description == nil {
-			break
-		}
-
-		return e.complexity.Tile.Description(childComplexity), true
 
 	case "Tile.height":
 		if e.complexity.Tile.Height == nil {
@@ -315,6 +359,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tile.Row(childComplexity), true
 
+	case "Tile.template":
+		if e.complexity.Tile.Template == nil {
+			break
+		}
+
+		return e.complexity.Tile.Template(childComplexity), true
+
+	case "Tile.variables":
+		if e.complexity.Tile.Variables == nil {
+			break
+		}
+
+		return e.complexity.Tile.Variables(childComplexity), true
+
 	case "Tile.width":
 		if e.complexity.Tile.Width == nil {
 			break
@@ -322,40 +380,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tile.Width(childComplexity), true
 
-	case "User.dashboards":
-		if e.complexity.User.Dashboards == nil {
+	case "Variable.default":
+		if e.complexity.Variable.Default == nil {
 			break
 		}
 
-		return e.complexity.User.Dashboards(childComplexity), true
+		return e.complexity.Variable.Default(childComplexity), true
 
-	case "User.email":
-		if e.complexity.User.Email == nil {
+	case "Variable.id":
+		if e.complexity.Variable.ID == nil {
 			break
 		}
 
-		return e.complexity.User.Email(childComplexity), true
+		return e.complexity.Variable.ID(childComplexity), true
 
-	case "User.id":
-		if e.complexity.User.ID == nil {
+	case "Variable.name":
+		if e.complexity.Variable.Name == nil {
 			break
 		}
 
-		return e.complexity.User.ID(childComplexity), true
+		return e.complexity.Variable.Name(childComplexity), true
 
-	case "User.name":
-		if e.complexity.User.Name == nil {
+	case "Variable.template":
+		if e.complexity.Variable.Template == nil {
 			break
 		}
 
-		return e.complexity.User.Name(childComplexity), true
+		return e.complexity.Variable.Template(childComplexity), true
 
-	case "User.password":
-		if e.complexity.User.Password == nil {
+	case "Variable.tile":
+		if e.complexity.Variable.Tile == nil {
 			break
 		}
 
-		return e.complexity.User.Password(childComplexity), true
+		return e.complexity.Variable.Tile(childComplexity), true
+
+	case "Variable.value":
+		if e.complexity.Variable.Value == nil {
+			break
+		}
+
+		return e.complexity.Variable.Value(childComplexity), true
 
 	}
 	return 0, false
@@ -366,7 +431,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputNewDashboard,
+		ec.unmarshalInputNewTemplate,
 		ec.unmarshalInputNewTile,
+		ec.unmarshalInputNewVariable,
 	)
 	first := true
 
@@ -490,6 +557,21 @@ func (ec *executionContext) field_Mutation_createDashboard_args(ctx context.Cont
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNNewDashboard2goserveᚋgraphᚋmodelᚐNewDashboard(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewTemplate
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewTemplate2goserveᚋgraphᚋmodelᚐNewTemplate(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -714,47 +796,6 @@ func (ec *executionContext) fieldContext_Dashboard_name(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Dashboard_description(ctx context.Context, field graphql.CollectedField, obj *model.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Dashboard_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Dashboard",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Dashboard_rows(ctx context.Context, field graphql.CollectedField, obj *model.Dashboard) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Dashboard_rows(ctx, field)
 	if err != nil {
@@ -884,14 +925,8 @@ func (ec *executionContext) fieldContext_Dashboard_tiles(ctx context.Context, fi
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Tile_id(ctx, field)
-			case "dashboard":
-				return ec.fieldContext_Tile_dashboard(ctx, field)
 			case "name":
 				return ec.fieldContext_Tile_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Tile_description(ctx, field)
-			case "data":
-				return ec.fieldContext_Tile_data(ctx, field)
 			case "row":
 				return ec.fieldContext_Tile_row(ctx, field)
 			case "col":
@@ -900,9 +935,84 @@ func (ec *executionContext) fieldContext_Dashboard_tiles(ctx context.Context, fi
 				return ec.fieldContext_Tile_width(ctx, field)
 			case "height":
 				return ec.fieldContext_Tile_height(ctx, field)
+			case "dashboard":
+				return ec.fieldContext_Tile_dashboard(ctx, field)
+			case "template":
+				return ec.fieldContext_Tile_template(ctx, field)
+			case "variables":
+				return ec.fieldContext_Tile_variables(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tile", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateTemplate(rctx, fc.Args["input"].(model.NewTemplate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Template)
+	fc.Result = res
+	return ec.marshalNTemplate2ᚖgoserveᚋgraphᚋmodelᚐTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Template_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Template_name(ctx, field)
+			case "data":
+				return ec.fieldContext_Template_data(ctx, field)
+			case "width":
+				return ec.fieldContext_Template_width(ctx, field)
+			case "height":
+				return ec.fieldContext_Template_height(ctx, field)
+			case "variables":
+				return ec.fieldContext_Template_variables(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Template", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -950,8 +1060,6 @@ func (ec *executionContext) fieldContext_Mutation_createDashboard(ctx context.Co
 				return ec.fieldContext_Dashboard_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Dashboard_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Dashboard_description(ctx, field)
 			case "rows":
 				return ec.fieldContext_Dashboard_rows(ctx, field)
 			case "cols":
@@ -1019,8 +1127,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteDashboard(ctx context.Co
 				return ec.fieldContext_Dashboard_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Dashboard_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Dashboard_description(ctx, field)
 			case "rows":
 				return ec.fieldContext_Dashboard_rows(ctx, field)
 			case "cols":
@@ -1086,14 +1192,8 @@ func (ec *executionContext) fieldContext_Mutation_createTile(ctx context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Tile_id(ctx, field)
-			case "dashboard":
-				return ec.fieldContext_Tile_dashboard(ctx, field)
 			case "name":
 				return ec.fieldContext_Tile_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Tile_description(ctx, field)
-			case "data":
-				return ec.fieldContext_Tile_data(ctx, field)
 			case "row":
 				return ec.fieldContext_Tile_row(ctx, field)
 			case "col":
@@ -1102,6 +1202,12 @@ func (ec *executionContext) fieldContext_Mutation_createTile(ctx context.Context
 				return ec.fieldContext_Tile_width(ctx, field)
 			case "height":
 				return ec.fieldContext_Tile_height(ctx, field)
+			case "dashboard":
+				return ec.fieldContext_Tile_dashboard(ctx, field)
+			case "template":
+				return ec.fieldContext_Tile_template(ctx, field)
+			case "variables":
+				return ec.fieldContext_Tile_variables(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tile", field.Name)
 		},
@@ -1161,14 +1267,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteTile(ctx context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Tile_id(ctx, field)
-			case "dashboard":
-				return ec.fieldContext_Tile_dashboard(ctx, field)
 			case "name":
 				return ec.fieldContext_Tile_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Tile_description(ctx, field)
-			case "data":
-				return ec.fieldContext_Tile_data(ctx, field)
 			case "row":
 				return ec.fieldContext_Tile_row(ctx, field)
 			case "col":
@@ -1177,6 +1277,12 @@ func (ec *executionContext) fieldContext_Mutation_deleteTile(ctx context.Context
 				return ec.fieldContext_Tile_width(ctx, field)
 			case "height":
 				return ec.fieldContext_Tile_height(ctx, field)
+			case "dashboard":
+				return ec.fieldContext_Tile_dashboard(ctx, field)
+			case "template":
+				return ec.fieldContext_Tile_template(ctx, field)
+			case "variables":
+				return ec.fieldContext_Tile_variables(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tile", field.Name)
 		},
@@ -1238,8 +1344,6 @@ func (ec *executionContext) fieldContext_Query_dashboards(ctx context.Context, f
 				return ec.fieldContext_Dashboard_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Dashboard_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Dashboard_description(ctx, field)
 			case "rows":
 				return ec.fieldContext_Dashboard_rows(ctx, field)
 			case "cols":
@@ -1293,8 +1397,6 @@ func (ec *executionContext) fieldContext_Query_dashboard(ctx context.Context, fi
 				return ec.fieldContext_Dashboard_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Dashboard_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Dashboard_description(ctx, field)
 			case "rows":
 				return ec.fieldContext_Dashboard_rows(ctx, field)
 			case "cols":
@@ -1360,14 +1462,8 @@ func (ec *executionContext) fieldContext_Query_tiles(ctx context.Context, field 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Tile_id(ctx, field)
-			case "dashboard":
-				return ec.fieldContext_Tile_dashboard(ctx, field)
 			case "name":
 				return ec.fieldContext_Tile_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Tile_description(ctx, field)
-			case "data":
-				return ec.fieldContext_Tile_data(ctx, field)
 			case "row":
 				return ec.fieldContext_Tile_row(ctx, field)
 			case "col":
@@ -1376,6 +1472,12 @@ func (ec *executionContext) fieldContext_Query_tiles(ctx context.Context, field 
 				return ec.fieldContext_Tile_width(ctx, field)
 			case "height":
 				return ec.fieldContext_Tile_height(ctx, field)
+			case "dashboard":
+				return ec.fieldContext_Tile_dashboard(ctx, field)
+			case "template":
+				return ec.fieldContext_Tile_template(ctx, field)
+			case "variables":
+				return ec.fieldContext_Tile_variables(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tile", field.Name)
 		},
@@ -1421,14 +1523,8 @@ func (ec *executionContext) fieldContext_Query_tile(ctx context.Context, field g
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Tile_id(ctx, field)
-			case "dashboard":
-				return ec.fieldContext_Tile_dashboard(ctx, field)
 			case "name":
 				return ec.fieldContext_Tile_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Tile_description(ctx, field)
-			case "data":
-				return ec.fieldContext_Tile_data(ctx, field)
 			case "row":
 				return ec.fieldContext_Tile_row(ctx, field)
 			case "col":
@@ -1437,6 +1533,12 @@ func (ec *executionContext) fieldContext_Query_tile(ctx context.Context, field g
 				return ec.fieldContext_Tile_width(ctx, field)
 			case "height":
 				return ec.fieldContext_Tile_height(ctx, field)
+			case "dashboard":
+				return ec.fieldContext_Tile_dashboard(ctx, field)
+			case "template":
+				return ec.fieldContext_Tile_template(ctx, field)
+			case "variables":
+				return ec.fieldContext_Tile_variables(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tile", field.Name)
 		},
@@ -1584,6 +1686,284 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Template_id(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Template_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Template",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Template_name(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Template_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Template",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Template_data(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_data(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Template_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Template",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Template_width(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_width(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Width, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Template_width(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Template",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Template_height(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_height(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Height, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Template_height(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Template",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Template_variables(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_variables(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Variables, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Variable)
+	fc.Result = res
+	return ec.marshalNVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐVariableᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Template_variables(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Template",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Variable_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Variable_name(ctx, field)
+			case "value":
+				return ec.fieldContext_Variable_value(ctx, field)
+			case "default":
+				return ec.fieldContext_Variable_default(ctx, field)
+			case "template":
+				return ec.fieldContext_Variable_template(ctx, field)
+			case "tile":
+				return ec.fieldContext_Variable_tile(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Variable", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Tile_id(ctx context.Context, field graphql.CollectedField, obj *model.Tile) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Tile_id(ctx, field)
 	if err != nil {
@@ -1628,64 +2008,6 @@ func (ec *executionContext) fieldContext_Tile_id(ctx context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _Tile_dashboard(ctx context.Context, field graphql.CollectedField, obj *model.Tile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Tile_dashboard(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Tile().Dashboard(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Dashboard)
-	fc.Result = res
-	return ec.marshalNDashboard2ᚖgoserveᚋgraphᚋmodelᚐDashboard(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Tile_dashboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Tile",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Dashboard_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Dashboard_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Dashboard_description(ctx, field)
-			case "rows":
-				return ec.fieldContext_Dashboard_rows(ctx, field)
-			case "cols":
-				return ec.fieldContext_Dashboard_cols(ctx, field)
-			case "tiles":
-				return ec.fieldContext_Dashboard_tiles(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Dashboard", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Tile_name(ctx context.Context, field graphql.CollectedField, obj *model.Tile) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Tile_name(ctx, field)
 	if err != nil {
@@ -1718,91 +2040,6 @@ func (ec *executionContext) _Tile_name(ctx context.Context, field graphql.Collec
 }
 
 func (ec *executionContext) fieldContext_Tile_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Tile",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Tile_description(ctx context.Context, field graphql.CollectedField, obj *model.Tile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Tile_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Tile_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Tile",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Tile_data(ctx context.Context, field graphql.CollectedField, obj *model.Tile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Tile_data(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Data, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Tile_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Tile",
 		Field:      field,
@@ -1991,8 +2228,177 @@ func (ec *executionContext) fieldContext_Tile_height(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_id(ctx, field)
+func (ec *executionContext) _Tile_dashboard(ctx context.Context, field graphql.CollectedField, obj *model.Tile) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tile_dashboard(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Tile().Dashboard(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Dashboard)
+	fc.Result = res
+	return ec.marshalNDashboard2ᚖgoserveᚋgraphᚋmodelᚐDashboard(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tile_dashboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tile",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Dashboard_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Dashboard_name(ctx, field)
+			case "rows":
+				return ec.fieldContext_Dashboard_rows(ctx, field)
+			case "cols":
+				return ec.fieldContext_Dashboard_cols(ctx, field)
+			case "tiles":
+				return ec.fieldContext_Dashboard_tiles(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Dashboard", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Tile_template(ctx context.Context, field graphql.CollectedField, obj *model.Tile) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tile_template(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Template, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Template)
+	fc.Result = res
+	return ec.marshalNTemplate2ᚖgoserveᚋgraphᚋmodelᚐTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tile_template(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tile",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Template_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Template_name(ctx, field)
+			case "data":
+				return ec.fieldContext_Template_data(ctx, field)
+			case "width":
+				return ec.fieldContext_Template_width(ctx, field)
+			case "height":
+				return ec.fieldContext_Template_height(ctx, field)
+			case "variables":
+				return ec.fieldContext_Template_variables(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Template", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Tile_variables(ctx context.Context, field graphql.CollectedField, obj *model.Tile) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tile_variables(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Variables, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Variable)
+	fc.Result = res
+	return ec.marshalOVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐVariableᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tile_variables(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tile",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Variable_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Variable_name(ctx, field)
+			case "value":
+				return ec.fieldContext_Variable_value(ctx, field)
+			case "default":
+				return ec.fieldContext_Variable_default(ctx, field)
+			case "template":
+				return ec.fieldContext_Variable_template(ctx, field)
+			case "tile":
+				return ec.fieldContext_Variable_tile(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Variable", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Variable_id(ctx context.Context, field graphql.CollectedField, obj *model.Variable) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Variable_id(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2017,26 +2423,26 @@ func (ec *executionContext) _User_id(ctx context.Context, field graphql.Collecte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Variable_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "User",
+		Object:     "Variable",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_name(ctx, field)
+func (ec *executionContext) _Variable_name(ctx context.Context, field graphql.CollectedField, obj *model.Variable) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Variable_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2066,9 +2472,9 @@ func (ec *executionContext) _User_name(ctx context.Context, field graphql.Collec
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Variable_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "User",
+		Object:     "Variable",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2079,8 +2485,8 @@ func (ec *executionContext) fieldContext_User_name(ctx context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_email(ctx, field)
+func (ec *executionContext) _Variable_value(ctx context.Context, field graphql.CollectedField, obj *model.Variable) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Variable_value(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2093,26 +2499,23 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Email, nil
+		return obj.Value, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Variable_value(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "User",
+		Object:     "Variable",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2123,8 +2526,8 @@ func (ec *executionContext) fieldContext_User_email(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _User_password(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_password(ctx, field)
+func (ec *executionContext) _Variable_default(ctx context.Context, field graphql.CollectedField, obj *model.Variable) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Variable_default(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2137,26 +2540,23 @@ func (ec *executionContext) _User_password(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Password, nil
+		return obj.Default, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_password(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Variable_default(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "User",
+		Object:     "Variable",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2167,8 +2567,8 @@ func (ec *executionContext) fieldContext_User_password(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _User_dashboards(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_dashboards(ctx, field)
+func (ec *executionContext) _Variable_template(ctx context.Context, field graphql.CollectedField, obj *model.Variable) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Variable_template(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2181,45 +2581,103 @@ func (ec *executionContext) _User_dashboards(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Dashboards, nil
+		return obj.Template, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Dashboard)
+	res := resTmp.(*model.Template)
 	fc.Result = res
-	return ec.marshalNDashboard2ᚕᚖgoserveᚋgraphᚋmodelᚐDashboardᚄ(ctx, field.Selections, res)
+	return ec.marshalOTemplate2ᚖgoserveᚋgraphᚋmodelᚐTemplate(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_dashboards(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Variable_template(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "User",
+		Object:     "Variable",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Dashboard_id(ctx, field)
+				return ec.fieldContext_Template_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Dashboard_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Dashboard_description(ctx, field)
-			case "rows":
-				return ec.fieldContext_Dashboard_rows(ctx, field)
-			case "cols":
-				return ec.fieldContext_Dashboard_cols(ctx, field)
-			case "tiles":
-				return ec.fieldContext_Dashboard_tiles(ctx, field)
+				return ec.fieldContext_Template_name(ctx, field)
+			case "data":
+				return ec.fieldContext_Template_data(ctx, field)
+			case "width":
+				return ec.fieldContext_Template_width(ctx, field)
+			case "height":
+				return ec.fieldContext_Template_height(ctx, field)
+			case "variables":
+				return ec.fieldContext_Template_variables(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Dashboard", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Template", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Variable_tile(ctx context.Context, field graphql.CollectedField, obj *model.Variable) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Variable_tile(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tile, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Tile)
+	fc.Result = res
+	return ec.marshalOTile2ᚖgoserveᚋgraphᚋmodelᚐTile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Variable_tile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Variable",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Tile_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Tile_name(ctx, field)
+			case "row":
+				return ec.fieldContext_Tile_row(ctx, field)
+			case "col":
+				return ec.fieldContext_Tile_col(ctx, field)
+			case "width":
+				return ec.fieldContext_Tile_width(ctx, field)
+			case "height":
+				return ec.fieldContext_Tile_height(ctx, field)
+			case "dashboard":
+				return ec.fieldContext_Tile_dashboard(ctx, field)
+			case "template":
+				return ec.fieldContext_Tile_template(ctx, field)
+			case "variables":
+				return ec.fieldContext_Tile_variables(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Tile", field.Name)
 		},
 	}
 	return fc, nil
@@ -4025,14 +4483,14 @@ func (ec *executionContext) unmarshalInputNewDashboard(ctx context.Context, obj 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj interface{}) (model.NewTile, error) {
-	var it model.NewTile
+func (ec *executionContext) unmarshalInputNewTemplate(ctx context.Context, obj interface{}) (model.NewTemplate, error) {
+	var it model.NewTemplate
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "dashboard_id", "description", "data", "row", "col", "width", "height"}
+	fieldsInOrder := [...]string{"name", "data", "width", "height", "variables"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4046,20 +4504,6 @@ func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Name = data
-		case "dashboard_id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dashboard_id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.DashboardID = data
-		case "description":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Description = data
 		case "data":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -4067,6 +4511,54 @@ func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Data = data
+		case "width":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("width"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Width = data
+		case "height":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("height"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Height = data
+		case "variables":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("variables"))
+			data, err := ec.unmarshalONewVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐNewVariableᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Variables = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj interface{}) (model.NewTile, error) {
+	var it model.NewTile
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "row", "col", "width", "height", "dashboard_id", "tile_id", "variables"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
 		case "row":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("row"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
@@ -4095,6 +4587,82 @@ func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Height = data
+		case "dashboard_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dashboard_id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DashboardID = data
+		case "tile_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tile_id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TileID = data
+		case "variables":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("variables"))
+			data, err := ec.unmarshalONewVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐNewVariableᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Variables = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewVariable(ctx context.Context, obj interface{}) (model.NewVariable, error) {
+	var it model.NewVariable
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "value", "default", "template_id", "tile_id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "value":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Value = data
+		case "default":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("default"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Default = data
+		case "template_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("template_id"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TemplateID = data
+		case "tile_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tile_id"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TileID = data
 		}
 	}
 
@@ -4130,8 +4698,6 @@ func (ec *executionContext) _Dashboard(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "description":
-			out.Values[i] = ec._Dashboard_description(ctx, field, obj)
 		case "rows":
 			out.Values[i] = ec._Dashboard_rows(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -4220,6 +4786,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "createTemplate":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createTemplate(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createDashboard":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createDashboard(ctx, field)
@@ -4403,6 +4976,70 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
+var templateImplementors = []string{"Template"}
+
+func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet, obj *model.Template) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, templateImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Template")
+		case "id":
+			out.Values[i] = ec._Template_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Template_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._Template_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "width":
+			out.Values[i] = ec._Template_width(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "height":
+			out.Values[i] = ec._Template_height(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "variables":
+			out.Values[i] = ec._Template_variables(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var tileImplementors = []string{"Tile"}
 
 func (ec *executionContext) _Tile(ctx context.Context, sel ast.SelectionSet, obj *model.Tile) graphql.Marshaler {
@@ -4416,6 +5053,31 @@ func (ec *executionContext) _Tile(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = graphql.MarshalString("Tile")
 		case "id":
 			out.Values[i] = ec._Tile_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "name":
+			out.Values[i] = ec._Tile_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "row":
+			out.Values[i] = ec._Tile_row(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "col":
+			out.Values[i] = ec._Tile_col(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "width":
+			out.Values[i] = ec._Tile_width(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "height":
+			out.Values[i] = ec._Tile_height(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -4455,38 +5117,13 @@ func (ec *executionContext) _Tile(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "name":
-			out.Values[i] = ec._Tile_name(ctx, field, obj)
+		case "template":
+			out.Values[i] = ec._Tile_template(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "description":
-			out.Values[i] = ec._Tile_description(ctx, field, obj)
-		case "data":
-			out.Values[i] = ec._Tile_data(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "row":
-			out.Values[i] = ec._Tile_row(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "col":
-			out.Values[i] = ec._Tile_col(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "width":
-			out.Values[i] = ec._Tile_width(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "height":
-			out.Values[i] = ec._Tile_height(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
+		case "variables":
+			out.Values[i] = ec._Tile_variables(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4510,42 +5147,35 @@ func (ec *executionContext) _Tile(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
-var userImplementors = []string{"User"}
+var variableImplementors = []string{"Variable"}
 
-func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *model.User) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, userImplementors)
+func (ec *executionContext) _Variable(ctx context.Context, sel ast.SelectionSet, obj *model.Variable) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, variableImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("User")
+			out.Values[i] = graphql.MarshalString("Variable")
 		case "id":
-			out.Values[i] = ec._User_id(ctx, field, obj)
+			out.Values[i] = ec._Variable_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "name":
-			out.Values[i] = ec._User_name(ctx, field, obj)
+			out.Values[i] = ec._Variable_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "email":
-			out.Values[i] = ec._User_email(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "password":
-			out.Values[i] = ec._User_password(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "dashboards":
-			out.Values[i] = ec._User_dashboards(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
+		case "value":
+			out.Values[i] = ec._Variable_value(ctx, field, obj)
+		case "default":
+			out.Values[i] = ec._Variable_default(ctx, field, obj)
+		case "template":
+			out.Values[i] = ec._Variable_template(ctx, field, obj)
+		case "tile":
+			out.Values[i] = ec._Variable_tile(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4968,21 +5598,6 @@ func (ec *executionContext) marshalNDashboard2ᚖgoserveᚋgraphᚋmodelᚐDashb
 	return ec._Dashboard(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalID(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalID(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5003,9 +5618,19 @@ func (ec *executionContext) unmarshalNNewDashboard2goserveᚋgraphᚋmodelᚐNew
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNNewTemplate2goserveᚋgraphᚋmodelᚐNewTemplate(ctx context.Context, v interface{}) (model.NewTemplate, error) {
+	res, err := ec.unmarshalInputNewTemplate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNNewTile2goserveᚋgraphᚋmodelᚐNewTile(ctx context.Context, v interface{}) (model.NewTile, error) {
 	res, err := ec.unmarshalInputNewTile(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewVariable2ᚖgoserveᚋgraphᚋmodelᚐNewVariable(ctx context.Context, v interface{}) (*model.NewVariable, error) {
+	res, err := ec.unmarshalInputNewVariable(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -5021,6 +5646,20 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNTemplate2goserveᚋgraphᚋmodelᚐTemplate(ctx context.Context, sel ast.SelectionSet, v model.Template) graphql.Marshaler {
+	return ec._Template(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTemplate2ᚖgoserveᚋgraphᚋmodelᚐTemplate(ctx context.Context, sel ast.SelectionSet, v *model.Template) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Template(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNTile2goserveᚋgraphᚋmodelᚐTile(ctx context.Context, sel ast.SelectionSet, v model.Tile) graphql.Marshaler {
@@ -5079,6 +5718,60 @@ func (ec *executionContext) marshalNTile2ᚖgoserveᚋgraphᚋmodelᚐTile(ctx c
 		return graphql.Null
 	}
 	return ec._Tile(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐVariableᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Variable) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNVariable2ᚖgoserveᚋgraphᚋmodelᚐVariable(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNVariable2ᚖgoserveᚋgraphᚋmodelᚐVariable(ctx context.Context, sel ast.SelectionSet, v *model.Variable) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Variable(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -5367,6 +6060,42 @@ func (ec *executionContext) marshalODashboard2ᚖgoserveᚋgraphᚋmodelᚐDashb
 	return ec._Dashboard(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalONewVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐNewVariableᚄ(ctx context.Context, v interface{}) ([]*model.NewVariable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.NewVariable, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNNewVariable2ᚖgoserveᚋgraphᚋmodelᚐNewVariable(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -5383,11 +6112,65 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
+func (ec *executionContext) marshalOTemplate2ᚖgoserveᚋgraphᚋmodelᚐTemplate(ctx context.Context, sel ast.SelectionSet, v *model.Template) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Template(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOTile2ᚖgoserveᚋgraphᚋmodelᚐTile(ctx context.Context, sel ast.SelectionSet, v *model.Tile) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Tile(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐVariableᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Variable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNVariable2ᚖgoserveᚋgraphᚋmodelᚐVariable(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

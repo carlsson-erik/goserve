@@ -2,19 +2,9 @@
 #
 # https://gqlgen.com/getting-started/
 
-type User {
-  id: ID!
-  name: String!
-  email: String!
-  password: String!
-  dashboards: [Dashboard!]!
-}
-
-
 type Dashboard {
   id: Int!
   name: String!
-  description: String
   rows: Int!
   cols: Int!
   tiles: [Tile!]!
@@ -24,43 +14,77 @@ input NewDashboard {
   name: String!
 }
 
+type Template {
+  id: Int!
+  name: String!
+  data: String!
+  width: Int!
+  height: Int!
+  variables: [Variable!]!
+}
+
+type Variable {
+  id: Int!
+  name: String!
+  value: String
+  default: String
+  template: Template
+  tile: Tile
+}
+
+input NewVariable {
+  name: String!
+  value: String
+  default: String
+  template_id: Int
+  tile_id: Int
+
+}
+
+input NewTemplate{
+  name: String!
+  data: String!
+  width: Int
+  height: Int
+  variables: [NewVariable!]
+}
+
 type Tile {
   id: Int!
-  dashboard: Dashboard!
   name: String!
-  description: String
-  data: String!
   row: Int!
   col: Int!
   width: Int!
   height: Int!
+  dashboard: Dashboard!
+  template: Template!
+  variables: [Variable!]
 }
 
 input NewTile {
   name: String!
-  dashboard_id: Int!
-  description: String
-  data: String!
   row: Int!
   col: Int!
   width: Int!
   height: Int!
+  dashboard_id: Int!
+  tile_id: Int!
+  variables: [NewVariable!]
 }
 
 
 
 type Mutation {
+  createTemplate(input: NewTemplate!): Template!
   createDashboard(input: NewDashboard!): Dashboard!
   deleteDashboard(id: Int!): Dashboard!
   createTile(input: NewTile!): Tile!
   deleteTile(id: Int!): Tile!
-  
 }
 
 type Query {
   dashboards: [Dashboard!]!
   dashboard(id: Int!) : Dashboard
-
   tiles: [Tile!]!
   tile(id: Int!) : Tile
 }

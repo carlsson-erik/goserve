@@ -3,12 +3,11 @@
 package model
 
 type Dashboard struct {
-	ID          int     `json:"id"`
-	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-	Rows        int     `json:"rows"`
-	Cols        int     `json:"cols"`
-	Tiles       []*Tile `json:"tiles"`
+	ID    int     `json:"id"`
+	Name  string  `json:"name"`
+	Rows  int     `json:"rows"`
+	Cols  int     `json:"cols"`
+	Tiles []*Tile `json:"tiles"`
 }
 
 type Mutation struct {
@@ -18,36 +17,62 @@ type NewDashboard struct {
 	Name string `json:"name"`
 }
 
+type NewTemplate struct {
+	Name      string         `json:"name"`
+	Data      string         `json:"data"`
+	Width     *int           `json:"width,omitempty"`
+	Height    *int           `json:"height,omitempty"`
+	Variables []*NewVariable `json:"variables,omitempty"`
+}
+
 type NewTile struct {
-	Name        string  `json:"name"`
-	DashboardID int     `json:"dashboard_id"`
-	Description *string `json:"description,omitempty"`
-	Data        string  `json:"data"`
-	Row         int     `json:"row"`
-	Col         int     `json:"col"`
-	Width       int     `json:"width"`
-	Height      int     `json:"height"`
+	Name        string         `json:"name"`
+	Row         int            `json:"row"`
+	Col         int            `json:"col"`
+	Width       int            `json:"width"`
+	Height      int            `json:"height"`
+	DashboardID int            `json:"dashboard_id"`
+	TileID      int            `json:"tile_id"`
+	Variables   []*NewVariable `json:"variables,omitempty"`
+}
+
+type NewVariable struct {
+	Name       string  `json:"name"`
+	Value      *string `json:"value,omitempty"`
+	Default    *string `json:"default,omitempty"`
+	TemplateID *int    `json:"template_id,omitempty"`
+	TileID     *int    `json:"tile_id,omitempty"`
 }
 
 type Query struct {
 }
 
-type Tile struct {
-	ID          int        `json:"id"`
-	Dashboard   *Dashboard `json:"dashboard"`
-	Name        string     `json:"name"`
-	Description *string    `json:"description,omitempty"`
-	Data        string     `json:"data"`
-	Row         int        `json:"row"`
-	Col         int        `json:"col"`
-	Width       int        `json:"width"`
-	Height      int        `json:"height"`
+type Template struct {
+	ID        int         `json:"id"`
+	Name      string      `json:"name"`
+	Data      string      `json:"data"`
+	Width     int         `json:"width"`
+	Height    int         `json:"height"`
+	Variables []*Variable `json:"variables"`
 }
 
-type User struct {
-	ID         string       `json:"id"`
-	Name       string       `json:"name"`
-	Email      string       `json:"email"`
-	Password   string       `json:"password"`
-	Dashboards []*Dashboard `json:"dashboards"`
+type Tile struct {
+	ID        int         `json:"id"`
+	Name      string      `json:"name"`
+	Row       int         `json:"row"`
+	Col       int         `json:"col"`
+	Width     int         `json:"width"`
+	Height    int         `json:"height"`
+	Dashboard *Dashboard  `json:"dashboard"`
+	Template  *Template   `json:"template"`
+	Variables []*Variable `json:"variables,omitempty"`
+}
+
+type Variable struct {
+	ID       int       `json:"id"`
+	Name     string    `json:"name"`
+	Value    *string   `json:"value,omitempty"`
+	Default  *string   `json:"default,omitempty"`
+	Template *Template `json:"template,omitempty"`
+	Tile     *Tile     `json:"tile,omitempty"`
 }

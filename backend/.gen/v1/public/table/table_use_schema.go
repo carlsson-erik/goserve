@@ -12,5 +12,7 @@ package table
 func UseSchema(schema string) {
 	Dashboard = Dashboard.FromSchema(schema)
 	SchemaMigrations = SchemaMigrations.FromSchema(schema)
+	Template = Template.FromSchema(schema)
 	Tile = Tile.FromSchema(schema)
+	Variable = Variable.FromSchema(schema)
 }

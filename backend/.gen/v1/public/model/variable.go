@@ -7,9 +7,11 @@
 
 package model
 
-type Dashboard struct {
-	ID   int32 `sql:"primary_key"`
-	Name string
-	Rows int32
-	Cols int32
+type Variable struct {
+	ID         int32 `sql:"primary_key"`
+	Name       string
+	Value      *string
+	Default    *string
+	TemplateID int32
+	TileID     int32
 }

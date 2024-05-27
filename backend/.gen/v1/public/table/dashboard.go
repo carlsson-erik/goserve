@@ -17,11 +17,10 @@ type dashboardTable struct {
 	postgres.Table
 
 	// Columns
-	ID          postgres.ColumnInteger
-	Name        postgres.ColumnString
-	Description postgres.ColumnString
-	Rows        postgres.ColumnInteger
-	Cols        postgres.ColumnInteger
+	ID   postgres.ColumnInteger
+	Name postgres.ColumnString
+	Rows postgres.ColumnInteger
+	Cols postgres.ColumnInteger
 
 	AllColumns     postgres.ColumnList
 	MutableColumns postgres.ColumnList
@@ -62,24 +61,22 @@ func newDashboardTable(schemaName, tableName, alias string) *DashboardTable {
 
 func newDashboardTableImpl(schemaName, tableName, alias string) dashboardTable {
 	var (
-		IDColumn          = postgres.IntegerColumn("id")
-		NameColumn        = postgres.StringColumn("name")
-		DescriptionColumn = postgres.StringColumn("description")
-		RowsColumn        = postgres.IntegerColumn("rows")
-		ColsColumn        = postgres.IntegerColumn("cols")
-		allColumns        = postgres.ColumnList{IDColumn, NameColumn, DescriptionColumn, RowsColumn, ColsColumn}
-		mutableColumns    = postgres.ColumnList{NameColumn, DescriptionColumn, RowsColumn, ColsColumn}
+		IDColumn       = postgres.IntegerColumn("id")
+		NameColumn     = postgres.StringColumn("name")
+		RowsColumn     = postgres.IntegerColumn("rows")
+		ColsColumn     = postgres.IntegerColumn("cols")
+		allColumns     = postgres.ColumnList{IDColumn, NameColumn, RowsColumn, ColsColumn}
+		mutableColumns = postgres.ColumnList{NameColumn, RowsColumn, ColsColumn}
 	)
 
 	return dashboardTable{
 		Table: postgres.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:          IDColumn,
-		Name:        NameColumn,
-		Description: DescriptionColumn,
-		Rows:        RowsColumn,
-		Cols:        ColsColumn,
+		ID:   IDColumn,
+		Name: NameColumn,
+		Rows: RowsColumn,
+		Cols: ColsColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

@@ -1,21 +1,38 @@
 CREATE TABLE public.dashboard (
 	id serial primary key,
 	"name" varchar NOT NULL UNIQUE CHECK (name <> ''),
-	"description" varchar NULL,
 	"rows" int NOT NULL,
 	"cols" int NOT NULL
 );
 
+CREATE TABLE public.template (
+	id serial primary key,
+	"name" varchar NOT NULL UNIQUE CHECK (name <> ''),
+	"data" varchar NOT NULL,
+	"width" int NOT NULL,
+	"height" int NOT NULL
+);
 
 CREATE TABLE public.tile (
 	id serial primary key,
-	"name" varchar NOT NULL UNIQUE CHECK (name <> ''),
-	"description" varchar NULL,
+	"name" varchar NOT NULL CHECK (name <> ''),
 	"row" int NOT NULL,
 	"col" int NOT NULL,
-	"data" varchar NOT NULL,
 	"width" int NOT NULL,
 	"height" int NOT NULL,
 	"dashboard_id" serial,
-	CONSTRAINT fk_tile_dashboard FOREIGN KEY(dashboard_id) REFERENCES dashboard(id)
+	"template_id" serial,
+	CONSTRAINT fk_tile_dashboard FOREIGN KEY(dashboard_id) REFERENCES dashboard(id),
+	CONSTRAINT fk_tile_template FOREIGN KEY(template_id) REFERENCES template(id)
+);
+
+CREATE TABLE public.variable (
+	id serial primary key,
+	"name" varchar NOT NULL CHECK (name <> ''),
+	"value" varchar,
+	"default" varchar,
+	"template_id" serial,
+	"tile_id" serial,
+	CONSTRAINT fk_variable_template FOREIGN KEY(template_id) REFERENCES template(id),
+	CONSTRAINT fk_variable_tile FOREIGN KEY(tile_id) REFERENCES tile(id)
 );
