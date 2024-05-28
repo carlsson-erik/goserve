@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Tile } from "./useTileQuery";
+import { Variable } from "./useCreateTemplate";
 
 export interface Template {
   id: number;
@@ -10,27 +10,24 @@ export interface Template {
   variables: Variable[];
 }
 
-export const GET_DASHBOARDS = gql`
+export const GET_TEMPLATES = gql`
   query {
-    dashboards {
+    templates {
       id
       name
-      rows
-      cols
-      tiles {
+      width
+      height
+      data
+      variables {
         id
         name
-        description
-        row
-        col
-        width
-        height
-        data
+        value
+        default
       }
     }
   }
 `;
 
-export interface GetDashboardsResult {
-  dashboards: Dashboard[];
+export interface GetTemplatesResult {
+  templates: Template[];
 }

@@ -1,10 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
 import React from "react";
-import {
-  Dashboard,
-  GET_DASHBOARDS,
-  GetDashboardsResult,
-} from "./useDashboardQuery";
 import { GET_TILES, GetTilesResult, Tile } from "./useTileQuery";
 
 export interface DeleteTileResult {

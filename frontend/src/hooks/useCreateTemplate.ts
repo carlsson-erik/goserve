@@ -1,6 +1,10 @@
-import { FetchResult, MutationResult, gql, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
+import {
+  GET_TEMPLATES,
+  GetTemplatesResult,
+  Template,
+} from "./useTemplateQuery";
 import React from "react";
-import { GET_TILES, GetTilesResult, Tile } from "./useTileQuery";
 
 export interface Variable {
   name: string;
@@ -17,15 +21,12 @@ export interface CreateTemplateData {
 }
 
 export interface CreateTemplateResult {
-  createTemplate: Tile;
+  createTemplate: Template;
 }
 
-const useCreateTile = (): [
-  (createData: CreateTileData) => Promise<FetchResult<CreateTileResult>>,
-  MutationResult<{ createTile: Tile }>
-] => {
-  const [createTileGQL, other] = useMutation<CreateTileResult>(gql`
-    mutation createTile($input: NewTile!) {
+const useCreateTemplate = () => {
+  const [createTemplateGQL, other] = useMutation<CreateTemplateResult>(gql`
+    mutation createTemplate($input: NewTemplate!) {
       createTile(input: $input) {
         id
         name
@@ -34,29 +35,29 @@ const useCreateTile = (): [
   `);
 
   const createTile = React.useCallback(
-    (createData: CreateTileData) => {
-      return createTileGQL({
+    (createData: CreateTemplateData) => {
+      return createTemplateGQL({
         variables: { input: createData },
-        update: (cache, { data: addTile }) => {
-          const data: GetTilesResult | null = cache.readQuery({
-            query: GET_TILES,
+        update: (cache, { data: addTemplate }) => {
+          const data: GetTemplatesResult | null = cache.readQuery({
+            query: GET_TEMPLATES,
           });
 
-          if (data === null || !addTile) return;
+          if (data === null || !addTemplate) return;
 
-          cache.writeQuery<GetTilesResult>({
-            query: GET_TILES,
+          cache.writeQuery<GetTemplatesResult>({
+            query: GET_TEMPLATES,
             data: {
-              tiles: [...data.tiles, addTile.createTile],
+              templates: [...data.templates, addTemplate.createTemplate],
             },
           });
         },
       });
     },
-    [createTileGQL]
+    [createTemplateGQL]
   );
 
   return [createTile, other];
 };
 
-export default useCreateTile;
+export default useCreateTemplate;
