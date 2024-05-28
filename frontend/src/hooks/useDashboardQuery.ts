@@ -20,12 +20,10 @@ export const GET_DASHBOARDS = gql`
       tiles {
         id
         name
-        description
         row
         col
         width
         height
-        data
       }
     }
   }

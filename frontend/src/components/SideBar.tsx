@@ -4,13 +4,19 @@ import { Link, generatePath } from "react-router-dom";
 import paths from "../utils/paths";
 import { Dashboard } from "../hooks/useDashboardQuery";
 import { IconPlus } from "@tabler/icons-react";
+import { Template } from "../hooks/useTemplateQuery";
 
 export interface SideBarProps {
   className?: string;
   dashboards?: Dashboard[];
+  templates?: Template[];
 }
 
-const SideBar: React.FC<SideBarProps> = ({ dashboards, className }) => {
+const SideBar: React.FC<SideBarProps> = ({
+  dashboards,
+  templates,
+  className,
+}) => {
   if (!dashboards) {
     return <div className={className}>loading...</div>;
   }
@@ -29,6 +35,20 @@ const SideBar: React.FC<SideBarProps> = ({ dashboards, className }) => {
             key={d.id}
           >
             <Button className="w-full text-start">{d.name}</Button>
+          </Link>
+        ))}
+        <span>Templates {templates?.length}</span>
+        <Link to={paths.template.create}>
+          <Button className="flex items-center gap-1">
+            New <IconPlus />
+          </Button>
+        </Link>
+        {templates?.map((t) => (
+          <Link
+            to={generatePath(paths.template.id, { templateId: t.id })}
+            key={t.id}
+          >
+            <Button className="w-full text-start">{t.name}</Button>
           </Link>
         ))}
       </div>

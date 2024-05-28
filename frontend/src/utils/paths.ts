@@ -10,6 +10,10 @@ const paths = {
       create: "/dashboard/:dashboardId/tile/create/:col/:row",
     },
   },
+  template: {
+    id: "/template/:templateId",
+    create: "/template/create",
+  },
 };
 
 export default paths;

@@ -8,28 +8,37 @@ import {
   GET_DASHBOARDS,
   GetDashboardsResult,
 } from "../hooks/useDashboardQuery";
-import TileCreateScreen from "./tile/TileCreateScreen";
+import TileCreateScreen from "./template/TemplateCreateScreen";
+import { GET_TEMPLATES, GetTemplatesResult } from "../hooks/useTemplateQuery";
+import TemplateCreateScreen from "./template/TemplateCreateScreen";
 
 export const HomeScreen = () => {
-  const { data } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
+  const { data: dashboards } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
+
+  const { data: templates } = useQuery<GetTemplatesResult>(GET_TEMPLATES);
 
   return (
     <div className="w-full h-full flex">
       <SideBar
         className="h-full w-36 overflow-hidden shrink-0"
-        dashboards={data?.dashboards}
+        dashboards={dashboards?.dashboards}
+        templates={templates?.templates}
       />
       <div className="grow h-full">
         <Routes>
           <Route
             path={paths.dashboard.create}
-            element={<DashboardCreateScreen />}
+            element={<DashbordCreateScreen />}
           />
           <Route
             path={paths.dashboard.tile.create}
             element={<TileCreateScreen />}
           />
           <Route path={paths.dashboard.id} element={<DashboardScreen />} />
+          <Route
+            path={paths.template.create}
+            element={<TemplateCreateScreen />}
+          />
 
           <Route path={"*"} element={<DashboardScreen />} />
         </Routes>
