@@ -89,16 +89,14 @@ models:
     fields:
       tiles:
         resolver: true
-  Dashboards:
-    fields:
-      tiles:
-        resolver: true
   Tile:
     fields:
       dashboard:
         resolver: true
-  Tiles:
+      template:
+        resolver: true
+  Template:
     fields:
-      dashboard:
+      variables:
         resolver: true
 

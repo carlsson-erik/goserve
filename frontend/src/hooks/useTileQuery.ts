@@ -1,17 +1,18 @@
 import { ApolloQueryResult, gql } from "@apollo/client";
 import React from "react";
 import { FetchContext } from "../App";
+import { Template } from "./useTemplateQuery";
+import { Variable } from "./useCreateTemplate";
 
 export interface Tile {
   id: number;
   name: string;
-  description: string;
-  dashboard_id: number;
-  data: string;
   row: number;
   col: number;
   width: number;
   height: number;
+  template: Template;
+  variables: Variable[];
 }
 
 export const GET_TILES = gql`

@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	. "goserve/.gen/v1/public/table"
 	"goserve/graph/model"
 	"log"
@@ -43,24 +44,36 @@ func (r *mutationResolver) CreateTemplate(ctx context.Context, input model.NewTe
 		return nil, err
 	}
 
-	var variablesRes []*model.Variable
+	var variablesInsertRes []*model.Variable
 
-	newVariables := []*model.NewVariable{}
+	newVariables := []model.NewVariable{}
 
 	for _, variable := range input.Variables {
-		newVariables = append(newVariables, &model.NewVariable{Name: variable.Name, Default: variable.Default, Value: variable.Value, TemplateID: &templateRes.ID})
+		newVariables = append(newVariables, model.NewVariable{Name: variable.Name, Default: variable.Default, Value: variable.Value, TemplateID: &templateRes.ID, TileID: nil})
 	}
+	fmt.Printf("%d", len(newVariables))
 
-	insertVariableQuery := Variable.INSERT(Variable.Name, Variable.Default, Variable.Value, Variable.TemplateID).MODELS(newVariables).RETURNING(Variable.AllColumns)
+	insertVariableQuery := Variable.INSERT(Variable.Name, Variable.Default, Variable.Value, Variable.TemplateID, Variable.TileID).MODELS(newVariables)
 
-	err = insertVariableQuery.Query(r.DB, &variablesRes)
+	err = insertVariableQuery.Query(r.DB, &variablesInsertRes)
 
 	if err != nil {
-		log.Printf("Insert error: %v", err)
+		log.Printf("Insert variables error: %v", err)
 		return nil, err
 	}
 
-	templateRes.Variables = variablesRes
+	var variablesGetRes []*model.Variable
+
+	getVariablesQuery := postgres.SELECT(Variable.AllColumns).FROM(Variable).WHERE(Variable.TemplateID.EQ(postgres.Int64(int64(templateRes.ID))))
+
+	err = getVariablesQuery.Query(r.DB, &variablesGetRes)
+
+	if err != nil {
+		log.Printf("Get variables error: %v", err)
+		return nil, err
+	}
+
+	templateRes.Variables = variablesGetRes
 
 	return &templateRes, err
 }
@@ -107,12 +120,13 @@ func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) 
 	newTile := model.NewTile{
 		Name:        input.Name,
 		DashboardID: input.DashboardID,
+		TemplateID:  input.TemplateID,
 		Row:         input.Row,
 		Col:         input.Col,
 		Width:       input.Width,
 		Height:      input.Height,
 	}
-	insertQuery := Tile.INSERT(Tile.Name, Tile.DashboardID, Tile.Row, Tile.Col, Tile.Width, Tile.Height).MODEL(newTile).RETURNING(Tile.AllColumns)
+	insertQuery := Tile.INSERT(Tile.Name, Tile.DashboardID, Tile.TemplateID, Tile.Row, Tile.Col, Tile.Width, Tile.Height).MODEL(newTile).RETURNING(Tile.AllColumns)
 
 	tileRes := model.Tile{}
 
@@ -123,24 +137,36 @@ func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) 
 		return nil, err
 	}
 
-	variablesRes := []*model.Variable{}
+	var variablesInsertRes []*model.Variable
 
-	newVariables := []*model.NewVariable{}
+	newVariables := []model.NewVariable{}
 
 	for _, variable := range input.Variables {
-		newVariables = append(newVariables, &model.NewVariable{Name: variable.Name, Default: variable.Default, Value: variable.Value, TileID: &tileRes.ID})
+		newVariables = append(newVariables, model.NewVariable{Name: variable.Name, Default: variable.Default, Value: variable.Value, TileID: &tileRes.ID})
 	}
+	fmt.Printf("%d", len(newVariables))
 
-	insertVariableQuery := Variable.INSERT(Variable.Name, Variable.Default, Variable.Value).MODELS(newVariables).RETURNING(Variable.AllColumns)
+	insertVariableQuery := Variable.INSERT(Variable.Name, Variable.Default, Variable.Value, Variable.TileID).MODELS(newVariables)
 
-	err = insertVariableQuery.Query(r.DB, &variablesRes)
+	err = insertVariableQuery.Query(r.DB, &variablesInsertRes)
 
 	if err != nil {
-		log.Printf("Insert error: %v", err)
+		log.Printf("Insert variables error: %v", err)
 		return nil, err
 	}
 
-	tileRes.Variables = variablesRes
+	var variablesGetRes []*model.Variable
+
+	getVariablesQuery := postgres.SELECT(Variable.AllColumns).FROM(Variable).WHERE(Variable.TemplateID.EQ(postgres.Int64(int64(tileRes.ID))))
+
+	err = getVariablesQuery.Query(r.DB, &variablesGetRes)
+
+	if err != nil {
+		log.Printf("Get variables error: %v", err)
+		return nil, err
+	}
+
+	tileRes.Variables = variablesGetRes
 
 	return &tileRes, err
 }
@@ -205,11 +231,44 @@ func (r *queryResolver) Tile(ctx context.Context, id int) (*model.Tile, error) {
 	return res, err
 }
 
+// Templates is the resolver for the templates field.
+func (r *queryResolver) Templates(ctx context.Context) ([]*model.Template, error) {
+	var res []*model.Template
+
+	getQuery := Template.SELECT(Template.AllColumns)
+
+	err := getQuery.Query(r.DB, &res)
+
+	return res, err
+}
+
+// Variables is the resolver for the variables field.
+func (r *templateResolver) Variables(ctx context.Context, obj *model.Template) ([]*model.Variable, error) {
+	var res []*model.Variable
+
+	getVariables := Variable.SELECT(Variable.AllColumns).WHERE(Variable.TemplateID.EQ(postgres.Int64(int64(obj.ID))))
+
+	err := getVariables.Query(r.DB, &res)
+
+	return res, err
+}
+
 // Dashboard is the resolver for the dashboard field.
 func (r *tileResolver) Dashboard(ctx context.Context, obj *model.Tile) (*model.Dashboard, error) {
 	var res model.Dashboard
 
 	getQuery := postgres.SELECT(Dashboard.AllColumns).FROM(Dashboard).WHERE(Dashboard.ID.EQ(postgres.Int(int64(obj.ID))))
+
+	err := getQuery.Query(r.DB, &res)
+
+	return &res, err
+}
+
+// Template is the resolver for the template field.
+func (r *tileResolver) Template(ctx context.Context, obj *model.Tile) (*model.Template, error) {
+	var res model.Template
+
+	getQuery := Template.SELECT(Template.AllColumns).WHERE(Template.ID.EQ(postgres.Int(int64(obj.ID))))
 
 	err := getQuery.Query(r.DB, &res)
 
@@ -225,10 +284,14 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// Template returns TemplateResolver implementation.
+func (r *Resolver) Template() TemplateResolver { return &templateResolver{r} }
+
 // Tile returns TileResolver implementation.
 func (r *Resolver) Tile() TileResolver { return &tileResolver{r} }
 
 type dashboardResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type templateResolver struct{ *Resolver }
 type tileResolver struct{ *Resolver }

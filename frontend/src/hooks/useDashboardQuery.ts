@@ -4,7 +4,6 @@ import { Tile } from "./useTileQuery";
 export interface Dashboard {
   id: number;
   name: string;
-  description: string;
   rows: number;
   cols: number;
   tiles: Tile[];
@@ -24,6 +23,19 @@ export const GET_DASHBOARDS = gql`
         col
         width
         height
+        template {
+          id
+          name
+          data
+          width
+          height
+        }
+        variables {
+          id
+          name
+          value
+          default
+        }
       }
     }
   }

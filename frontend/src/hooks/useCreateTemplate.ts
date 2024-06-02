@@ -7,6 +7,7 @@ import {
 import React from "react";
 
 export interface Variable {
+  id: number;
   name: string;
   value: string;
   default?: string;
@@ -17,7 +18,7 @@ export interface CreateTemplateData {
   data: string;
   width: number;
   height: number;
-  variables: Variable[];
+  variables: Omit<Variable, "id">[];
 }
 
 export interface CreateTemplateResult {

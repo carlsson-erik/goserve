@@ -3,8 +3,16 @@ import { LiveEditor, LiveError, LivePreview, LiveProvider } from "react-live";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/input/Button";
 import { tw } from "twind";
-import useCreateTile from "../../hooks/useCreateTile";
+import useCreateTile, { CreateTileData } from "../../hooks/useCreateTile";
 import paths from "../../utils/paths";
+import { useQuery } from "@apollo/client";
+import {
+  GET_TEMPLATES,
+  GetTemplatesResult,
+  Template,
+} from "../../hooks/useTemplateQuery";
+import { useForm } from "react-hook-form";
+import { CreateTemplateData } from "../../hooks/useCreateTemplate";
 
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
@@ -13,11 +21,15 @@ const DefaultCode = `() => {
 }`;
 
 const TileCreateScreen: React.FC = () => {
+  //Fetch data
+
+  const { data: templates } = useQuery<GetTemplatesResult>(GET_TEMPLATES);
+
+  const form = useForm<CreateTileData>();
+
+  const [template, setTemplate] = React.useState<Template | undefined>();
+
   const [width, setWidth] = React.useState(2);
-
-  const [name, setName] = React.useState("");
-
-  const [data, setData] = React.useState(DefaultCode);
 
   const [error, setError] = React.useState<string | undefined>();
 
@@ -27,40 +39,58 @@ const TileCreateScreen: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const onCreate = React.useCallback(async () => {
-    try {
-      const res = await createTile({
-        name: name,
-        data: data,
-        col: Number(col) ?? 1,
-        row: Number(row) ?? 1,
-        dashboard_id: Number(dashboardId) ?? 1,
-        width: width,
-        height: 1,
-      });
-      if (res.data) {
-        navigate(generatePath(paths.dashboard.id, { dashboardId }));
+  const onCreate = React.useCallback(
+    async (data: CreateTileData) => {
+      if (!template) return;
+      try {
+        const res = await createTile({
+          name: data.name,
+          col: Number(col) ?? 1,
+          row: Number(row) ?? 1,
+          dashboardId: Number(dashboardId) ?? 1,
+          templateId: template.id,
+          width: width,
+          height: 1,
+          variables: (template.variables ?? []).map((t, index) => ({
+            name: t.name,
+            value: data.variables[index].value ?? t.default ?? "",
+          })),
+        });
+        if (res.data) {
+          navigate(generatePath(paths.dashboard.id, { dashboardId }));
+        }
+      } catch (error) {
+        console.log(error);
+        setError(error.message);
       }
-    } catch (error) {
-      console.log(error);
-      setError(error.message);
-    }
-  }, [col, createTile, dashboardId, data, name, navigate, row, width]);
+    },
+    [col, createTile, dashboardId, navigate, row, template, width]
+  );
+
+  console.log(template?.variables);
+
+  if (!templates) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="p-2 h-full flex flex-col overflow-hidden">
       {/* <Editor /> */}
+      <div className="flex gap-2">
+        {templates.templates.map((t) => (
+          <Button key={t.id} onClick={() => setTemplate(t)}>
+            {t.name}
+          </Button>
+        ))}
+      </div>
       <LiveProvider
-        code={DefaultCode}
-        transformCode={(code) => {
-          setData(code);
-          return code;
-        }}
+        code={template?.data}
         scope={{
           tw,
         }}
       >
         <div className="h-2/3 grid grid-cols-2 gap-4">
-          <div>
+          <form onSubmit={form.handleSubmit(onCreate)}>
             <div className="h-24">
               <h1>Create Tile</h1>
             </div>
@@ -68,10 +98,20 @@ const TileCreateScreen: React.FC = () => {
               className="mb-1"
               type="text"
               placeholder="Name..."
-              onChange={(v) => setName(v.target.value)}
+              {...form.register("name")}
             />
-            <LiveEditor className="tile-editor h-full" />
-          </div>
+            <div className="flex flex-col gap-2">
+              {(template?.variables ?? []).map((v, index) => (
+                <div key={v.id} className="flex gap-2">
+                  <span>{v.name}</span>
+                  <input
+                    type="text"
+                    {...form.register(`variables.${index}.value`)}
+                  />
+                </div>
+              ))}
+            </div>
+          </form>
           <div>
             <div className="mt-8 flex justify-between">
               <div className="h-16 flex gap-2">
@@ -88,7 +128,7 @@ const TileCreateScreen: React.FC = () => {
                   1x2
                 </Button>
               </div>
-              <Button onClick={() => onCreate()} variant="primary">
+              <Button onClick={form.handleSubmit(onCreate)} variant="primary">
                 Create
               </Button>
             </div>

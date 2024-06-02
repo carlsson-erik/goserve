@@ -60,7 +60,7 @@ const TileCard: React.FC<TileProps> = ({
         <div className="h-full p-4">
           {tile ? (
             <div className="h-full rounded-3xl overflow-hidden flex justify-center bg-gray-700 border border-gray-800">
-              <LiveProvider code={tile?.data}>
+              <LiveProvider code={tile?.template.data}>
                 <LivePreview />
               </LiveProvider>
             </div>

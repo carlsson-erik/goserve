@@ -42,6 +42,7 @@ type ResolverRoot interface {
 	Dashboard() DashboardResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
+	Template() TemplateResolver
 	Tile() TileResolver
 }
 
@@ -68,6 +69,7 @@ type ComplexityRoot struct {
 	Query struct {
 		Dashboard  func(childComplexity int, id int) int
 		Dashboards func(childComplexity int) int
+		Templates  func(childComplexity int) int
 		Tile       func(childComplexity int, id int) int
 		Tiles      func(childComplexity int) int
 	}
@@ -118,9 +120,14 @@ type QueryResolver interface {
 	Dashboard(ctx context.Context, id int) (*model.Dashboard, error)
 	Tiles(ctx context.Context) ([]*model.Tile, error)
 	Tile(ctx context.Context, id int) (*model.Tile, error)
+	Templates(ctx context.Context) ([]*model.Template, error)
+}
+type TemplateResolver interface {
+	Variables(ctx context.Context, obj *model.Template) ([]*model.Variable, error)
 }
 type TileResolver interface {
 	Dashboard(ctx context.Context, obj *model.Tile) (*model.Dashboard, error)
+	Template(ctx context.Context, obj *model.Tile) (*model.Template, error)
 }
 
 type executableSchema struct {
@@ -255,6 +262,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Dashboards(childComplexity), true
+
+	case "Query.templates":
+		if e.complexity.Query.Templates == nil {
+			break
+		}
+
+		return e.complexity.Query.Templates(childComplexity), true
 
 	case "Query.tile":
 		if e.complexity.Query.Tile == nil {
@@ -1557,6 +1571,64 @@ func (ec *executionContext) fieldContext_Query_tile(ctx context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_templates(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_templates(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Templates(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Template)
+	fc.Result = res
+	return ec.marshalNTemplate2ᚕᚖgoserveᚋgraphᚋmodelᚐTemplateᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_templates(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Template_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Template_name(ctx, field)
+			case "data":
+				return ec.fieldContext_Template_data(ctx, field)
+			case "width":
+				return ec.fieldContext_Template_width(ctx, field)
+			case "height":
+				return ec.fieldContext_Template_height(ctx, field)
+			case "variables":
+				return ec.fieldContext_Template_variables(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Template", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -1920,29 +1992,26 @@ func (ec *executionContext) _Template_variables(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Variables, nil
+		return ec.resolvers.Template().Variables(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.([]*model.Variable)
 	fc.Result = res
-	return ec.marshalNVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐVariableᚄ(ctx, field.Selections, res)
+	return ec.marshalOVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐVariableᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Template_variables(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Template",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -2249,14 +2318,11 @@ func (ec *executionContext) _Tile_dashboard(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Dashboard)
 	fc.Result = res
-	return ec.marshalNDashboard2ᚖgoserveᚋgraphᚋmodelᚐDashboard(ctx, field.Selections, res)
+	return ec.marshalODashboard2ᚖgoserveᚋgraphᚋmodelᚐDashboard(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Tile_dashboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2298,7 +2364,7 @@ func (ec *executionContext) _Tile_template(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Template, nil
+		return ec.resolvers.Tile().Template(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2319,8 +2385,8 @@ func (ec *executionContext) fieldContext_Tile_template(ctx context.Context, fiel
 	fc = &graphql.FieldContext{
 		Object:     "Tile",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -2506,11 +2572,14 @@ func (ec *executionContext) _Variable_value(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Variable_value(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2547,11 +2616,14 @@ func (ec *executionContext) _Variable_default(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Variable_default(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4545,7 +4617,7 @@ func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "row", "col", "width", "height", "dashboard_id", "tile_id", "variables"}
+	fieldsInOrder := [...]string{"name", "row", "col", "width", "height", "dashboardId", "templateId", "variables"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4587,20 +4659,20 @@ func (ec *executionContext) unmarshalInputNewTile(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Height = data
-		case "dashboard_id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dashboard_id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+		case "dashboardId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dashboardId"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.DashboardID = data
-		case "tile_id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tile_id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+		case "templateId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("templateId"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.TileID = data
+			it.TemplateID = data
 		case "variables":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("variables"))
 			data, err := ec.unmarshalONewVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐNewVariableᚄ(ctx, v)
@@ -4945,6 +5017,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "templates":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_templates(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -4990,33 +5084,61 @@ func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet,
 		case "id":
 			out.Values[i] = ec._Template_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Template_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "data":
 			out.Values[i] = ec._Template_data(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "width":
 			out.Values[i] = ec._Template_width(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "height":
 			out.Values[i] = ec._Template_height(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "variables":
-			out.Values[i] = ec._Template_variables(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Template_variables(ctx, field, obj)
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5091,6 +5213,39 @@ func (ec *executionContext) _Tile(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._Tile_dashboard(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "template":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Tile_template(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -5117,11 +5272,6 @@ func (ec *executionContext) _Tile(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "template":
-			out.Values[i] = ec._Tile_template(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "variables":
 			out.Values[i] = ec._Tile_variables(ctx, field, obj)
 		default:
@@ -5170,8 +5320,14 @@ func (ec *executionContext) _Variable(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "value":
 			out.Values[i] = ec._Variable_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "default":
 			out.Values[i] = ec._Variable_default(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "template":
 			out.Values[i] = ec._Variable_template(ctx, field, obj)
 		case "tile":
@@ -5652,6 +5808,50 @@ func (ec *executionContext) marshalNTemplate2goserveᚋgraphᚋmodelᚐTemplate(
 	return ec._Template(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNTemplate2ᚕᚖgoserveᚋgraphᚋmodelᚐTemplateᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Template) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTemplate2ᚖgoserveᚋgraphᚋmodelᚐTemplate(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) marshalNTemplate2ᚖgoserveᚋgraphᚋmodelᚐTemplate(ctx context.Context, sel ast.SelectionSet, v *model.Template) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -5718,50 +5918,6 @@ func (ec *executionContext) marshalNTile2ᚖgoserveᚋgraphᚋmodelᚐTile(ctx c
 		return graphql.Null
 	}
 	return ec._Tile(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐVariableᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Variable) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNVariable2ᚖgoserveᚋgraphᚋmodelᚐVariable(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
 }
 
 func (ec *executionContext) marshalNVariable2ᚖgoserveᚋgraphᚋmodelᚐVariable(ctx context.Context, sel ast.SelectionSet, v *model.Variable) graphql.Marshaler {

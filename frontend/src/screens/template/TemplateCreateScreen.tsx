@@ -21,8 +21,6 @@ const TemplateCreateScreen = () => {
 
   const [error, setError] = React.useState<string | undefined>();
 
-  const { dashboardId, col, row } = useParams();
-
   const [createTemplate] = useCreateTemplate();
 
   const navigate = useNavigate();
@@ -51,14 +49,18 @@ const TemplateCreateScreen = () => {
           height: 1,
         });
         if (res.data) {
-          navigate(generatePath(paths.dashboard.id, { dashboardId }));
+          navigate(
+            generatePath(paths.template.id, {
+              templateId: res.data.createTemplate.id,
+            })
+          );
         }
       } catch (error) {
         console.log(error);
         setError(error.message);
       }
     },
-    [createTemplate, dashboardId, navigate, width]
+    [createTemplate, navigate, width]
   );
   return (
     <div className="p-2 h-full flex flex-col overflow-hidden">

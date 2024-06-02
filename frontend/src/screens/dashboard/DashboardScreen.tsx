@@ -47,7 +47,7 @@ const DashboardScreen = () => {
   );
 
   const tiles: (Tile | undefined)[] = React.useMemo(() => {
-    if (!dashboard) return;
+    if (!dashboard) return [];
     const numberOfTiles = dashboard.cols * dashboard.rows;
 
     const tmpTiles = Array(numberOfTiles).fill(undefined);

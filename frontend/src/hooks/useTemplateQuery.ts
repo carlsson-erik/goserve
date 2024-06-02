@@ -7,7 +7,7 @@ export interface Template {
   width: number;
   height: number;
   data: string;
-  variables: Variable[];
+  variables?: Variable[];
 }
 
 export const GET_TEMPLATES = gql`

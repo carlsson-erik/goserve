@@ -20,14 +20,14 @@ type Template {
   data: String!
   width: Int!
   height: Int!
-  variables: [Variable!]!
+  variables: [Variable!]
 }
 
 type Variable {
   id: Int!
   name: String!
-  value: String
-  default: String
+  value: String!
+  default: String!
   template: Template
   tile: Tile
 }
@@ -56,7 +56,7 @@ type Tile {
   col: Int!
   width: Int!
   height: Int!
-  dashboard: Dashboard!
+  dashboard: Dashboard
   template: Template!
   variables: [Variable!]
 }
@@ -67,8 +67,8 @@ input NewTile {
   col: Int!
   width: Int!
   height: Int!
-  dashboard_id: Int!
-  tile_id: Int!
+  dashboardId: Int
+  templateId: Int
   variables: [NewVariable!]
 }
 
@@ -87,4 +87,5 @@ type Query {
   dashboard(id: Int!) : Dashboard
   tiles: [Tile!]!
   tile(id: Int!) : Tile
+  templates: [Template!]!
 }

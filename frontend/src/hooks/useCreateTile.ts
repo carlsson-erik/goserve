@@ -1,16 +1,17 @@
 import { FetchResult, MutationResult, gql, useMutation } from "@apollo/client";
 import React from "react";
 import { GET_TILES, GetTilesResult, Tile } from "./useTileQuery";
+import { Variable } from "./useCreateTemplate";
 
 export interface CreateTileData {
   name: string;
-  description?: string;
-  dashboard_id: number;
+  dashboardId: number;
   row: number;
   col: number;
-  data: string;
   width: number;
   height: number;
+  templateId: number;
+  variables: Omit<Variable, "id">[];
 }
 
 export interface CreateTileResult {
