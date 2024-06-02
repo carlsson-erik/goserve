@@ -1,5 +1,4 @@
 import { Route, Routes } from "react-router-dom";
-import DashboardCreateScreen from "./dashboard/DashboardCreateScreen";
 import paths from "../utils/paths";
 import DashboardScreen from "./dashboard/DashboardScreen";
 import SideBar from "../components/SideBar";
@@ -8,8 +7,9 @@ import {
   GET_DASHBOARDS,
   GetDashboardsResult,
 } from "../hooks/useDashboardQuery";
-import TileCreateScreen from "./template/TemplateCreateScreen";
 import { GET_TEMPLATES, GetTemplatesResult } from "../hooks/useTemplateQuery";
+import DashboardCreateScreen from "./dashboard/DashboardCreateScreen";
+import TileCreateScreen from "./tile/TileCreateScreen";
 import TemplateCreateScreen from "./template/TemplateCreateScreen";
 
 export const HomeScreen = () => {
@@ -28,7 +28,7 @@ export const HomeScreen = () => {
         <Routes>
           <Route
             path={paths.dashboard.create}
-            element={<DashbordCreateScreen />}
+            element={<DashboardCreateScreen />}
           />
           <Route
             path={paths.dashboard.tile.create}

@@ -27,7 +27,7 @@ export interface CreateTemplateResult {
 const useCreateTemplate = () => {
   const [createTemplateGQL, other] = useMutation<CreateTemplateResult>(gql`
     mutation createTemplate($input: NewTemplate!) {
-      createTile(input: $input) {
+      createTemplate(input: $input) {
         id
         name
       }
@@ -57,7 +57,7 @@ const useCreateTemplate = () => {
     [createTemplateGQL]
   );
 
-  return [createTile, other];
+  return [createTile, other] as const;
 };
 
 export default useCreateTemplate;
