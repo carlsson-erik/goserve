@@ -5,11 +5,19 @@ import paths from "../utils/paths";
 import { Tile } from "../hooks/useTileQuery";
 import { LivePreview, LiveProvider } from "react-live";
 import Button from "./input/Button";
-import { tw } from "twind";
+import { TW, tw } from "twind";
+
+export function getVariable(tile?: Tile): (name: string) => string {
+  return (name: string) => {
+    if (!tile) return "";
+    return tile.variables.find((v) => v.name === name)?.value ?? "";
+  };
+}
 
 export interface TileProps {
   col: number;
   row: number;
+  scope: { tw: TW; getVariable: (name: string) => string };
   className?: string;
   tile?: Tile;
   compiledData?: string;
@@ -24,6 +32,7 @@ const TileCard: React.FC<TileProps> = ({
   tile,
   className,
   editing,
+  scope,
   onEditClick,
   onDelete,
 }) => {
@@ -60,7 +69,7 @@ const TileCard: React.FC<TileProps> = ({
         <div className="h-full p-4">
           {tile ? (
             <div className="h-full rounded-3xl overflow-hidden flex justify-center bg-gray-700 border border-gray-800">
-              <LiveProvider code={tile?.template.data}>
+              <LiveProvider code={tile?.template.data} scope={scope}>
                 <LivePreview />
               </LiveProvider>
             </div>

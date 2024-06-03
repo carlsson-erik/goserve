@@ -8,10 +8,11 @@ import {
 } from "../../hooks/useDashboardQuery";
 import useDeleteDashboard from "../../hooks/useDeleteDashboard";
 import React from "react";
-import TileCard from "../../components/TileCard";
+import TileCard, { getVariable } from "../../components/TileCard";
 import { IconEdit, IconEditOff } from "@tabler/icons-react";
 import { Tile } from "../../hooks/useTileQuery";
 import useDeleteTile from "../../hooks/useDeleteTile";
+import { tw } from "twind";
 
 const DashboardScreen = () => {
   const [editing, setEditing] = React.useState(true);
@@ -96,6 +97,7 @@ const DashboardScreen = () => {
           {tiles.slice(0, 6).map((t, index) => {
             return (
               <TileCard
+                scope={{ tw: tw, getVariable: getVariable(t) }}
                 col={index}
                 row={1}
                 key={t ? t.id + index : index}
@@ -116,6 +118,7 @@ const DashboardScreen = () => {
           {tiles.slice(6, 12).map((t, index) => {
             return (
               <TileCard
+                scope={{ tw: tw, getVariable: getVariable(t) }}
                 col={index}
                 row={2}
                 key={t ? t.id + index : index}
@@ -132,6 +135,7 @@ const DashboardScreen = () => {
           {tiles.slice(12, 18).map((t, index) => {
             return (
               <TileCard
+                scope={{ tw: tw, getVariable: getVariable(t) }}
                 col={index}
                 row={3}
                 key={t ? t.id + index : index}
@@ -148,6 +152,7 @@ const DashboardScreen = () => {
           {tiles.slice(18, 24).map((t, index) => {
             return (
               <TileCard
+                scope={{ tw: tw, getVariable: getVariable(t) }}
                 col={index}
                 row={4}
                 key={t ? t.id + index : index}
