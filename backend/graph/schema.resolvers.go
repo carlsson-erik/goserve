@@ -275,6 +275,17 @@ func (r *tileResolver) Template(ctx context.Context, obj *model.Tile) (*model.Te
 	return &res, err
 }
 
+// Variables is the resolver for the variables field.
+func (r *tileResolver) Variables(ctx context.Context, obj *model.Tile) ([]*model.Variable, error) {
+	var res []*model.Variable
+
+	getQuery := Variable.SELECT(Variable.AllColumns).WHERE(Variable.ID.EQ(postgres.Int(int64(obj.ID))))
+
+	err := getQuery.Query(r.DB, &res)
+
+	return res, err
+}
+
 // Dashboard returns DashboardResolver implementation.
 func (r *Resolver) Dashboard() DashboardResolver { return &dashboardResolver{r} }
 

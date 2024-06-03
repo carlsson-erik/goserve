@@ -21,6 +21,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       style={buttonStyle(variant)}
+      type="button"
       {...props}
       className={
         props.className +
