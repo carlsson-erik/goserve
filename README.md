@@ -41,6 +41,13 @@ Apply migrations at restart of the go server
 cd backend/
 migrate -path db/migrations --database "postgresql://postgres:postgres@localhost:5432/v1?sslmode=disable" -verbose down
 
+If drop doesn't work, then drop the whole database and re apply all migrations
+migrate -path db/migrations --database "postgresql://postgres:postgres@localhost:5432/v1?sslmode=disable" drop
+
+Reapply migrations
+migrate -path db/migrations --database "postgresql://postgres:postgres@localhost:5432/v1?sslmode=disable" up
+
+
 Generate jet types:
 cd backend/
 jet -dsn="postgresql://postgres:postgres@localhost:5432/v1?sslmode=disable" -schema=public -path="./.gen"
