@@ -13,12 +13,10 @@ const DashboardCreateScreen = () => {
   const navigate = useNavigate();
 
   const onSubmit = async () => {
-    console.log("hej");
     try {
       const res = await createDashboard({ name: name });
 
       if (res.errors) console.log(res.errors);
-      console.log(res, data);
       if (res.data) {
         navigate(
           generatePath(paths.dashboard.id, {

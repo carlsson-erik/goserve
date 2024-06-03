@@ -279,7 +279,7 @@ func (r *tileResolver) Template(ctx context.Context, obj *model.Tile) (*model.Te
 func (r *tileResolver) Variables(ctx context.Context, obj *model.Tile) ([]*model.Variable, error) {
 	var res []*model.Variable
 
-	getQuery := Variable.SELECT(Variable.AllColumns).WHERE(Variable.ID.EQ(postgres.Int(int64(obj.ID))))
+	getQuery := Variable.SELECT(Variable.AllColumns).WHERE(Variable.TileID.EQ(postgres.Int(int64(obj.ID))))
 
 	err := getQuery.Query(r.DB, &res)
 

@@ -37,7 +37,8 @@ const TileCard: React.FC<TileProps> = ({
   onDelete,
 }) => {
   const { dashboardId } = useParams();
-  console.log(dashboardId, col, row);
+
+  console.log(tile?.variables);
   return (
     <div className={tw(className, "relative w-full h-full")}>
       {editing ? (

@@ -13,6 +13,7 @@ import {
 } from "../../hooks/useTemplateQuery";
 import { useForm } from "react-hook-form";
 import { CreateTemplateData } from "../../hooks/useCreateTemplate";
+import { getVariable } from "../../components/TileCard";
 
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
@@ -26,6 +27,8 @@ const TileCreateScreen: React.FC = () => {
   const { data: templates } = useQuery<GetTemplatesResult>(GET_TEMPLATES);
 
   const form = useForm<CreateTileData>();
+
+  const variables = form.watch("variables");
 
   const [template, setTemplate] = React.useState<Template | undefined>();
 
@@ -67,8 +70,6 @@ const TileCreateScreen: React.FC = () => {
     [col, createTile, dashboardId, navigate, row, template, width]
   );
 
-  console.log(template?.variables);
-
   if (!templates) {
     return <div>Loading...</div>;
   }
@@ -87,6 +88,7 @@ const TileCreateScreen: React.FC = () => {
         code={template?.data}
         scope={{
           tw,
+          getVariable: getVariable({ variables: variables }),
         }}
       >
         <div className="h-2/3 grid grid-cols-2 gap-4">

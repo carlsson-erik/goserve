@@ -8,7 +8,8 @@ import useCreateTemplate, {
   CreateTemplateData,
   Variable,
 } from "../../hooks/useCreateTemplate";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { getVariable } from "../../components/TileCard";
 
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
@@ -34,6 +35,8 @@ const TemplateCreateScreen = () => {
       variables: [],
     },
   });
+
+  const variables = form.watch("variables");
 
   const { append, remove, fields } = useFieldArray({
     control: form.control,
@@ -73,6 +76,7 @@ const TemplateCreateScreen = () => {
         }}
         scope={{
           tw,
+          getVariable: getVariable({ variables: variables }),
         }}
       >
         <div className="h-2/3 grid grid-cols-2 gap-4">
