@@ -4536,7 +4536,7 @@ func (ec *executionContext) unmarshalInputNewDashboard(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name"}
+	fieldsInOrder := [...]string{"name", "rows", "cols"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4550,6 +4550,20 @@ func (ec *executionContext) unmarshalInputNewDashboard(ctx context.Context, obj 
 				return it, err
 			}
 			it.Name = data
+		case "rows":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rows"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rows = data
+		case "cols":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cols"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Cols = data
 		}
 	}
 

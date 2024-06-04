@@ -22,8 +22,8 @@ CREATE TABLE public.tile (
 	"height" int NOT NULL,
 	"dashboard_id" serial,
 	"template_id" serial,
-	CONSTRAINT fk_tile_dashboard FOREIGN KEY(dashboard_id) REFERENCES dashboard(id),
-	CONSTRAINT fk_tile_template FOREIGN KEY(template_id) REFERENCES template(id)
+	CONSTRAINT fk_tile_dashboard FOREIGN KEY(dashboard_id) REFERENCES dashboard(id) ON DELETE CASCADE,
+	CONSTRAINT fk_tile_template FOREIGN KEY(template_id) REFERENCES template(id) on DELETE CASCADE
 );
 
 CREATE TABLE public.variable (
@@ -33,6 +33,6 @@ CREATE TABLE public.variable (
 	"default" varchar,
 	"template_id" int NULL,
 	"tile_id" int NULL,
-	CONSTRAINT fk_variable_template FOREIGN KEY(template_id) REFERENCES template(id),
-	CONSTRAINT fk_variable_tile FOREIGN KEY(tile_id) REFERENCES tile(id)
+	CONSTRAINT fk_variable_template FOREIGN KEY(template_id) REFERENCES template(id) on DELETE CASCADE,
+	CONSTRAINT fk_variable_tile FOREIGN KEY(tile_id) REFERENCES tile(id) on DELETE CASCADE
 );

@@ -1,9 +1,9 @@
 
-INSERT INTO public.dashboard
-VALUES (1,'Test dashboard', 4, 6);
+INSERT INTO public.dashboard ("name","rows","cols")
+VALUES ('Test dashboard', 4, 6);
 
-INSERT INTO public.template
-values(1,'Bookmark', '() => {
+INSERT INTO public.template ("name","data","width","height")
+values('Bookmark', '() => {
     const [count, setCount] = React.useState(0)
     
     const siteName = getVariable("title")? getVariable("title") : "No title"

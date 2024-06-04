@@ -15,6 +15,8 @@ type Mutation struct {
 
 type NewDashboard struct {
 	Name string `json:"name"`
+	Rows *int   `json:"rows,omitempty"`
+	Cols *int   `json:"cols,omitempty"`
 }
 
 type NewTemplate struct {

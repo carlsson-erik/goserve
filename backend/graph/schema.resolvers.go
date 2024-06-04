@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	. "goserve/.gen/v1/public/table"
+	"goserve/db"
 	"goserve/graph/model"
 	"log"
 
@@ -80,23 +81,36 @@ func (r *mutationResolver) CreateTemplate(ctx context.Context, input model.NewTe
 
 // CreateDashboard is the resolver for the createDashboard field.
 func (r *mutationResolver) CreateDashboard(ctx context.Context, input model.NewDashboard) (*model.Dashboard, error) {
-	newDashboard := model.Dashboard{
-		Name: input.Name,
-		Rows: 6,
-		Cols: 8,
+
+	var rows, cols int
+	if input.Rows == nil {
+		rows = 4
+	} else {
+		rows = *input.Rows
 	}
-	insertQuery := Dashboard.INSERT(Dashboard.Name, Dashboard.Rows, Dashboard.Cols).MODEL(newDashboard).RETURNING(Dashboard.AllColumns)
 
-	res := model.Dashboard{}
+	if input.Cols == nil {
+		cols = 4
+	} else {
+		cols = *input.Cols
+	}
 
-	err := insertQuery.Query(r.DB, &res)
+	newDashboard := model.NewDashboard{
+		Name: input.Name,
+		Rows: &rows,
+		Cols: &cols,
+	}
+
+	dashboardService := db.DashboardService{DB: r.DB}
+
+	res, err := dashboardService.Create(&newDashboard)
 
 	if err != nil {
 		log.Printf("Insert error: %v", err)
 		return nil, err
 	}
 
-	return &res, err
+	return res, err
 }
 
 // DeleteDashboard is the resolver for the deleteDashboard field.
@@ -189,13 +203,10 @@ func (r *mutationResolver) DeleteTile(ctx context.Context, id int) (*model.Tile,
 
 // Dashboards is the resolver for the dashboards field.
 func (r *queryResolver) Dashboards(ctx context.Context) ([]*model.Dashboard, error) {
-	var getDest []*model.Dashboard
 
-	getQuery := postgres.SELECT(Dashboard.AllColumns).FROM(Dashboard)
+	dashboardService := db.DashboardService{DB: r.DB}
 
-	err := getQuery.Query(r.DB, &getDest)
-
-	return getDest, err
+	return dashboardService.All()
 }
 
 // Dashboard is the resolver for the dashboard field.

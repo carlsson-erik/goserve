@@ -12,6 +12,8 @@ type Dashboard {
 
 input NewDashboard {
   name: String!
+  rows: Int
+  cols: Int
 }
 
 type Template {
