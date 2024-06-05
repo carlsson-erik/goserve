@@ -126,7 +126,6 @@ type TemplateResolver interface {
 	Variables(ctx context.Context, obj *model.Template) ([]*model.Variable, error)
 }
 type TileResolver interface {
-	Dashboard(ctx context.Context, obj *model.Tile) (*model.Dashboard, error)
 	Template(ctx context.Context, obj *model.Tile) (*model.Template, error)
 	Variables(ctx context.Context, obj *model.Tile) ([]*model.Variable, error)
 }
@@ -2312,7 +2311,7 @@ func (ec *executionContext) _Tile_dashboard(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Tile().Dashboard(rctx, obj)
+		return obj.Dashboard, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2330,8 +2329,8 @@ func (ec *executionContext) fieldContext_Tile_dashboard(ctx context.Context, fie
 	fc = &graphql.FieldContext{
 		Object:     "Tile",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -5219,38 +5218,7 @@ func (ec *executionContext) _Tile(ctx context.Context, sel ast.SelectionSet, obj
 				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "dashboard":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Tile_dashboard(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			out.Values[i] = ec._Tile_dashboard(ctx, field, obj)
 		case "template":
 			field := field
 

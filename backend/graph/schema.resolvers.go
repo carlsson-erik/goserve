@@ -6,10 +6,9 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	. "goserve/.gen/v1/public/table"
-	"goserve/db"
 	"goserve/graph/model"
+	"goserve/service"
 	"log"
 
 	"github.com/go-jet/jet/v2/postgres"
@@ -19,7 +18,7 @@ import (
 func (r *dashboardResolver) Tiles(ctx context.Context, obj *model.Dashboard) ([]*model.Tile, error) {
 	var res []*model.Tile
 
-	getQuery := postgres.SELECT(Tile.AllColumns).FROM(Tile).WHERE(Tile.DashboardID.EQ(postgres.Int64(int64(obj.ID))))
+	getQuery := Tile.SELECT(Tile.AllColumns).FROM(Tile).WHERE(Tile.DashboardID.EQ(postgres.Int64(int64(obj.ID))))
 
 	err := getQuery.Query(r.DB, &res)
 
@@ -28,60 +27,13 @@ func (r *dashboardResolver) Tiles(ctx context.Context, obj *model.Dashboard) ([]
 
 // CreateTemplate is the resolver for the createTemplate field.
 func (r *mutationResolver) CreateTemplate(ctx context.Context, input model.NewTemplate) (*model.Template, error) {
-	newTemplate := model.Template{
-		Name:   input.Name,
-		Width:  *input.Width,
-		Height: *input.Height,
-		Data:   input.Data,
-	}
-	insertQuery := Template.INSERT(Template.Name, Template.Width, Template.Height, Template.Data).MODEL(newTemplate).RETURNING(Template.AllColumns)
+	res, err := r.TemplateService.Create(input)
 
-	templateRes := model.Template{}
-
-	err := insertQuery.Query(r.DB, &templateRes)
-
-	if err != nil {
-		log.Printf("Insert error: %v", err)
-		return nil, err
-	}
-
-	var variablesInsertRes []*model.Variable
-
-	newVariables := []model.NewVariable{}
-
-	for _, variable := range input.Variables {
-		newVariables = append(newVariables, model.NewVariable{Name: variable.Name, Default: variable.Default, Value: variable.Value, TemplateID: &templateRes.ID, TileID: nil})
-	}
-	fmt.Printf("%d", len(newVariables))
-
-	insertVariableQuery := Variable.INSERT(Variable.Name, Variable.Default, Variable.Value, Variable.TemplateID, Variable.TileID).MODELS(newVariables)
-
-	err = insertVariableQuery.Query(r.DB, &variablesInsertRes)
-
-	if err != nil {
-		log.Printf("Insert variables error: %v", err)
-		return nil, err
-	}
-
-	var variablesGetRes []*model.Variable
-
-	getVariablesQuery := postgres.SELECT(Variable.AllColumns).FROM(Variable).WHERE(Variable.TemplateID.EQ(postgres.Int64(int64(templateRes.ID))))
-
-	err = getVariablesQuery.Query(r.DB, &variablesGetRes)
-
-	if err != nil {
-		log.Printf("Get variables error: %v", err)
-		return nil, err
-	}
-
-	templateRes.Variables = variablesGetRes
-
-	return &templateRes, err
+	return res, err
 }
 
 // CreateDashboard is the resolver for the createDashboard field.
 func (r *mutationResolver) CreateDashboard(ctx context.Context, input model.NewDashboard) (*model.Dashboard, error) {
-
 	var rows, cols int
 	if input.Rows == nil {
 		rows = 4
@@ -101,9 +53,7 @@ func (r *mutationResolver) CreateDashboard(ctx context.Context, input model.NewD
 		Cols: &cols,
 	}
 
-	dashboardService := db.DashboardService{DB: r.DB}
-
-	res, err := dashboardService.Create(&newDashboard)
+	res, err := r.DashboardService.Create(newDashboard)
 
 	if err != nil {
 		log.Printf("Insert error: %v", err)
@@ -115,140 +65,67 @@ func (r *mutationResolver) CreateDashboard(ctx context.Context, input model.NewD
 
 // DeleteDashboard is the resolver for the deleteDashboard field.
 func (r *mutationResolver) DeleteDashboard(ctx context.Context, id int) (*model.Dashboard, error) {
-	deleteQuery := Dashboard.DELETE().WHERE(Dashboard.ID.EQ(postgres.Int(int64(id)))).RETURNING(Dashboard.AllColumns)
+	dashboardService := service.DashboardService{DB: r.DB}
 
-	res := model.Dashboard{}
-
-	err := deleteQuery.Query(r.DB, &res)
+	res, err := dashboardService.Delete(id)
 
 	if err != nil {
 		log.Printf("Delete failed: %v", err)
 		return nil, err
 	}
-
-	return &res, err
-}
-
-// CreateTile is the resolver for the createTile field.
-func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) (*model.Tile, error) {
-	newTile := model.NewTile{
-		Name:        input.Name,
-		DashboardID: input.DashboardID,
-		TemplateID:  input.TemplateID,
-		Row:         input.Row,
-		Col:         input.Col,
-		Width:       input.Width,
-		Height:      input.Height,
-	}
-	insertQuery := Tile.INSERT(Tile.Name, Tile.DashboardID, Tile.TemplateID, Tile.Row, Tile.Col, Tile.Width, Tile.Height).MODEL(newTile).RETURNING(Tile.AllColumns)
-
-	tileRes := model.Tile{}
-
-	err := insertQuery.Query(r.DB, &tileRes)
-
-	if err != nil {
-		log.Printf("Insert failed: %v", err)
-		return nil, err
-	}
-
-	var variablesInsertRes []*model.Variable
-
-	newVariables := []model.NewVariable{}
-
-	for _, variable := range input.Variables {
-		newVariables = append(newVariables, model.NewVariable{Name: variable.Name, Default: variable.Default, Value: variable.Value, TileID: &tileRes.ID})
-	}
-	fmt.Printf("%d", len(newVariables))
-
-	insertVariableQuery := Variable.INSERT(Variable.Name, Variable.Default, Variable.Value, Variable.TileID).MODELS(newVariables)
-
-	err = insertVariableQuery.Query(r.DB, &variablesInsertRes)
-
-	if err != nil {
-		log.Printf("Insert variables error: %v", err)
-		return nil, err
-	}
-
-	var variablesGetRes []*model.Variable
-
-	getVariablesQuery := postgres.SELECT(Variable.AllColumns).FROM(Variable).WHERE(Variable.TemplateID.EQ(postgres.Int64(int64(tileRes.ID))))
-
-	err = getVariablesQuery.Query(r.DB, &variablesGetRes)
-
-	if err != nil {
-		log.Printf("Get variables error: %v", err)
-		return nil, err
-	}
-
-	tileRes.Variables = variablesGetRes
-
-	return &tileRes, err
-}
-
-// DeleteTile is the resolver for the deleteTile field.
-func (r *mutationResolver) DeleteTile(ctx context.Context, id int) (*model.Tile, error) {
-	deleteQuery := Tile.DELETE().WHERE(Tile.ID.EQ(postgres.Int(int64(id)))).RETURNING(Tile.AllColumns)
-
-	res := model.Tile{}
-
-	err := deleteQuery.Query(r.DB, &res)
-
-	if err != nil {
-		log.Printf("Delete failed: %v", err)
-		return nil, err
-	}
-
-	return &res, err
-}
-
-// Dashboards is the resolver for the dashboards field.
-func (r *queryResolver) Dashboards(ctx context.Context) ([]*model.Dashboard, error) {
-
-	dashboardService := db.DashboardService{DB: r.DB}
-
-	return dashboardService.All()
-}
-
-// Dashboard is the resolver for the dashboard field.
-func (r *queryResolver) Dashboard(ctx context.Context, id int) (*model.Dashboard, error) {
-	var res *model.Dashboard
-
-	getQuery := postgres.SELECT(Dashboard.AllColumns).FROM(Dashboard).WHERE(Dashboard.ID.EQ(postgres.Int(int64(id))))
-
-	err := getQuery.Query(r.DB, &res)
 
 	return res, err
 }
 
+// CreateTile is the resolver for the createTile field.
+func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) (*model.Tile, error) {
+	res, err := r.TileService.Create(input)
+
+	return res, err
+}
+
+// DeleteTile is the resolver for the deleteTile field.
+func (r *mutationResolver) DeleteTile(ctx context.Context, id int) (*model.Tile, error) {
+	res, err := r.TileService.Delete(id)
+
+	if err != nil {
+		log.Printf("Delete failed: %v", err)
+		return nil, err
+	}
+
+	return res, err
+}
+
+// Dashboards is the resolver for the dashboards field.
+func (r *queryResolver) Dashboards(ctx context.Context) ([]*model.Dashboard, error) {
+	res, err := r.DashboardService.All()
+
+	return res, err
+}
+
+// Dashboard is the resolver for the dashboard field.
+func (r *queryResolver) Dashboard(ctx context.Context, id int) (*model.Dashboard, error) {
+	log.Println("Not implemented")
+	return nil, nil
+}
+
 // Tiles is the resolver for the tiles field.
 func (r *queryResolver) Tiles(ctx context.Context) ([]*model.Tile, error) {
-	var res []*model.Tile
-
-	getQuery := postgres.SELECT(Tile.AllColumns).FROM(Tile)
-
-	err := getQuery.Query(r.DB, &res)
+	res, err := r.TileService.All()
 
 	return res, err
 }
 
 // Tile is the resolver for the tile field.
 func (r *queryResolver) Tile(ctx context.Context, id int) (*model.Tile, error) {
-	var res *model.Tile
-
-	getQuery := postgres.SELECT(Tile.AllColumns).FROM(Tile).WHERE(Tile.ID.EQ(postgres.Int(int64(id))))
-
-	err := getQuery.Query(r.DB, &res)
+	res, err := r.TileService.Get(id)
 
 	return res, err
 }
 
 // Templates is the resolver for the templates field.
 func (r *queryResolver) Templates(ctx context.Context) ([]*model.Template, error) {
-	var res []*model.Template
-
-	getQuery := Template.SELECT(Template.AllColumns)
-
-	err := getQuery.Query(r.DB, &res)
+	res, err := r.TemplateService.All()
 
 	return res, err
 }
@@ -262,17 +139,6 @@ func (r *templateResolver) Variables(ctx context.Context, obj *model.Template) (
 	err := getVariables.Query(r.DB, &res)
 
 	return res, err
-}
-
-// Dashboard is the resolver for the dashboard field.
-func (r *tileResolver) Dashboard(ctx context.Context, obj *model.Tile) (*model.Dashboard, error) {
-	var res model.Dashboard
-
-	getQuery := postgres.SELECT(Dashboard.AllColumns).FROM(Dashboard).WHERE(Dashboard.ID.EQ(postgres.Int(int64(obj.ID))))
-
-	err := getQuery.Query(r.DB, &res)
-
-	return &res, err
 }
 
 // Template is the resolver for the template field.
@@ -317,3 +183,19 @@ type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type templateResolver struct{ *Resolver }
 type tileResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *tileResolver) Dashboard(ctx context.Context, obj *model.Tile) (*model.Dashboard, error) {
+	var res model.Dashboard
+
+	getQuery := postgres.SELECT(Dashboard.AllColumns).FROM(Dashboard).WHERE(Dashboard.ID.EQ(postgres.Int(int64(obj.ID))))
+
+	err := getQuery.Query(r.DB, &res)
+
+	return &res, err
+}

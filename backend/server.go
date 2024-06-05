@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"goserve/db"
 	"goserve/graph"
+	"goserve/service"
 	"log"
 	"net/http"
 	"os"
@@ -42,6 +43,11 @@ func main() {
 
 	db, err := sql.Open("postgres", connectString)
 
+	dashboardService := service.DashboardService{DB: db}
+	templateService := service.TemplateService{DB: db}
+	tileService := service.TileService{DB: db}
+	variableService := service.VariableService{DB: db}
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,7 +62,7 @@ func main() {
 		Debug:            false,
 	}).Handler)
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: db}}))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: db, DashboardService: &dashboardService, TemplateService: &templateService, TileService: &tileService, VariableService: &variableService}}))
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)
