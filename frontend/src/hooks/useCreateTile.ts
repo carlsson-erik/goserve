@@ -18,15 +18,22 @@ export interface CreateTileResult {
   createTile: Tile;
 }
 
-const useCreateTile = (): [
-  (createData: CreateTileData) => Promise<FetchResult<CreateTileResult>>,
-  MutationResult<{ createTile: Tile }>
-] => {
+const useCreateTile = () => {
   const [createTileGQL, other] = useMutation<CreateTileResult>(gql`
     mutation createTile($input: NewTile!) {
       createTile(input: $input) {
         id
         name
+        row
+        col
+        width
+        height
+        template {
+          id
+        }
+        variables {
+          id
+        }
       }
     }
   `);
@@ -54,7 +61,7 @@ const useCreateTile = (): [
     [createTileGQL]
   );
 
-  return [createTile, other];
+  return [createTile, other] as const;
 };
 
 export default useCreateTile;

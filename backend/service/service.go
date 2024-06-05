@@ -21,7 +21,7 @@ func (d DashboardService) Create(createData model.NewDashboard) (*model.Dashboar
 	err := insertQuery.Query(d.DB, &res)
 
 	if err != nil {
-		log.Printf("Insert failed: %v", err)
+		log.Printf("Insert dashboard failed: %v", err)
 		return nil, err
 	}
 
@@ -36,7 +36,7 @@ func (d DashboardService) All() ([]*model.Dashboard, error) {
 	err := getQuery.Query(d.DB, &res)
 
 	if err != nil {
-		log.Printf("Insert failed: %v", err)
+		log.Printf("Get dashboard failed: %v", err)
 		return nil, err
 	}
 
@@ -46,12 +46,12 @@ func (d DashboardService) All() ([]*model.Dashboard, error) {
 func (d DashboardService) Delete(id int) (*model.Dashboard, error) {
 	var res model.Dashboard
 
-	deleteQuery := Dashboard.DELETE().WHERE(Dashboard.ID.EQ(postgres.Int64(int64(id))))
+	deleteQuery := Dashboard.DELETE().WHERE(Dashboard.ID.EQ(postgres.Int64(int64(id)))).RETURNING(Dashboard.AllColumns)
 
 	err := deleteQuery.Query(d.DB, &res)
 
 	if err != nil {
-		log.Printf("Insert failed: %v", err)
+		log.Printf("Delete dashboard failed: %v", err)
 		return nil, err
 	}
 
@@ -71,7 +71,7 @@ func (t TileService) Create(createData model.NewTile) (*model.Tile, error) {
 	err := insertQuery.Query(t.DB, &tileRes)
 
 	if err != nil {
-		log.Printf("Insert failed: %v", err)
+		log.Printf("Insert tile failed: %v", err)
 		return nil, err
 	}
 
@@ -104,7 +104,7 @@ func (t TileService) All() ([]*model.Tile, error) {
 	err := getQuery.Query(t.DB, &res)
 
 	if err != nil {
-		log.Printf("Get tiles error: %v", err)
+		log.Printf("Get all tiles error: %v", err)
 		return nil, err
 	}
 
@@ -129,7 +129,7 @@ func (t TileService) Get(id int) (*model.Tile, error) {
 func (t TileService) Delete(id int) (*model.Tile, error) {
 	var res model.Tile
 
-	deleteQuery := Tile.DELETE().WHERE(Tile.ID.EQ(postgres.Int64(int64(id))))
+	deleteQuery := Tile.DELETE().WHERE(Tile.ID.EQ(postgres.Int64(int64(id)))).RETURNING(Tile.AllColumns)
 
 	err := deleteQuery.Query(t.DB, &res)
 
@@ -179,7 +179,7 @@ func (v VariableService) All() ([]*model.Variable, error) {
 func (v VariableService) Delete(id int) (*model.Variable, error) {
 	var res model.Variable
 
-	deleteQuery := Variable.DELETE().WHERE(Variable.ID.EQ(postgres.Int64(int64(id))))
+	deleteQuery := Variable.DELETE().WHERE(Variable.ID.EQ(postgres.Int64(int64(id)))).RETURNING(Variable.AllColumns)
 
 	err := deleteQuery.Query(v.DB, &res)
 
@@ -246,7 +246,7 @@ func (v TemplateService) All() ([]*model.Template, error) {
 func (v TemplateService) Delete(id int) (*model.Template, error) {
 	var res model.Template
 
-	deleteQuery := Template.DELETE().WHERE(Template.ID.EQ(postgres.Int64(int64(id))))
+	deleteQuery := Template.DELETE().WHERE(Template.ID.EQ(postgres.Int64(int64(id)))).RETURNING(Template.AllColumns)
 
 	err := deleteQuery.Query(v.DB, &res)
 
