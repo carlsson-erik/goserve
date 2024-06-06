@@ -243,6 +243,21 @@ func (v TemplateService) All() ([]*model.Template, error) {
 	return res, err
 }
 
+func (v TemplateService) Get(id int) (*model.Template, error) {
+	var res *model.Template
+
+	getQuery := Template.SELECT(Template.AllColumns).WHERE(Template.ID.EQ(postgres.Int64(int64(id))))
+
+	err := getQuery.Query(v.DB, &res)
+
+	if err != nil {
+		log.Printf("Get template error: %v", err)
+		return nil, err
+	}
+
+	return res, err
+}
+
 func (v TemplateService) Delete(id int) (*model.Template, error) {
 	var res model.Template
 

@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	. "goserve/.gen/v1/public/table"
 	"goserve/graph/model"
 	"goserve/service"
@@ -21,6 +22,11 @@ func (r *dashboardResolver) Tiles(ctx context.Context, obj *model.Dashboard) ([]
 	getQuery := Tile.SELECT(Tile.AllColumns).FROM(Tile).WHERE(Tile.DashboardID.EQ(postgres.Int64(int64(obj.ID))))
 
 	err := getQuery.Query(r.DB, &res)
+
+	if err != nil {
+		log.Printf("Get tiles for dashboard error: %v", err)
+		return nil, err
+	}
 
 	return res, err
 }
@@ -100,25 +106,10 @@ func (r *mutationResolver) DeleteTile(ctx context.Context, id int) (*model.Tile,
 func (r *queryResolver) Dashboards(ctx context.Context) ([]*model.Dashboard, error) {
 	res, err := r.DashboardService.All()
 
-	return res, err
-}
-
-// Dashboard is the resolver for the dashboard field.
-func (r *queryResolver) Dashboard(ctx context.Context, id int) (*model.Dashboard, error) {
-	log.Println("Not implemented")
-	return nil, nil
-}
-
-// Tiles is the resolver for the tiles field.
-func (r *queryResolver) Tiles(ctx context.Context) ([]*model.Tile, error) {
-	res, err := r.TileService.All()
-
-	return res, err
-}
-
-// Tile is the resolver for the tile field.
-func (r *queryResolver) Tile(ctx context.Context, id int) (*model.Tile, error) {
-	res, err := r.TileService.Get(id)
+	if err != nil {
+		log.Printf("Get Dashboards error: %v", err)
+		return nil, err
+	}
 
 	return res, err
 }
@@ -138,6 +129,11 @@ func (r *templateResolver) Variables(ctx context.Context, obj *model.Template) (
 
 	err := getVariables.Query(r.DB, &res)
 
+	if err != nil {
+		log.Printf("Get variables for template error: %v", err)
+		return nil, err
+	}
+
 	return res, err
 }
 
@@ -145,9 +141,14 @@ func (r *templateResolver) Variables(ctx context.Context, obj *model.Template) (
 func (r *tileResolver) Template(ctx context.Context, obj *model.Tile) (*model.Template, error) {
 	var res model.Template
 
-	getQuery := Template.SELECT(Template.AllColumns).WHERE(Template.ID.EQ(postgres.Int(int64(obj.ID))))
+	getQuery := Tile.INNER_JOIN(Template, Template.ID.EQ(Tile.TemplateID)).SELECT(Template.AllColumns).WHERE(Tile.ID.EQ(postgres.Int64(int64(obj.ID))))
 
 	err := getQuery.Query(r.DB, &res)
+
+	if err != nil {
+		log.Printf("Get template for tile error: %v", err)
+		return nil, err
+	}
 
 	return &res, err
 }
@@ -156,9 +157,16 @@ func (r *tileResolver) Template(ctx context.Context, obj *model.Tile) (*model.Te
 func (r *tileResolver) Variables(ctx context.Context, obj *model.Tile) ([]*model.Variable, error) {
 	var res []*model.Variable
 
+	fmt.Print("variables for tile")
+
 	getQuery := Variable.SELECT(Variable.AllColumns).WHERE(Variable.TileID.EQ(postgres.Int(int64(obj.ID))))
 
 	err := getQuery.Query(r.DB, &res)
+
+	if err != nil {
+		log.Printf("Get variables for tile error: %v", err)
+		return nil, err
+	}
 
 	return res, err
 }
@@ -183,19 +191,3 @@ type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type templateResolver struct{ *Resolver }
 type tileResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *tileResolver) Dashboard(ctx context.Context, obj *model.Tile) (*model.Dashboard, error) {
-	var res model.Dashboard
-
-	getQuery := postgres.SELECT(Dashboard.AllColumns).FROM(Dashboard).WHERE(Dashboard.ID.EQ(postgres.Int(int64(obj.ID))))
-
-	err := getQuery.Query(r.DB, &res)
-
-	return &res, err
-}

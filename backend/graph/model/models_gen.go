@@ -24,7 +24,7 @@ type NewTemplate struct {
 	Data      string         `json:"data"`
 	Width     *int           `json:"width,omitempty"`
 	Height    *int           `json:"height,omitempty"`
-	Variables []*NewVariable `json:"variables,omitempty"`
+	Variables []*NewVariable `json:"variables"`
 }
 
 type NewTile struct {
@@ -35,7 +35,7 @@ type NewTile struct {
 	Height      int            `json:"height"`
 	DashboardID *int           `json:"dashboardId,omitempty"`
 	TemplateID  *int           `json:"templateId,omitempty"`
-	Variables   []*NewVariable `json:"variables,omitempty"`
+	Variables   []*NewVariable `json:"variables"`
 }
 
 type NewVariable struct {
@@ -65,16 +65,13 @@ type Tile struct {
 	Col       int         `json:"col"`
 	Width     int         `json:"width"`
 	Height    int         `json:"height"`
-	Dashboard *Dashboard  `json:"dashboard,omitempty"`
 	Template  *Template   `json:"template"`
-	Variables []*Variable `json:"variables,omitempty"`
+	Variables []*Variable `json:"variables"`
 }
 
 type Variable struct {
-	ID       int       `json:"id"`
-	Name     string    `json:"name"`
-	Value    string    `json:"value"`
-	Default  string    `json:"default"`
-	Template *Template `json:"template,omitempty"`
-	Tile     *Tile     `json:"tile,omitempty"`
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	Value   string `json:"value"`
+	Default string `json:"default"`
 }

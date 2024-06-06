@@ -30,8 +30,6 @@ type Variable {
   name: String!
   value: String!
   default: String!
-  template: Template
-  tile: Tile
 }
 
 input NewVariable {
@@ -48,7 +46,7 @@ input NewTemplate{
   data: String!
   width: Int
   height: Int
-  variables: [NewVariable!]
+  variables: [NewVariable!]!
 }
 
 type Tile {
@@ -58,9 +56,8 @@ type Tile {
   col: Int!
   width: Int!
   height: Int!
-  dashboard: Dashboard
   template: Template!
-  variables: [Variable!]
+  variables: [Variable!]!
 }
 
 input NewTile {
@@ -71,7 +68,7 @@ input NewTile {
   height: Int!
   dashboardId: Int
   templateId: Int
-  variables: [NewVariable!]
+  variables: [NewVariable!]!
 }
 
 
@@ -86,8 +83,5 @@ type Mutation {
 
 type Query {
   dashboards: [Dashboard!]!
-  dashboard(id: Int!) : Dashboard
-  tiles: [Tile!]!
-  tile(id: Int!) : Tile
   templates: [Template!]!
 }
