@@ -7,7 +7,7 @@ import {
   GET_DASHBOARDS,
   GetDashboardsResult,
 } from "../hooks/useDashboardQuery";
-import { GET_TEMPLATES, GetTemplatesResult } from "../hooks/useTemplateQuery";
+import { GET_TEMPLATES } from "../hooks/useTemplateQuery";
 import DashboardCreateScreen from "./dashboard/DashboardCreateScreen";
 import TileCreateScreen from "./tile/TileCreateScreen";
 import TemplateCreateScreen from "./template/TemplateCreateScreen";
@@ -15,7 +15,7 @@ import TemplateCreateScreen from "./template/TemplateCreateScreen";
 export const HomeScreen = () => {
   const { data: dashboards } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
 
-  const { data: templates } = useQuery<GetTemplatesResult>(GET_TEMPLATES);
+  const { data: templates } = useQuery(GET_TEMPLATES);
 
   return (
     <div className="w-full h-full flex">

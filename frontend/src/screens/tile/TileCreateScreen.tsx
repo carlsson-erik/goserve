@@ -1,5 +1,5 @@
 import React from "react";
-import { LiveEditor, LiveError, LivePreview, LiveProvider } from "react-live";
+import { LiveError, LivePreview, LiveProvider } from "react-live";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/input/Button";
 import { tw } from "twind";
@@ -12,14 +12,7 @@ import {
   Template,
 } from "../../hooks/useTemplateQuery";
 import { useForm } from "react-hook-form";
-import { CreateTemplateData } from "../../hooks/useCreateTemplate";
 import { getVariable } from "../../components/TileCard";
-
-const DefaultCode = `() => {
-    const [count, setCount] = React.useState(0)
-    
-    return(<div className="h-full flex justify-center items-center" onClick={() => setCount(count+1)}> {count}</div>)
-}`;
 
 const TileCreateScreen: React.FC = () => {
   //Fetch data
@@ -88,7 +81,7 @@ const TileCreateScreen: React.FC = () => {
         code={template?.data}
         scope={{
           tw,
-          getVariable: getVariable({ variables: variables }),
+          getVariable: getVariable({ variables: { ...variables } }),
         }}
       >
         <div className="h-2/3 grid grid-cols-2 gap-4">

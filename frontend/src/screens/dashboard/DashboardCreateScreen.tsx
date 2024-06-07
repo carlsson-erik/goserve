@@ -9,6 +9,7 @@ const DashboardCreateScreen = () => {
   const [name, setName] = React.useState("");
 
   const [createDashboard, { data, loading }] = useCreateDashboard();
+  console.log(data);
 
   const navigate = useNavigate();
 

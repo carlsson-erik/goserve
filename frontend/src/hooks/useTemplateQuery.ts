@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { graphql } from "../utils/graphql";
 import { Variable } from "./useCreateTemplate";
 
 export interface Template {
@@ -10,8 +10,8 @@ export interface Template {
   variables?: Variable[];
 }
 
-export const GET_TEMPLATES = gql`
-  query {
+export const GET_TEMPLATES = graphql(`
+  query Templates {
     templates {
       id
       name
@@ -26,8 +26,7 @@ export const GET_TEMPLATES = gql`
       }
     }
   }
-`;
-
+`);
 export interface GetTemplatesResult {
   templates: Template[];
 }

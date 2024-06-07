@@ -30,7 +30,7 @@ CREATE TABLE public.variable (
 	id serial primary key,
 	"name" varchar NOT NULL CHECK (name <> ''),
 	"value" varchar,
-	"default" varchar,
+	"default" varchar NULL,
 	"template_id" int NULL,
 	"tile_id" int NULL,
 	CONSTRAINT fk_variable_template FOREIGN KEY(template_id) REFERENCES template(id) on DELETE CASCADE,

@@ -5,12 +5,12 @@ import { useQuery } from "@apollo/client";
 import {
   GET_DASHBOARDS,
   GetDashboardsResult,
+  Tile,
 } from "../../hooks/useDashboardQuery";
 import useDeleteDashboard from "../../hooks/useDeleteDashboard";
 import React from "react";
 import TileCard, { getVariable } from "../../components/TileCard";
 import { IconEdit, IconEditOff } from "@tabler/icons-react";
-import { Tile } from "../../hooks/useTileQuery";
 import useDeleteTile from "../../hooks/useDeleteTile";
 import { tw } from "twind";
 
@@ -25,7 +25,9 @@ const DashboardScreen = () => {
 
   const [deleteTile] = useDeleteTile();
 
-  const onTileEditClick = React.useCallback((id: number) => {}, []);
+  const onTileEditClick = React.useCallback((id: number) => {
+    console.log(id);
+  }, []);
 
   const onDeleteDashboard = React.useCallback(
     (id: number) => {

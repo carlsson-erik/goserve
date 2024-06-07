@@ -1,7 +1,8 @@
-import { FetchResult, MutationResult, gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import React from "react";
-import { GET_TILES, GetTilesResult, Tile } from "./useTileQuery";
 import { Variable } from "./useCreateTemplate";
+import { Tile } from "./useDashboardQuery";
+import { graphql } from "../utils/graphql";
 
 export interface CreateTileData {
   name: string;
@@ -19,43 +20,31 @@ export interface CreateTileResult {
 }
 
 const useCreateTile = () => {
-  const [createTileGQL, other] = useMutation<CreateTileResult>(gql`
-    mutation createTile($input: NewTile!) {
-      createTile(input: $input) {
-        id
-        name
-        row
-        col
-        width
-        height
-        template {
+  const [createTileGQL, other] = useMutation<CreateTileResult>(
+    graphql(`
+      mutation createTile($input: NewTile!) {
+        createTile(input: $input) {
           id
-        }
-        variables {
-          id
+          name
+          row
+          col
+          width
+          height
+          template {
+            id
+          }
+          variables {
+            id
+          }
         }
       }
-    }
-  `);
+    `)
+  );
 
   const createTile = React.useCallback(
     (createData: CreateTileData) => {
       return createTileGQL({
         variables: { input: createData },
-        update: (cache, { data: addTile }) => {
-          const data: GetTilesResult | null = cache.readQuery({
-            query: GET_TILES,
-          });
-
-          if (data === null || !addTile) return;
-
-          cache.writeQuery<GetTilesResult>({
-            query: GET_TILES,
-            data: {
-              tiles: [...data.tiles, addTile.createTile],
-            },
-          });
-        },
       });
     },
     [createTileGQL]

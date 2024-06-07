@@ -1,10 +1,11 @@
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   GET_TEMPLATES,
   GetTemplatesResult,
   Template,
 } from "./useTemplateQuery";
 import React from "react";
+import { graphql } from "../utils/graphql";
 
 export interface Variable {
   id: number;
@@ -26,30 +27,34 @@ export interface CreateTemplateResult {
 }
 
 const useCreateTemplate = () => {
-  const [createTemplateGQL, other] = useMutation<CreateTemplateResult>(gql`
-    mutation createTemplate($input: NewTemplate!) {
-      createTemplate(input: $input) {
-        id
-        name
+  const [createTemplateGQL, other] = useMutation<CreateTemplateResult>(
+    graphql(`
+      mutation createTemplate($input: NewTemplate!) {
+        createTemplate(input: $input) {
+          id
+          name
+        }
       }
-    }
-  `);
+    `)
+  );
 
   const createTile = React.useCallback(
     (createData: CreateTemplateData) => {
       return createTemplateGQL({
         variables: { input: createData },
-        update: (cache, { data: addTemplate }) => {
+        update: (cache, { data: newTemplate }) => {
+          if (!newTemplate) return;
+
           const data: GetTemplatesResult | null = cache.readQuery({
             query: GET_TEMPLATES,
           });
 
-          if (data === null || !addTemplate) return;
+          if (data === null || !newTemplate) return;
 
           cache.writeQuery<GetTemplatesResult>({
             query: GET_TEMPLATES,
             data: {
-              templates: [...data.templates, addTemplate.createTemplate],
+              templates: [...data.templates, newTemplate.createTemplate],
             },
           });
         },

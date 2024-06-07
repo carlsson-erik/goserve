@@ -1,14 +1,13 @@
 import React from "react";
 import { LiveEditor, LiveError, LivePreview, LiveProvider } from "react-live";
-import { generatePath, useNavigate, useParams } from "react-router-dom";
+import { generatePath, useNavigate } from "react-router-dom";
 import Button from "../../components/input/Button";
 import { tw } from "twind";
 import paths from "../../utils/paths";
 import useCreateTemplate, {
   CreateTemplateData,
-  Variable,
 } from "../../hooks/useCreateTemplate";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { getVariable } from "../../components/TileCard";
 
 const DefaultCode = `() => {
@@ -92,7 +91,7 @@ const TemplateCreateScreen = () => {
             />
             <LiveEditor className="tile-editor h-full" />
             <div className="mt-2 flex flex-col gap-2">
-              {fields.map((v, index) => (
+              {fields.map((_, index) => (
                 <div className="flex justify-between">
                   <div>
                     <input

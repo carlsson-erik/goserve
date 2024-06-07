@@ -70,8 +70,8 @@ type Tile struct {
 }
 
 type Variable struct {
-	ID      int    `json:"id"`
-	Name    string `json:"name"`
-	Value   string `json:"value"`
-	Default string `json:"default"`
+	ID      int     `json:"id"`
+	Name    string  `json:"name"`
+	Value   string  `json:"value"`
+	Default *string `json:"default,omitempty"`
 }

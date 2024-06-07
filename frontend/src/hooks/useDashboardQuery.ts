@@ -1,5 +1,6 @@
-import { gql } from "@apollo/client";
-import { Tile } from "./useTileQuery";
+import { graphql } from "../utils/graphql";
+import { Variable } from "./useCreateTemplate";
+import { Template } from "./useTemplateQuery";
 
 export interface Dashboard {
   id: number;
@@ -9,8 +10,19 @@ export interface Dashboard {
   tiles: Tile[];
 }
 
-export const GET_DASHBOARDS = gql`
-  query {
+export interface Tile {
+  id: number;
+  name: string;
+  row: number;
+  col: number;
+  width: number;
+  height: number;
+  template: Template;
+  variables: Variable[];
+}
+
+export const GET_DASHBOARDS = graphql(`
+  query Dashboards {
     dashboards {
       id
       name
@@ -39,7 +51,7 @@ export const GET_DASHBOARDS = gql`
       }
     }
   }
-`;
+`);
 
 export interface GetDashboardsResult {
   dashboards: Dashboard[];

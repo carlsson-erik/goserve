@@ -2,10 +2,10 @@ import { IconPlus } from "@tabler/icons-react";
 import React from "react";
 import { Link, useParams, generatePath } from "react-router-dom";
 import paths from "../utils/paths";
-import { Tile } from "../hooks/useTileQuery";
 import { LivePreview, LiveProvider } from "react-live";
 import Button from "./input/Button";
 import { TW, tw } from "twind";
+import { Tile } from "../hooks/useDashboardQuery";
 
 export function getVariable(tile?: Tile): (name: string) => string {
   return (name: string) => {

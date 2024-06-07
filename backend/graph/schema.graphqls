@@ -29,7 +29,7 @@ type Variable {
   id: Int!
   name: String!
   value: String!
-  default: String!
+  default: String
 }
 
 input NewVariable {

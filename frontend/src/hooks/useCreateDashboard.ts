@@ -1,10 +1,11 @@
-import { FetchResult, MutationResult, gql, useMutation } from "@apollo/client";
+import { FetchResult, MutationResult, useMutation } from "@apollo/client";
 import React from "react";
 import {
   Dashboard,
   GET_DASHBOARDS,
   GetDashboardsResult,
 } from "./useDashboardQuery";
+import { graphql } from "../utils/graphql";
 
 export interface CreateDashboardData {
   name: string;
@@ -21,14 +22,16 @@ const useCreateDashboard = (): [
   ) => Promise<FetchResult<CreateDashboardResult>>,
   MutationResult<{ createDashboard: Dashboard }>
 ] => {
-  const [createDashboardGQL, other] = useMutation<CreateDashboardResult>(gql`
-    mutation CreateDashboard($name: String!) {
-      createDashboard(input: { name: $name }) {
-        id
-        name
+  const [createDashboardGQL, other] = useMutation<CreateDashboardResult>(
+    graphql(`
+      mutation CreateDashboard($name: String!) {
+        createDashboard(input: { name: $name }) {
+          id
+          name
+        }
       }
-    }
-  `);
+    `)
+  );
 
   const createDashboard = React.useCallback(
     (createData: CreateDashboardData) => {
