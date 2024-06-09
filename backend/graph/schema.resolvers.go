@@ -38,6 +38,20 @@ func (r *mutationResolver) CreateTemplate(ctx context.Context, input model.NewTe
 	return res, err
 }
 
+// UpdateTemplate is the resolver for the updateTemplate field.
+func (r *mutationResolver) UpdateTemplate(ctx context.Context, input model.NewTemplate) (*model.Template, error) {
+	res, err := r.TemplateService.Update(input)
+
+	return res, err
+}
+
+// DeleteTemplate is the resolver for the deleteTemplate field.
+func (r *mutationResolver) DeleteTemplate(ctx context.Context, id int) (*model.Template, error) {
+	res, err := r.TemplateService.Delete(id)
+
+	return res, err
+}
+
 // CreateDashboard is the resolver for the createDashboard field.
 func (r *mutationResolver) CreateDashboard(ctx context.Context, input model.NewDashboard) (*model.Dashboard, error) {
 	var rows, cols int
@@ -69,6 +83,13 @@ func (r *mutationResolver) CreateDashboard(ctx context.Context, input model.NewD
 	return res, err
 }
 
+// UpdateDashboard is the resolver for the updateDashboard field.
+func (r *mutationResolver) UpdateDashboard(ctx context.Context, input model.NewDashboard) (*model.Dashboard, error) {
+	res, err := r.DashboardService.Update(input)
+
+	return res, err
+}
+
 // DeleteDashboard is the resolver for the deleteDashboard field.
 func (r *mutationResolver) DeleteDashboard(ctx context.Context, id int) (*model.Dashboard, error) {
 	dashboardService := service.DashboardService{DB: r.DB}
@@ -86,6 +107,13 @@ func (r *mutationResolver) DeleteDashboard(ctx context.Context, id int) (*model.
 // CreateTile is the resolver for the createTile field.
 func (r *mutationResolver) CreateTile(ctx context.Context, input model.NewTile) (*model.Tile, error) {
 	res, err := r.TileService.Create(input)
+
+	return res, err
+}
+
+// UpdateTile is the resolver for the updateTile field.
+func (r *mutationResolver) UpdateTile(ctx context.Context, input model.NewTile) (*model.Tile, error) {
+	res, err := r.TileService.Update(input)
 
 	return res, err
 }

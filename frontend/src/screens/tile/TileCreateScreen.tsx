@@ -3,14 +3,14 @@ import { LiveError, LivePreview, LiveProvider } from "react-live";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/input/Button";
 import { tw } from "twind";
-import useCreateTile, { CreateTileData } from "../../hooks/useCreateTile";
+import useCreateTile, { CreateTileData } from "../../hooks/tile/useCreateTile";
 import paths from "../../utils/paths";
 import { useQuery } from "@apollo/client";
 import {
   GET_TEMPLATES,
   GetTemplatesResult,
   Template,
-} from "../../hooks/useTemplateQuery";
+} from "../../hooks/template/useTemplateQuery";
 import { useForm } from "react-hook-form";
 import { getVariable } from "../../components/TileCard";
 
@@ -50,6 +50,7 @@ const TileCreateScreen: React.FC = () => {
           variables: (template.variables ?? []).map((t, index) => ({
             name: t.name,
             value: data.variables[index].value ?? t.default ?? "",
+            default: "",
           })),
         });
         if (res.data) {

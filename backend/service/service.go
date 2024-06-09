@@ -28,6 +28,21 @@ func (d DashboardService) Create(createData model.NewDashboard) (*model.Dashboar
 	return &res, err
 }
 
+func (d DashboardService) Update(updateData model.NewDashboard) (*model.Dashboard, error) {
+	updateQuery := Dashboard.UPDATE(Dashboard.MutableColumns).WHERE(Dashboard.ID.EQ(postgres.Int64(int64(*updateData.ID)))).MODEL(updateData).RETURNING(Dashboard.AllColumns)
+
+	res := model.Dashboard{}
+
+	err := updateQuery.Query(d.DB, &res)
+
+	if err != nil {
+		log.Printf("Update dashboard failed: %v", err)
+		return nil, err
+	}
+
+	return &res, err
+}
+
 func (d DashboardService) All() ([]*model.Dashboard, error) {
 	var res []*model.Dashboard
 
@@ -85,6 +100,40 @@ func (t TileService) Create(createData model.NewTile) (*model.Tile, error) {
 
 		if err != nil {
 			log.Printf("Insert variable in tile create failed: %v", err)
+			return nil, err
+		}
+
+		variables = append(variables, res)
+	}
+
+	tileRes.Variables = variables
+
+	return &tileRes, err
+}
+
+func (t TileService) Update(updateData model.NewTile) (*model.Tile, error) {
+
+	updateQuery := Tile.UPDATE(Tile.MutableColumns).WHERE(Tile.ID.EQ(postgres.Int64(int64(*updateData.ID)))).MODEL(updateData).RETURNING(Tile.AllColumns)
+
+	tileRes := model.Tile{}
+
+	err := updateQuery.Query(t.DB, &tileRes)
+
+	if err != nil {
+		log.Printf("Update tile failed: %v", err)
+		return nil, err
+	}
+
+	variableService := VariableService{t.DB}
+
+	var variables []*model.Variable
+
+	for _, variable := range updateData.Variables {
+		variable.TileID = &tileRes.ID
+		res, err := variableService.Update(*variable)
+
+		if err != nil {
+			log.Printf("Update variable in tile update failed: %v", err)
 			return nil, err
 		}
 
@@ -161,6 +210,22 @@ func (v VariableService) Create(createData model.NewVariable) (*model.Variable, 
 	return &res, err
 }
 
+func (v VariableService) Update(updateData model.NewVariable) (*model.Variable, error) {
+
+	var res model.Variable
+
+	updateQuery := Variable.UPDATE(Variable.MutableColumns).WHERE(Variable.ID.EQ(postgres.Int64((int64(*updateData.ID))))).MODEL(updateData).RETURNING(Variable.AllColumns)
+
+	err := updateQuery.Query(v.DB, &res)
+
+	if err != nil {
+		log.Printf("Update variable error: %v", err)
+		return nil, err
+	}
+
+	return &res, err
+}
+
 func (v VariableService) All() ([]*model.Variable, error) {
 	var res []*model.Variable
 
@@ -218,6 +283,39 @@ func (v TemplateService) Create(createData model.NewTemplate) (*model.Template, 
 
 		if err != nil {
 			log.Printf("Insert variable in template create error: %v", err)
+			return nil, err
+		}
+		variables = append(variables, res)
+	}
+
+	res.Variables = variables
+
+	return &res, err
+}
+
+func (v TemplateService) Update(updateData model.NewTemplate) (*model.Template, error) {
+
+	var res model.Template
+
+	updateQuery := Template.UPDATE(Template.MutableColumns).WHERE(Template.ID.EQ(postgres.Int64(int64(*updateData.ID)))).MODEL(updateData).RETURNING(Template.AllColumns)
+
+	err := updateQuery.Query(v.DB, &res)
+
+	if err != nil {
+		log.Printf("Update template error: %v", err)
+		return nil, err
+	}
+
+	variableService := VariableService{DB: v.DB}
+
+	var variables []*model.Variable
+
+	for _, variable := range updateData.Variables {
+		variable.TemplateID = &res.ID
+		res, err := variableService.Update(*variable)
+
+		if err != nil {
+			log.Printf("Update variable in template update error: %v", err)
 			return nil, err
 		}
 		variables = append(variables, res)

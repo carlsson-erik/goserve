@@ -2,9 +2,9 @@ import React from "react";
 import Button from "./input/Button";
 import { Link, generatePath } from "react-router-dom";
 import paths from "../utils/paths";
-import { Dashboard } from "../hooks/useDashboardQuery";
 import { IconPlus } from "@tabler/icons-react";
-import { Template } from "../hooks/useTemplateQuery";
+import { Template } from "../hooks/template/useTemplateQuery";
+import { Dashboard } from "../hooks/dashboard/useDashboardQuery";
 
 export interface SideBarProps {
   className?: string;

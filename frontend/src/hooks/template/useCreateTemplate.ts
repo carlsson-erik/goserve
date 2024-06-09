@@ -5,13 +5,13 @@ import {
   Template,
 } from "./useTemplateQuery";
 import React from "react";
-import { graphql } from "../utils/graphql";
+import { graphql } from "../../utils/graphql";
 
 export interface Variable {
   id: number;
   name: string;
   value: string;
-  default?: string;
+  default: string | null;
 }
 
 export interface CreateTemplateData {
@@ -38,7 +38,7 @@ const useCreateTemplate = () => {
     `)
   );
 
-  const createTile = React.useCallback(
+  const createTemplate = React.useCallback(
     (createData: CreateTemplateData) => {
       return createTemplateGQL({
         variables: { input: createData },
@@ -63,7 +63,7 @@ const useCreateTemplate = () => {
     [createTemplateGQL]
   );
 
-  return [createTile, other] as const;
+  return [createTemplate, other] as const;
 };
 
 export default useCreateTemplate;

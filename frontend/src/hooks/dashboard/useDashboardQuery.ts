@@ -1,6 +1,6 @@
-import { graphql } from "../utils/graphql";
-import { Variable } from "./useCreateTemplate";
-import { Template } from "./useTemplateQuery";
+import { graphql } from "../../utils/graphql";
+import { Variable } from "../template/useCreateTemplate";
+import { Template } from "../template/useTemplateQuery";
 
 export interface Dashboard {
   id: number;

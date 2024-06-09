@@ -1,8 +1,8 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
-import { Variable } from "./useCreateTemplate";
-import { Tile } from "./useDashboardQuery";
-import { graphql } from "../utils/graphql";
+import { graphql } from "../../utils/graphql";
+import { Tile } from "../dashboard/useDashboardQuery";
+import { Variable } from "../template/useCreateTemplate";
 
 export interface CreateTileData {
   name: string;

@@ -5,7 +5,7 @@ import {
   GET_DASHBOARDS,
   GetDashboardsResult,
 } from "./useDashboardQuery";
-import { graphql } from "../utils/graphql";
+import { graphql } from "../../utils/graphql";
 
 export interface CreateDashboardData {
   name: string;

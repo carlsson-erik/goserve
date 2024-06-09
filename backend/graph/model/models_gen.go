@@ -14,12 +14,14 @@ type Mutation struct {
 }
 
 type NewDashboard struct {
+	ID   *int   `json:"id,omitempty"`
 	Name string `json:"name"`
 	Rows *int   `json:"rows,omitempty"`
 	Cols *int   `json:"cols,omitempty"`
 }
 
 type NewTemplate struct {
+	ID        *int           `json:"id,omitempty"`
 	Name      string         `json:"name"`
 	Data      string         `json:"data"`
 	Width     *int           `json:"width,omitempty"`
@@ -28,6 +30,7 @@ type NewTemplate struct {
 }
 
 type NewTile struct {
+	ID          *int           `json:"id,omitempty"`
 	Name        string         `json:"name"`
 	Row         int            `json:"row"`
 	Col         int            `json:"col"`
@@ -39,6 +42,7 @@ type NewTile struct {
 }
 
 type NewVariable struct {
+	ID         *int    `json:"id,omitempty"`
 	Name       string  `json:"name"`
 	Value      *string `json:"value,omitempty"`
 	Default    *string `json:"default,omitempty"`

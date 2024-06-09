@@ -1,4 +1,4 @@
-import { graphql } from "../utils/graphql";
+import { graphql } from "../../utils/graphql";
 import { Variable } from "./useCreateTemplate";
 
 export interface Template {

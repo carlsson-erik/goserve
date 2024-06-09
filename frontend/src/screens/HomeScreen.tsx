@@ -3,14 +3,14 @@ import paths from "../utils/paths";
 import DashboardScreen from "./dashboard/DashboardScreen";
 import SideBar from "../components/SideBar";
 import { useQuery } from "@apollo/client/react/hooks/useQuery";
-import {
-  GET_DASHBOARDS,
-  GetDashboardsResult,
-} from "../hooks/useDashboardQuery";
-import { GET_TEMPLATES } from "../hooks/useTemplateQuery";
+import { GET_TEMPLATES } from "../hooks/template/useTemplateQuery";
 import DashboardCreateScreen from "./dashboard/DashboardCreateScreen";
 import TileCreateScreen from "./tile/TileCreateScreen";
 import TemplateCreateScreen from "./template/TemplateCreateScreen";
+import {
+  GET_DASHBOARDS,
+  GetDashboardsResult,
+} from "../hooks/dashboard/useDashboardQuery";
 
 export const HomeScreen = () => {
   const { data: dashboards } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);

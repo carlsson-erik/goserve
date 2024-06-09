@@ -11,6 +11,7 @@ type Dashboard {
 }
 
 input NewDashboard {
+  id: Int
   name: String!
   rows: Int
   cols: Int
@@ -33,6 +34,7 @@ type Variable {
 }
 
 input NewVariable {
+  id: Int
   name: String!
   value: String
   default: String
@@ -42,6 +44,7 @@ input NewVariable {
 }
 
 input NewTemplate{
+  id : Int
   name: String!
   data: String!
   width: Int
@@ -61,6 +64,7 @@ type Tile {
 }
 
 input NewTile {
+  id: Int
   name: String!
   row: Int!
   col: Int!
@@ -75,9 +79,13 @@ input NewTile {
 
 type Mutation {
   createTemplate(input: NewTemplate!): Template!
+  updateTemplate(input: NewTemplate!): Template!
+  deleteTemplate(id: Int!): Template!
   createDashboard(input: NewDashboard!): Dashboard!
+  updateDashboard(input: NewDashboard!): Dashboard!
   deleteDashboard(id: Int!): Dashboard!
   createTile(input: NewTile!): Tile!
+  updateTile(input: NewTile!): Tile!
   deleteTile(id: Int!): Tile!
 }
 

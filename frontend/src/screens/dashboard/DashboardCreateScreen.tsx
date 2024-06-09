@@ -1,9 +1,9 @@
 import React from "react";
-import useCreateDashboard from "../../hooks/useCreateDashboard";
 import Button from "../../components/input/Button";
 import Card from "../../components/Card";
 import { generatePath, useNavigate } from "react-router-dom";
 import paths from "../../utils/paths";
+import useCreateDashboard from "../../hooks/dashboard/useCreateDashboard";
 
 const DashboardCreateScreen = () => {
   const [name, setName] = React.useState("");

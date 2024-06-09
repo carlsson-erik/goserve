@@ -5,8 +5,8 @@ import paths from "../utils/paths";
 import { LivePreview, LiveProvider } from "react-live";
 import Button from "./input/Button";
 import { TW, tw } from "twind";
-import { Tile } from "../hooks/useDashboardQuery";
-import { Variable } from "../hooks/useCreateTemplate";
+import { Tile } from "../hooks/dashboard/useDashboardQuery";
+import { Variable } from "../hooks/template/useCreateTemplate";
 
 export function getVariable(
   data?: Tile | { variables: Omit<Variable, "id">[] }

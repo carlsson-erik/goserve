@@ -4,12 +4,12 @@ import { generatePath, useNavigate } from "react-router-dom";
 import Button from "../../components/input/Button";
 import { tw } from "twind";
 import paths from "../../utils/paths";
-import useCreateTemplate from "../../hooks/useCreateTemplate";
 import { useFieldArray, useForm } from "react-hook-form";
 import { getVariable } from "../../components/TileCard";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "../../components/FormField";
+import useCreateTemplate from "../../hooks/template/useCreateTemplate";
 
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)

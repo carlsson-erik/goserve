@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
-import { graphql } from "../utils/graphql";
-import { Tile } from "./useDashboardQuery";
+import { graphql } from "../../utils/graphql";
+import { Tile } from "../dashboard/useDashboardQuery";
 
 export interface DeleteTileResult {
   deleteTile: Tile;
