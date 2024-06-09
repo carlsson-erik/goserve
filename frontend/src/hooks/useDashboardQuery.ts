@@ -18,7 +18,7 @@ export interface Tile {
   width: number;
   height: number;
   template: Template;
-  variables: Variable[];
+  variables?: Variable[];
 }
 
 export const GET_DASHBOARDS = graphql(`

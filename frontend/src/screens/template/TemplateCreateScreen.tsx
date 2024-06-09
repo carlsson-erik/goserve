@@ -4,17 +4,33 @@ import { generatePath, useNavigate } from "react-router-dom";
 import Button from "../../components/input/Button";
 import { tw } from "twind";
 import paths from "../../utils/paths";
-import useCreateTemplate, {
-  CreateTemplateData,
-} from "../../hooks/useCreateTemplate";
+import useCreateTemplate from "../../hooks/useCreateTemplate";
 import { useFieldArray, useForm } from "react-hook-form";
 import { getVariable } from "../../components/TileCard";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import FormField from "../../components/FormField";
 
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
     
     return(<div className="h-full flex justify-center items-center" onClick={() => setCount(count+1)}> {count}</div>)
 }`;
+
+const schema = z.object({
+  name: z.string().min(1),
+  data: z.string(),
+  width: z.number().min(1).max(2),
+  height: z.number().min(1).max(1),
+  variables: z.array(
+    z.object({
+      name: z.string().min(1),
+      default: z.string(),
+    })
+  ),
+});
+
+export type TemplateCreateFormData = z.infer<typeof schema>;
 
 const TemplateCreateScreen = () => {
   const [width, setWidth] = React.useState(2);
@@ -25,15 +41,17 @@ const TemplateCreateScreen = () => {
 
   const navigate = useNavigate();
 
-  const form = useForm<CreateTemplateData>({
+  const form = useForm<TemplateCreateFormData>({
     defaultValues: {
       name: "",
       data: DefaultCode,
       height: 1,
       width: 2,
-      variables: [],
     },
+    resolver: zodResolver(schema),
   });
+
+  console.log(form.formState.errors);
 
   const variables = form.watch("variables");
 
@@ -43,12 +61,18 @@ const TemplateCreateScreen = () => {
   });
 
   const onCreate = React.useCallback(
-    async (data: CreateTemplateData) => {
+    async (formData: TemplateCreateFormData) => {
       try {
         const res = await createTemplate({
-          ...data,
-          width: width,
-          height: 1,
+          name: formData.name,
+          data: formData.data,
+          width: formData.height,
+          height: formData.height,
+          variables: formData.variables.map((v) => ({
+            name: v.name,
+            value: "",
+            default: v.default,
+          })),
         });
         if (res.data) {
           navigate(
@@ -62,7 +86,7 @@ const TemplateCreateScreen = () => {
         setError(error.message);
       }
     },
-    [createTemplate, navigate, width]
+    [createTemplate, navigate]
   );
   return (
     <div className="p-2 h-full flex flex-col overflow-hidden">
@@ -83,34 +107,53 @@ const TemplateCreateScreen = () => {
             <div className="h-24">
               <h1>Create template</h1>
             </div>
-            <input
-              className="mb-1"
-              type="text"
-              placeholder="Name..."
-              {...form.register("name")}
-            />
+            <FormField error={form.formState.errors.name?.message}>
+              <input
+                className="mb-1"
+                type="text"
+                placeholder="Name..."
+                {...form.register("name")}
+              />
+            </FormField>
             <LiveEditor className="tile-editor h-full" />
             <div className="mt-2 flex flex-col gap-2">
-              {fields.map((_, index) => (
-                <div className="flex justify-between">
-                  <div>
+              {fields.map((v, index) => (
+                <div key={index} className="flex gap-2 overflow-hidden">
+                  <FormField
+                    className="overflow-hidden"
+                    error={
+                      form.formState.errors.variables?.[index]?.name?.message
+                    }
+                  >
                     <input
                       type="text"
                       placeholder="Name"
                       {...form.register(`variables.${index}.name`)}
                     />
+                  </FormField>
+                  <FormField
+                    className="overflow-hidden"
+                    error={
+                      form.formState.errors.variables?.[index]?.default?.message
+                    }
+                  >
                     <input
                       type="text"
                       placeholder="Value"
-                      {...form.register(`variables.${index}.value`)}
+                      {...form.register(`variables.${index}.default`)}
                     />
-                  </div>
-                  <Button onClick={() => remove(index)}>X</Button>
+                  </FormField>
+                  <Button
+                    className="shrink-0 self-start"
+                    onClick={() => remove(index)}
+                  >
+                    X
+                  </Button>
                 </div>
               ))}
               <Button
                 onClick={() => {
-                  append({ name: "", value: "" });
+                  append({ name: "", default: "" });
                 }}
               >
                 Add variable

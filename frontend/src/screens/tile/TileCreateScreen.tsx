@@ -81,7 +81,7 @@ const TileCreateScreen: React.FC = () => {
         code={template?.data}
         scope={{
           tw,
-          getVariable: getVariable({ variables: { ...variables } }),
+          getVariable: getVariable({ variables }),
         }}
       >
         <div className="h-2/3 grid grid-cols-2 gap-4">

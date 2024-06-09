@@ -6,11 +6,15 @@ import { LivePreview, LiveProvider } from "react-live";
 import Button from "./input/Button";
 import { TW, tw } from "twind";
 import { Tile } from "../hooks/useDashboardQuery";
+import { Variable } from "../hooks/useCreateTemplate";
 
-export function getVariable(tile?: Tile): (name: string) => string {
+export function getVariable(
+  data?: Tile | { variables: Omit<Variable, "id">[] }
+): (name: string) => string {
   return (name: string) => {
-    if (!tile) return "";
-    return tile.variables.find((v) => v.name === name)?.value ?? "";
+    if (!data || !data.variables) return "";
+
+    return data.variables.find((v) => v.name === name)?.value ?? "";
   };
 }
 

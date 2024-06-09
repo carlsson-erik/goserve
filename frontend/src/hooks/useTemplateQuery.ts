@@ -7,7 +7,7 @@ export interface Template {
   width: number;
   height: number;
   data: string;
-  variables?: Variable[];
+  variables?: Variable[] | null;
 }
 
 export const GET_TEMPLATES = graphql(`
