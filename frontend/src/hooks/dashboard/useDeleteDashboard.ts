@@ -6,6 +6,7 @@ import {
   GetDashboardsResult,
 } from "./useDashboardQuery";
 import { graphql } from "../../utils/graphql";
+import { err, ok } from "neverthrow";
 
 export interface DeleteDashboardResult {
   deleteDashboard: Dashboard;
@@ -23,8 +24,8 @@ const useDeleteDashboard = () => {
   );
 
   const deleteDashboard = React.useCallback(
-    (id: number) => {
-      return deleteDashboardGQL({
+    async (id: number) => {
+      const res = await deleteDashboardGQL({
         variables: { id },
         update: (cache, { data: addDashboard }) => {
           const data: GetDashboardsResult | null = cache.readQuery({
@@ -41,6 +42,10 @@ const useDeleteDashboard = () => {
           });
         },
       });
+
+      if (res.errors) return err(res.errors.map((e) => e.message).join(","));
+
+      return ok(res);
     },
     [deleteDashboardGQL]
   );

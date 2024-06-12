@@ -4,28 +4,27 @@ version: '3.9'
 name: goserve
 services:
   frontend:
-    image: node:latest
+    build: ./frontend
+    # image: node:latest
     volumes:
       - ./frontend:/app
     working_dir: /app
-    command:
-      - npm install yarn
-      - yarn
-      - yarn dev
     ports:
-      - 3000:3000
+      - 3000:80
+    depends_on:
+      - backend
 
-  # backend:
-  #   image: golang:latest
-  #   volumes:
-  #     - ./backend:/go/src/app
-  #   working_dir: /go/src/app
-  #   command: go run server.go
-    
-  #   ports:
-  #     - 8081:8081
-  #   depends_on:
-  #     - postgres
+  backend:
+    build: ./backend
+    network_mode: "host"
+    # image: golang:latest
+    volumes:
+      - ./backend:/go/src/app
+    working_dir: /go/src/app
+    ports:
+      - 8081:8081
+    depends_on:
+      - postgres
 
 
   postgres:
@@ -50,3 +49,4 @@ services:
     restart: always
     ports:
       - 8080:8080
+

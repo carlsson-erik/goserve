@@ -7,6 +7,7 @@ import {
 import React from "react";
 import { graphql } from "../../utils/graphql";
 import { CreateTemplateData } from "./useCreateTemplate";
+import { err, ok } from "neverthrow";
 
 export interface UpdateTemplateResult {
   updateTemplate: Template;
@@ -25,8 +26,8 @@ const useUpdateTemplate = () => {
   );
 
   const updateTemplate = React.useCallback(
-    (updateData: CreateTemplateData) => {
-      return updateTemplateGQL({
+    async (updateData: CreateTemplateData) => {
+      const res = await updateTemplateGQL({
         variables: { input: updateData },
         update: (cache, { data: updatedTemplate }) => {
           if (!updatedTemplate) return;
@@ -45,6 +46,10 @@ const useUpdateTemplate = () => {
           });
         },
       });
+
+      if (res.errors) return err(res.errors.map((e) => e.message).join(","));
+
+      return ok(res);
     },
     [updateTemplateGQL]
   );

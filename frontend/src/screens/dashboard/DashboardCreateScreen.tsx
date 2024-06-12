@@ -14,20 +14,17 @@ const DashboardCreateScreen = () => {
   const navigate = useNavigate();
 
   const onSubmit = async () => {
-    try {
-      const res = await createDashboard({ name: name });
+    const res = await createDashboard({ name: name });
 
-      if (res.errors) console.log(res.errors);
-      if (res.data) {
-        navigate(
-          generatePath(paths.dashboard.id, {
-            dashboardId: res.data.createDashboard.id,
-          })
-        );
-      }
-    } catch (e) {
-      console.log(e);
+    if (res.isErr()) {
+      console.log(res.error);
+      return;
     }
+    navigate(
+      generatePath(paths.dashboard.id, {
+        dashboardId: res.value.data?.createDashboard.id,
+      })
+    );
   };
 
   return (

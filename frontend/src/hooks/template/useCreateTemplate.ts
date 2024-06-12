@@ -6,6 +6,7 @@ import {
 } from "./useTemplateQuery";
 import React from "react";
 import { graphql } from "../../utils/graphql";
+import { err, ok } from "neverthrow";
 
 export interface Variable {
   id: number;
@@ -39,8 +40,8 @@ const useCreateTemplate = () => {
   );
 
   const createTemplate = React.useCallback(
-    (createData: CreateTemplateData) => {
-      return createTemplateGQL({
+    async (createData: CreateTemplateData) => {
+      const res = await createTemplateGQL({
         variables: { input: createData },
         update: (cache, { data: newTemplate }) => {
           if (!newTemplate) return;
@@ -59,6 +60,10 @@ const useCreateTemplate = () => {
           });
         },
       });
+
+      if (res.errors) return err(res.errors.map((e) => e.message).join(","));
+
+      return ok(res);
     },
     [createTemplateGQL]
   );

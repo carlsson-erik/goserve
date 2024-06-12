@@ -39,6 +39,7 @@ export const HomeScreen = () => {
             path={paths.template.create}
             element={<TemplateCreateScreen />}
           />
+          <Route path={paths.template.id} element={<TemplateCreateScreen />} />
 
           <Route path={"*"} element={<DashboardScreen />} />
         </Routes>

@@ -3,6 +3,7 @@ import React from "react";
 import { graphql } from "../../utils/graphql";
 import { Tile } from "../dashboard/useDashboardQuery";
 import { Variable } from "../template/useCreateTemplate";
+import { err, ok } from "neverthrow";
 
 export interface CreateTileData {
   name: string;
@@ -42,10 +43,14 @@ const useCreateTile = () => {
   );
 
   const createTile = React.useCallback(
-    (createData: CreateTileData) => {
-      return createTileGQL({
+    async (createData: CreateTileData) => {
+      const res = await createTileGQL({
         variables: { input: createData },
       });
+
+      if (res.errors) return err(res.errors.map((e) => e.message).join(","));
+
+      return ok(res);
     },
     [createTileGQL]
   );

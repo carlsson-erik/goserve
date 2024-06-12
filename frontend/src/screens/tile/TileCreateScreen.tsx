@@ -1,6 +1,6 @@
 import React from "react";
 import { LiveError, LivePreview, LiveProvider } from "react-live";
-import { generatePath, useNavigate, useParams } from "react-router-dom";
+import { Link, generatePath, useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/input/Button";
 import { tw } from "twind";
 import useCreateTile, { CreateTileData } from "../../hooks/tile/useCreateTile";
@@ -15,17 +15,20 @@ import { useForm } from "react-hook-form";
 import { getVariable } from "../../components/TileCard";
 
 const TileCreateScreen: React.FC = () => {
-  //Fetch data
-
   const { data: templates } = useQuery<GetTemplatesResult>(GET_TEMPLATES);
 
-  const form = useForm<CreateTileData>();
+  const form = useForm<CreateTileData>({
+    defaultValues: {
+      width: 2,
+      height: 1,
+    },
+  });
 
   const variables = form.watch("variables");
 
-  const [template, setTemplate] = React.useState<Template | undefined>();
+  const width = form.watch("width");
 
-  const [width, setWidth] = React.useState(2);
+  const [template, setTemplate] = React.useState<Template | undefined>();
 
   const [error, setError] = React.useState<string | undefined>();
 
@@ -38,34 +41,52 @@ const TileCreateScreen: React.FC = () => {
   const onCreate = React.useCallback(
     async (data: CreateTileData) => {
       if (!template) return;
-      try {
-        const res = await createTile({
-          name: data.name,
-          col: Number(col) ?? 1,
-          row: Number(row) ?? 1,
-          dashboardId: Number(dashboardId) ?? 1,
-          templateId: template.id,
-          width: width,
-          height: 1,
-          variables: (template.variables ?? []).map((t, index) => ({
-            name: t.name,
-            value: data.variables[index].value ?? t.default ?? "",
-            default: "",
-          })),
-        });
-        if (res.data) {
-          navigate(generatePath(paths.dashboard.id, { dashboardId }));
-        }
-      } catch (error) {
-        console.log(error);
-        setError(error.message);
+      const res = await createTile({
+        name: data.name,
+        col: Number(col) ?? 1,
+        row: Number(row) ?? 1,
+        dashboardId: Number(dashboardId) ?? 1,
+        templateId: template.id,
+        width: data.width,
+        height: 1,
+        variables: (template.variables ?? []).map((t, index) => ({
+          name: t.name,
+          value: data.variables[index].value ?? t.default ?? "",
+          default: "",
+        })),
+      });
+
+      if (res.isErr()) {
+        console.log(res.error);
+        setError(res.error);
+        return;
       }
+
+      navigate(generatePath(paths.dashboard.id, { dashboardId }));
     },
-    [col, createTile, dashboardId, navigate, row, template, width]
+    [col, createTile, dashboardId, navigate, row, template]
   );
 
   if (!templates) {
     return <div>Loading...</div>;
+  }
+
+  if (!template) {
+    return (
+      <div className="flex flex-col text-center max-w-2xl m-auto mt-12 p-2 border rounded bg-gray-700">
+        <span>Please Select a template</span>
+        <div className="p-2 border max-h-80 overflow-y-auto overflow-x-hidden rounded bg-gray-800 flex flex-col gap-2 items-center justify-stretch">
+          {templates.templates.map((t) => (
+            <Button onClick={() => setTemplate(t)} className="w-full">
+              {t.name}
+            </Button>
+          ))}
+        </div>
+        <Link to={paths.template.create}>
+          <Button className="w-full mt-4">Create template</Button>
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -113,13 +134,13 @@ const TileCreateScreen: React.FC = () => {
               <div className="h-16 flex gap-2">
                 <Button
                   className="h-full aspect-[1]"
-                  onClick={() => setWidth(1)}
+                  onClick={() => form.setValue("width", 1)}
                 >
                   1x1
                 </Button>
                 <Button
                   className="h-full aspect-[2]"
-                  onClick={() => setWidth(2)}
+                  onClick={() => form.setValue("width", 2)}
                 >
                   1x2
                 </Button>

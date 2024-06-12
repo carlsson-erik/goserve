@@ -7,6 +7,7 @@ import {
 } from "./useDashboardQuery";
 import { graphql } from "../../utils/graphql";
 import { CreateDashboardData } from "./useCreateDashboard";
+import { err, ok } from "neverthrow";
 
 export interface UpdateDashboardResult {
   updateDashboard: Dashboard;
@@ -25,8 +26,8 @@ const useUpdateDashboard = () => {
   );
 
   const updateDashboard = React.useCallback(
-    (updateData: CreateDashboardData) => {
-      return updateDashboardGQL({
+    async (updateData: CreateDashboardData) => {
+      const res = await updateDashboardGQL({
         variables: { name: updateData.name },
         update: (cache, { data: updatedDashboard }) => {
           if (!updatedDashboard) return;
@@ -48,6 +49,10 @@ const useUpdateDashboard = () => {
           });
         },
       });
+
+      if (res.errors) return err(res.errors.map((e) => e.message).join(","));
+
+      return ok(res);
     },
     [updateDashboardGQL]
   );
