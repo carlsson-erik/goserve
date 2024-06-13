@@ -14,7 +14,7 @@ import { useQuery } from "@apollo/client";
 import { GET_TEMPLATES } from "../../hooks/template/useTemplateQuery";
 import useUpdateTemplate from "../../hooks/template/useUpdateTemplate";
 import useDeleteTemplate from "../../hooks/template/useDeleteTemplate";
-
+import Editor from "@monaco-editor/react";
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
     
@@ -68,6 +68,7 @@ const TemplateCreateScreen = () => {
   });
 
   const variables = form.watch("variables");
+  const code = form.watch("data");
 
   const { append, remove, fields } = useFieldArray({
     control: form.control,
@@ -142,11 +143,7 @@ const TemplateCreateScreen = () => {
     <div className="p-2 h-full flex flex-col overflow-hidden">
       {/* <Editor /> */}
       <LiveProvider
-        code={DefaultCode}
-        transformCode={(code) => {
-          form.setValue("data", code);
-          return code;
-        }}
+        code={code}
         scope={{
           tw,
           getVariable: getVariable({
@@ -158,7 +155,7 @@ const TemplateCreateScreen = () => {
           }),
         }}
       >
-        <div className="h-2/3 grid grid-cols-2 gap-4">
+        <div className="h-full grid overflow-hidden grid-cols-2 gap-4">
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="h-24">
               <h1>{template ? "Update template" : "Create template"}</h1>
@@ -171,7 +168,14 @@ const TemplateCreateScreen = () => {
                 {...form.register("name")}
               />
             </FormField>
-            <LiveEditor className="tile-editor h-full" />
+            <Editor
+              height="50em"
+              defaultLanguage="typescript"
+              language="typescript"
+              theme="vs-dark"
+              defaultValue={DefaultCode}
+              onChange={(v) => form.setValue("data", v)}
+            />
             <div className="mt-2 flex flex-col gap-2">
               {fields.map((_, index) => (
                 <div key={index} className="flex gap-2 overflow-hidden">
