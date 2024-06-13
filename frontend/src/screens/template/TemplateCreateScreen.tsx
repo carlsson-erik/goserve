@@ -13,6 +13,7 @@ import useCreateTemplate from "../../hooks/template/useCreateTemplate";
 import { useQuery } from "@apollo/client";
 import { GET_TEMPLATES } from "../../hooks/template/useTemplateQuery";
 import useUpdateTemplate from "../../hooks/template/useUpdateTemplate";
+import useDeleteTemplate from "../../hooks/template/useDeleteTemplate";
 
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
@@ -51,6 +52,7 @@ const TemplateCreateScreen = () => {
 
   const [createTemplate] = useCreateTemplate();
   const [updateTemplate] = useUpdateTemplate();
+  const [deleteTemplate] = useDeleteTemplate();
 
   const navigate = useNavigate();
 
@@ -230,9 +232,20 @@ const TemplateCreateScreen = () => {
                   1x2
                 </Button>
               </div>
-              <Button onClick={form.handleSubmit(onSubmit)} variant="primary">
-                {template ? "Update" : "Create"}
-              </Button>
+              <div>
+                {template && (
+                  <Button
+                    onClick={() => {
+                      deleteTemplate(template.id);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                )}
+                <Button onClick={form.handleSubmit(onSubmit)} variant="primary">
+                  {template ? "Update" : "Create"}
+                </Button>
+              </div>
             </div>
             <span>{error}</span>
             <div className="h-full flex justify-center items-center">
