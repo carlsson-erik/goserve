@@ -18,13 +18,13 @@ export const HomeScreen = () => {
   const { data: templates } = useQuery(GET_TEMPLATES);
 
   return (
-    <div className="w-full h-full flex">
+    <div className="w-full h-full flex items-stretch overflow-hidden">
       <SideBar
-        className="h-full w-36 overflow-hidden shrink-0"
+        className="shrink-0"
         dashboards={dashboards?.dashboards}
         templates={templates?.templates}
       />
-      <div className="grow h-full">
+      <div className="grow">
         <Routes>
           <Route
             path={paths.dashboard.create}

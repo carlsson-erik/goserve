@@ -1,5 +1,5 @@
 import React from "react";
-import { LiveEditor, LiveError, LivePreview, LiveProvider } from "react-live";
+import { LiveError, LivePreview, LiveProvider } from "react-live";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/input/Button";
 import { tw } from "twind";
@@ -15,6 +15,7 @@ import { GET_TEMPLATES } from "../../hooks/template/useTemplateQuery";
 import useUpdateTemplate from "../../hooks/template/useUpdateTemplate";
 import useDeleteTemplate from "../../hooks/template/useDeleteTemplate";
 import Editor from "@monaco-editor/react";
+import SlideContainer from "../../components/SlideContainer";
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
     
@@ -139,8 +140,114 @@ const TemplateCreateScreen = () => {
       });
   }, [form, template]);
 
+  const leftSlide = () => {
+    return (
+      <div className="h-full">
+        <div className="h-24">
+          <h1>{template ? "Update template" : "Create template"}</h1>
+        </div>
+        <FormField error={form.formState.errors.name?.message}>
+          <input
+            className="mb-1"
+            type="text"
+            placeholder="Name..."
+            {...form.register("name")}
+          />
+        </FormField>
+        <Editor
+          className="h-2/3"
+          defaultLanguage="typescript"
+          language="typescript"
+          theme="vs-dark"
+          defaultValue={DefaultCode}
+          value={code}
+          onChange={(v) => v && form.setValue("data", v)}
+        />
+        <div className="mt-2 flex flex-col gap-2">
+          {fields.map((_, index) => (
+            <div key={index} className="flex gap-2 overflow-hidden">
+              <FormField
+                className="overflow-hidden"
+                error={form.formState.errors.variables?.[index]?.name?.message}
+              >
+                <input
+                  type="text"
+                  placeholder="Name"
+                  {...form.register(`variables.${index}.name`)}
+                />
+              </FormField>
+              <FormField
+                className="overflow-hidden"
+                error={
+                  form.formState.errors.variables?.[index]?.default?.message
+                }
+              >
+                <input
+                  type="text"
+                  placeholder="Value"
+                  {...form.register(`variables.${index}.default`)}
+                />
+              </FormField>
+              <Button
+                className="shrink-0 self-start"
+                onClick={() => remove(index)}
+              >
+                X
+              </Button>
+            </div>
+          ))}
+          <Button
+            onClick={() => {
+              append({ name: "", default: "" });
+            }}
+          >
+            Add variable
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const rightSide = () => {
+    return (
+      <div>
+        <div className="mt-8 flex justify-between">
+          <div className="h-16 flex gap-2">
+            <Button className="h-full aspect-[1]" onClick={() => setWidth(1)}>
+              1x1
+            </Button>
+            <Button className="h-full aspect-[2]" onClick={() => setWidth(2)}>
+              1x2
+            </Button>
+          </div>
+          <div>
+            {template && (
+              <Button
+                onClick={() => {
+                  deleteTemplate(template.id);
+                }}
+              >
+                Delete
+              </Button>
+            )}
+            <Button onClick={form.handleSubmit(onSubmit)} variant="primary">
+              {template ? "Update" : "Create"}
+            </Button>
+          </div>
+        </div>
+        <span>{error}</span>
+        <div className="h-full flex justify-center items-center">
+          <LivePreview
+            className="h-48 border rounded bg-gray-700"
+            style={{ aspectRatio: width }}
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="p-2 h-full flex flex-col overflow-hidden">
+    <form className="h-full" onSubmit={form.handleSubmit(onSubmit)}>
       {/* <Editor /> */}
       <LiveProvider
         code={code}
@@ -155,114 +262,15 @@ const TemplateCreateScreen = () => {
           }),
         }}
       >
-        <div className="h-full grid overflow-hidden grid-cols-2 gap-4">
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="h-24">
-              <h1>{template ? "Update template" : "Create template"}</h1>
-            </div>
-            <FormField error={form.formState.errors.name?.message}>
-              <input
-                className="mb-1"
-                type="text"
-                placeholder="Name..."
-                {...form.register("name")}
-              />
-            </FormField>
-            <Editor
-              height="50em"
-              defaultLanguage="typescript"
-              language="typescript"
-              theme="vs-dark"
-              defaultValue={DefaultCode}
-              onChange={(v) => form.setValue("data", v)}
-            />
-            <div className="mt-2 flex flex-col gap-2">
-              {fields.map((_, index) => (
-                <div key={index} className="flex gap-2 overflow-hidden">
-                  <FormField
-                    className="overflow-hidden"
-                    error={
-                      form.formState.errors.variables?.[index]?.name?.message
-                    }
-                  >
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      {...form.register(`variables.${index}.name`)}
-                    />
-                  </FormField>
-                  <FormField
-                    className="overflow-hidden"
-                    error={
-                      form.formState.errors.variables?.[index]?.default?.message
-                    }
-                  >
-                    <input
-                      type="text"
-                      placeholder="Value"
-                      {...form.register(`variables.${index}.default`)}
-                    />
-                  </FormField>
-                  <Button
-                    className="shrink-0 self-start"
-                    onClick={() => remove(index)}
-                  >
-                    X
-                  </Button>
-                </div>
-              ))}
-              <Button
-                onClick={() => {
-                  append({ name: "", default: "" });
-                }}
-              >
-                Add variable
-              </Button>
-            </div>
-          </form>
-          <div>
-            <div className="mt-8 flex justify-between">
-              <div className="h-16 flex gap-2">
-                <Button
-                  className="h-full aspect-[1]"
-                  onClick={() => setWidth(1)}
-                >
-                  1x1
-                </Button>
-                <Button
-                  className="h-full aspect-[2]"
-                  onClick={() => setWidth(2)}
-                >
-                  1x2
-                </Button>
-              </div>
-              <div>
-                {template && (
-                  <Button
-                    onClick={() => {
-                      deleteTemplate(template.id);
-                    }}
-                  >
-                    Delete
-                  </Button>
-                )}
-                <Button onClick={form.handleSubmit(onSubmit)} variant="primary">
-                  {template ? "Update" : "Create"}
-                </Button>
-              </div>
-            </div>
-            <span>{error}</span>
-            <div className="h-full flex justify-center items-center">
-              <LivePreview
-                className="h-48 border rounded bg-gray-700"
-                style={{ aspectRatio: width }}
-              />
-            </div>
-          </div>
-          <LiveError />
-        </div>
+        <SlideContainer
+          className="h-full px-4 flex items-stretch justify-between gap-4"
+          panels={[
+            { element: leftSlide(), minWidth: "80px", maxWidth: "150px" },
+            { element: rightSide() },
+          ]}
+        />
       </LiveProvider>
-    </div>
+    </form>
   );
 };
 
