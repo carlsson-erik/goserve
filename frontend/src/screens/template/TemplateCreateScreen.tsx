@@ -1,5 +1,5 @@
 import React from "react";
-import { LiveError, LivePreview, LiveProvider } from "react-live";
+import { LivePreview, LiveProvider } from "react-live";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/input/Button";
 import { tw } from "twind";
@@ -14,7 +14,8 @@ import { useQuery } from "@apollo/client";
 import { GET_TEMPLATES } from "../../hooks/template/useTemplateQuery";
 import useUpdateTemplate from "../../hooks/template/useUpdateTemplate";
 import useDeleteTemplate from "../../hooks/template/useDeleteTemplate";
-import Editor from "@monaco-editor/react";
+import { Editor, useMonaco } from "@monaco-editor/react";
+("@monaco-editor/react");
 import SlideContainer from "../../components/SlideContainer";
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
@@ -142,7 +143,7 @@ const TemplateCreateScreen = () => {
 
   const leftSlide = () => {
     return (
-      <div className="h-full">
+      <div className="w-full h-full">
         <div className="h-24">
           <h1>{template ? "Update template" : "Create template"}</h1>
         </div>
@@ -154,15 +155,17 @@ const TemplateCreateScreen = () => {
             {...form.register("name")}
           />
         </FormField>
-        <Editor
-          className="h-2/3"
-          defaultLanguage="typescript"
-          language="typescript"
-          theme="vs-dark"
-          defaultValue={DefaultCode}
-          value={code}
-          onChange={(v) => v && form.setValue("data", v)}
-        />
+        <div className="h-3/5">
+          <Editor
+            className="h-full"
+            defaultLanguage="typescript"
+            language="typescript"
+            theme="vs-dark"
+            defaultValue={DefaultCode}
+            value={code}
+            onChange={(v) => v && form.setValue("data", v)}
+          />
+        </div>
         <div className="mt-2 flex flex-col gap-2">
           {fields.map((_, index) => (
             <div key={index} className="flex gap-2 overflow-hidden">
@@ -210,7 +213,7 @@ const TemplateCreateScreen = () => {
 
   const rightSide = () => {
     return (
-      <div>
+      <div className="w-full">
         <div className="mt-8 flex justify-between">
           <div className="h-16 flex gap-2">
             <Button className="h-full aspect-[1]" onClick={() => setWidth(1)}>
@@ -263,9 +266,9 @@ const TemplateCreateScreen = () => {
         }}
       >
         <SlideContainer
-          className="h-full px-4 flex items-stretch justify-between gap-4"
+          className="h-full px-4"
           panels={[
-            { element: leftSlide(), minWidth: "80px", maxWidth: "150px" },
+            { element: leftSlide(), minWidth: 0.2, maxWidth: 0.7 },
             { element: rightSide() },
           ]}
         />
