@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import paths from "../utils/paths";
 import React from "react";
 import EditTilesButton from "./input/EditTilesButton";
+import Tooltip from "./Tooltip";
 
 const Navbar = () => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
@@ -16,7 +17,9 @@ const Navbar = () => {
         <span>Go Serve</span>
       </Link>
       <div className="flex items-center">
-        <EditTilesButton onEditModeChange={handleEditModeChange} />
+        <Tooltip content="Edit dashboard">
+          <EditTilesButton onEditModeChange={handleEditModeChange} />
+        </Tooltip>
         <Link to={paths.dashboard.about}>
           <button className="text-white hover:bg-gray-600 p-2">
             {editMode ? <p>Edit</p> : <p>About</p>}

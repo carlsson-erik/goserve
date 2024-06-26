@@ -13,6 +13,7 @@
     "@apollo/client": "^3.10.3",
     "@hookform/resolvers": "^3.6.0",
     "@monaco-editor/react": "^4.6.0",
+    "@popperjs/core": "^2.11.8",
     "@tabler/icons-react": "^3.3.0",
     "gql.tada": "^1.7.5",
     "graphql": "^16.8.1",
@@ -22,6 +23,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.5",
     "react-live": "^4.1.6",
+    "react-popper": "^2.3.0",
     "react-router-dom": "^6.23.0",
     "twind": "^0.16.19",
     "zod": "^3.23.8"
