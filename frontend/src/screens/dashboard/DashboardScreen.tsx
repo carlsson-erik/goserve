@@ -13,6 +13,7 @@ import {
   Tile,
 } from "../../hooks/dashboard/useDashboardQuery";
 import useDeleteDashboard from "../../hooks/dashboard/useDeleteDashboard";
+import useConfirmModal from "../../components/ConfirmModal";
 
 const DashboardScreen = () => {
   const [editing, setEditing] = React.useState(true);
@@ -20,6 +21,8 @@ const DashboardScreen = () => {
   const { dashboardId } = useParams();
 
   const { data: dashboardData } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
+
+  const [confirmDelete, deleteModal] = useConfirmModal();
 
   const [deleteDashboard] = useDeleteDashboard();
 
@@ -30,10 +33,17 @@ const DashboardScreen = () => {
   }, []);
 
   const onDeleteDashboard = React.useCallback(
-    (id: number) => {
-      deleteDashboard(id);
+    async (id: number) => {
+      const response = await confirmDelete(
+        "Confirm",
+        "Do you want to delete dashboard?"
+      );
+
+      if (response) {
+        deleteDashboard(id);
+      }
     },
-    [deleteDashboard]
+    [confirmDelete, deleteDashboard]
   );
 
   const onDeleteTile = React.useCallback(
@@ -78,6 +88,7 @@ const DashboardScreen = () => {
   }
   return (
     <div className="h-full flex flex-col">
+      {deleteModal}
       <div className="p-2 flex justify-between">
         <span className="text-2xl">{dashboard.name}</span>
         <div className="flex items-center gap-2">
