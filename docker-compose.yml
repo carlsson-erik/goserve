@@ -19,8 +19,7 @@ services:
   #   network_mode: "host"
   #   # image: golang:latest
   #   volumes:
-  #     - ./backend:/go/src/app
-  #   working_dir: /go/src/app
+  #     - ./backend:/backend
   #   ports:
   #     - 8081:8081
   #   depends_on:
