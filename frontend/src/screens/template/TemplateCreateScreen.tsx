@@ -14,7 +14,7 @@ import { useQuery } from "@apollo/client";
 import { GET_TEMPLATES } from "../../hooks/template/useTemplateQuery";
 import useUpdateTemplate from "../../hooks/template/useUpdateTemplate";
 import useDeleteTemplate from "../../hooks/template/useDeleteTemplate";
-import { Editor, useMonaco } from "@monaco-editor/react";
+import { Editor } from "@monaco-editor/react";
 ("@monaco-editor/react");
 import SlideContainer from "../../components/SlideContainer";
 const DefaultCode = `() => {

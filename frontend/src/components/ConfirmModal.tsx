@@ -1,5 +1,4 @@
 import React from "react";
-import Button from "./input/Button";
 import Modal from "./Modal";
 import Dialog from "./Dialog";
 
