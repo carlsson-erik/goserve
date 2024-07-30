@@ -1,6 +1,6 @@
 FROM node:18.19.1 AS build
 WORKDIR /
-COPY . .
+COPY /frontend .
 RUN npm install --force
 RUN npm run build
 
