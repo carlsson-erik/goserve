@@ -27,7 +27,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: cerik/goserve
+          images: cerik/goserve-backend
 
       - name: Build and push Docker image
         id: push
