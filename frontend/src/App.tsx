@@ -4,13 +4,10 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { HomeScreen } from "./screens/HomeScreen";
 import Navbar from "./components/Navbar";
 
-const API_URL = import.meta.env.VITE_API_URL || window.location.hostname;
-const API_PORT = import.meta.env.VITE_API_PORT
-  ? ":" + import.meta.env.VITE_API_PORT
-  : "";
-console.log(import.meta.env.VITE_APP_TITLE, API_URL, API_PORT);
+const API_URL = import.meta.env.VITE_API_URL;
+console.log(import.meta.env.VITE_APP_TITLE);
 const client = new ApolloClient({
-  uri: `http://${API_URL}${API_PORT}/query`,
+  uri: API_URL ? API_URL : `${window.location.protocol}/query`,
   cache: new InMemoryCache(),
   defaultOptions: {
     watchQuery: {
