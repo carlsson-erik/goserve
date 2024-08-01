@@ -1,4 +1,4 @@
-import TileEditor from "../../components/TileEditor";
+import TileEditor from "../../components/feature/dashboard/TileEditor";
 
 const TileForm: React.FC = () => {
   return (

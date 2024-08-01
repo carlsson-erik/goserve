@@ -12,7 +12,7 @@ import {
   Template,
 } from "../../hooks/template/useTemplateQuery";
 import { useForm } from "react-hook-form";
-import { getVariable } from "../../components/TileCard";
+import { getVariable } from "../../components/feature/dashboard/TileCard";
 
 const TileCreateScreen: React.FC = () => {
   const { data: templates } = useQuery<GetTemplatesResult>(GET_TEMPLATES);

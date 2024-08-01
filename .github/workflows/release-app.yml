@@ -27,14 +27,14 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: cerik/goserve-backend
+          images: cerik/goserve-app
 
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./backend/dockerfile
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

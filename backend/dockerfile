@@ -1,6 +1,6 @@
 FROM golang:latest
 WORKDIR /
-COPY /backend .
+COPY . .
 RUN go mod download
 RUN go build
 

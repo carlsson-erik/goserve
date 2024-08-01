@@ -1,12 +1,12 @@
-import { IconPlus } from "@tabler/icons-react";
+import { IconLoader, IconPlus } from "@tabler/icons-react";
 import React from "react";
 import { Link, useParams, generatePath } from "react-router-dom";
-import paths from "../utils/paths";
 import { LivePreview, LiveProvider } from "react-live";
-import Button from "./input/Button";
 import { TW, tw } from "twind";
-import { Tile } from "../hooks/dashboard/useDashboardQuery";
-import { Variable } from "../hooks/template/useCreateTemplate";
+import { Tile } from "../../../hooks/dashboard/useDashboardQuery";
+import paths from "../../../utils/paths";
+import Button from "../../input/Button";
+import { Variable } from "../../../hooks/template/useCreateTemplate";
 
 export function getVariable(
   data?: Tile | { variables: Omit<Variable, "id">[] }
@@ -41,6 +41,8 @@ const TileCard: React.FC<TileProps> = ({
   onDelete,
 }) => {
   const { dashboardId } = useParams();
+
+  if (!dashboardId) return <IconLoader />;
 
   console.log(tile?.variables);
   return (

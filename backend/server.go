@@ -17,21 +17,15 @@ import (
 	"github.com/rs/cors"
 )
 
-const defaultPlaygroundPort = "8081"
-
 func main() {
 	err := godotenv.Load()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println("No env file found. Skipping...")
+		// log.Fatal(err)
 	}
 
 	db.MigrateDB()
-
-	playgroudPort := os.Getenv("PLAYGROUND_PORT")
-	if playgroudPort == "" {
-		playgroudPort = defaultPlaygroundPort
-	}
 
 	host := os.Getenv("DB_URL")
 	dbPort := os.Getenv("DB_PORT")
@@ -43,14 +37,15 @@ func main() {
 
 	db, err := sql.Open("postgres", connectString)
 
+	if err != nil {
+		fmt.Println(connectString)
+		log.Fatal(err)
+	}
+
 	dashboardService := service.DashboardService{DB: db}
 	templateService := service.TemplateService{DB: db}
 	tileService := service.TileService{DB: db}
 	variableService := service.VariableService{DB: db}
-
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	router := chi.NewRouter()
 
@@ -67,6 +62,9 @@ func main() {
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", playgroudPort)
-	log.Fatal(http.ListenAndServe(":"+playgroudPort, router))
+	playgroundPort := "8081"
+
+	log.Printf("connect to http://localhost:%s/ for GraphQL playground", playgroundPort)
+	log.Fatal(http.ListenAndServe(":"+playgroundPort, router))
+
 }

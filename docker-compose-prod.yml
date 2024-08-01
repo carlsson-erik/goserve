@@ -1,0 +1,49 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: v1
+    hostname: postgres
+    ports:
+      - 5432:5432
+    networks:
+      - backend_network
+
+  backend:
+    build: ./backend
+    working_dir: /
+    volumes:
+      - ./backend:/backend
+    ports:
+      - 8081:8081
+    environment:
+      DB_URL: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_DATABASE: v1
+    depends_on:
+      - postgres
+    networks:
+      - backend_network
+      - frontend_network
+
+  frontend:
+    build: ./frontend
+    working_dir: /frontend
+    volumes:
+      - ./frontend:/frontend
+    ports:
+      - 3000:80
+    depends_on:
+      - backend
+    networks:
+      - frontend_network
+networks:
+  backend_network:
+  frontend_network:

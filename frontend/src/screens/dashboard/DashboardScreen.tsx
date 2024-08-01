@@ -3,7 +3,6 @@ import paths from "../../utils/paths";
 import Button from "../../components/input/Button";
 import { useQuery } from "@apollo/client";
 import React from "react";
-import TileCard, { getVariable } from "../../components/TileCard";
 import { IconEdit, IconEditOff } from "@tabler/icons-react";
 import useDeleteTile from "../../hooks/tile/useDeleteTile";
 import { tw } from "twind";
@@ -14,6 +13,9 @@ import {
 } from "../../hooks/dashboard/useDashboardQuery";
 import useDeleteDashboard from "../../hooks/dashboard/useDeleteDashboard";
 import useConfirmModal from "../../components/ConfirmModal";
+import TileCard, {
+  getVariable,
+} from "../../components/feature/dashboard/TileCard";
 
 const DashboardScreen = () => {
   const [editing, setEditing] = React.useState(true);
