@@ -12,7 +12,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="p-2 flex justify-between gap-2 bg-gray-700">
+    <div className="p-2 flex justify-between gap-2 bg-gray-800 border-b border-gray-700">
       <Link to={paths.root} className="p-2 font-medium text-2xl text-gray-100">
         <span>Go Serve</span>
       </Link>
@@ -21,7 +21,7 @@ const Navbar = () => {
           <EditTilesButton onEditModeChange={handleEditModeChange} />
         </Tooltip>
         <Link to={paths.dashboard.about}>
-          <button className="text-white hover:bg-gray-600 p-2">
+          <button className="text-gray-100 hover:bg-gray-600 p-2">
             {editMode ? <p>Edit</p> : <p>About</p>}
           </button>
         </Link>

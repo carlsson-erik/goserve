@@ -27,6 +27,7 @@ export interface TileProps {
   compiledData?: string;
   editing?: boolean;
   onEditClick: (id: number) => void;
+  onCreate: (col: number, row: number) => void;
   onDelete: (id?: number) => void;
 }
 
@@ -38,6 +39,7 @@ const TileCard: React.FC<TileProps> = ({
   editing,
   scope,
   onEditClick,
+  onCreate,
   onDelete,
 }) => {
   const { dashboardId } = useParams();
@@ -57,20 +59,22 @@ const TileCard: React.FC<TileProps> = ({
               X
             </Button>
           )}
-          <Link
-            to={generatePath(paths.dashboard.tile.create, {
-              dashboardId: dashboardId,
-              col: col,
-              row: row,
-            })}
-          >
-            <div
-              className=" hover:bg-gray-500 hover:cursor-pointer"
-              onClick={() => onEditClick}
-            >
-              {tile ? <span>{tile.name}</span> : <IconPlus />}
-            </div>
-          </Link>
+
+          <div className=" hover:bg-gray-500 hover:cursor-pointer">
+            {tile ? (
+              <Link
+                to={generatePath(paths.dashboard.tile.create, {
+                  dashboardId: dashboardId,
+                  col: col,
+                  row: row,
+                })}
+              >
+                <span>{tile.name}</span>
+              </Link>
+            ) : (
+              <IconPlus onClick={() => onCreate(col, row)} />
+            )}
+          </div>
         </div>
       ) : (
         <div className="h-full p-4">

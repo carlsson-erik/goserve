@@ -42,6 +42,22 @@ func (r *mutationResolver) CreateTemplate(ctx context.Context, input model.NewTe
 func (r *mutationResolver) UpdateTemplate(ctx context.Context, input model.NewTemplate) (*model.Template, error) {
 	res, err := r.TemplateService.Update(input)
 
+	log.Println("Success update template. Next update variables...")
+
+	var variables []*model.Variable
+
+	for _, variable := range input.Variables {
+		variable.TemplateID = &res.ID
+		res, err := r.VariableService.Update(*variable)
+
+		if err != nil {
+			log.Printf("Update variable in template update error: %v", err)
+			return nil, err
+		}
+		variables = append(variables, res)
+	}
+
+	res.Variables = variables
 	return res, err
 }
 

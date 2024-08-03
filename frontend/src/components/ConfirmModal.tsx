@@ -27,7 +27,7 @@ const confirmModal: React.FC<ConfirmModalProps> = ({
 const useConfirmModal = () => {
   const [modal, setModal] = React.useState<React.ReactNode | null>(null);
 
-  const confirm = (title: string, message: string): Promise<boolean> => {
+  const confirm = (message: string, title = "Confirm"): Promise<boolean> => {
     const promise = new Promise<boolean>((resolve) => {
       setModal(
         confirmModal({

@@ -5,9 +5,11 @@ import { HomeScreen } from "./screens/HomeScreen";
 import Navbar from "./components/Navbar";
 
 const API_URL = import.meta.env.VITE_API_URL;
-console.log(import.meta.env.VITE_APP_TITLE);
+const url = API_URL ? API_URL : `${window.location.protocol}`;
+console.log(import.meta.env.VITE_APP_TITLE, API_URL);
+console.log(url);
 const client = new ApolloClient({
-  uri: API_URL ? API_URL : `${window.location.protocol}/query`,
+  uri: url + "/query",
   cache: new InMemoryCache(),
   defaultOptions: {
     watchQuery: {
@@ -22,7 +24,8 @@ const App = () => {
   return (
     <ApolloProvider client={client}>
       <BrowserRouter>
-        <div className="h-screen w-screen flex flex-col bg-gray-500 text-gray-100">
+        <div id="modal-root" />
+        <div className="h-screen w-screen flex flex-col bg-gray-900 text-gray-100">
           <Navbar />
           <Routes>
             <Route path="/*" element={<HomeScreen />} />

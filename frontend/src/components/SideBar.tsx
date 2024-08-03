@@ -20,9 +20,10 @@ const SideBar: React.FC<SideBarProps> = ({
   if (!dashboards) {
     return <div className={className}>loading...</div>;
   }
+
   return (
     <div className={className}>
-      <div className="h-full p-1 flex flex-col items-stretch gap-2 bg-gray-900">
+      <div className="h-full p-1 flex flex-col items-stretch gap-2 bg-gray-900 border-r border-gray-800">
         <span>Dashboards {dashboards.length}</span>
         <Link to={paths.dashboard.create}>
           <Button className="flex items-center gap-1">

@@ -16,6 +16,7 @@ import useDeleteTemplate from "../../hooks/template/useDeleteTemplate";
 import { Editor } from "@monaco-editor/react";
 ("@monaco-editor/react");
 import SlideContainer from "../../components/SlideContainer";
+import useConfirmModal from "../../components/ConfirmModal";
 import { getVariable } from "../../components/feature/dashboard/TileCard";
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
@@ -129,6 +130,15 @@ const TemplateCreateScreen = () => {
     [createTemplate, error, navigate, template, updateTemplate]
   );
 
+  const [getConfirm, ConfirmModal] = useConfirmModal();
+
+  const onDelete = React.useCallback(async () => {
+    if (!template) return;
+    const confirm = await getConfirm("Delete template " + template.name);
+
+    if (confirm) deleteTemplate(template.id);
+  }, [deleteTemplate, getConfirm, template]);
+
   React.useEffect(() => {
     console.log("reset");
     if (template)
@@ -224,15 +234,7 @@ const TemplateCreateScreen = () => {
             </Button>
           </div>
           <div>
-            {template && (
-              <Button
-                onClick={() => {
-                  deleteTemplate(template.id);
-                }}
-              >
-                Delete
-              </Button>
-            )}
+            {template && <Button onClick={onDelete}>Delete</Button>}
             <Button onClick={form.handleSubmit(onSubmit)} variant="primary">
               {template ? "Update" : "Create"}
             </Button>
@@ -251,6 +253,7 @@ const TemplateCreateScreen = () => {
 
   return (
     <form className="h-full" onSubmit={form.handleSubmit(onSubmit)}>
+      {ConfirmModal}
       {/* <Editor /> */}
       <LiveProvider
         code={code}

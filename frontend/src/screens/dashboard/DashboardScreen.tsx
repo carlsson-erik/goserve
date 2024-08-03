@@ -13,6 +13,8 @@ import {
 } from "../../hooks/dashboard/useDashboardQuery";
 import useDeleteDashboard from "../../hooks/dashboard/useDeleteDashboard";
 import useConfirmModal from "../../components/ConfirmModal";
+import Modal, { useModal } from "../../components/Modal";
+import DashboardCreateTileDialog from "../../components/dashboard/DashboardCreateTileDialog";
 import TileCard, {
   getVariable,
 } from "../../components/feature/dashboard/TileCard";
@@ -26,6 +28,16 @@ const DashboardScreen = () => {
 
   const [confirmDelete, deleteModal] = useConfirmModal();
 
+  const dashboard = dashboardData?.dashboards.find(
+    (d) => d.id === Number(dashboardId)
+  );
+
+  const createTileModal = useModal<{
+    dashboardId: number;
+    col: number;
+    row: number;
+  }>();
+
   const [deleteDashboard] = useDeleteDashboard();
 
   const [deleteTile] = useDeleteTile();
@@ -36,10 +48,7 @@ const DashboardScreen = () => {
 
   const onDeleteDashboard = React.useCallback(
     async (id: number) => {
-      const response = await confirmDelete(
-        "Confirm",
-        "Do you want to delete dashboard?"
-      );
+      const response = await confirmDelete("Do you want to delete dashboard?");
 
       if (response) {
         deleteDashboard(id);
@@ -57,8 +66,16 @@ const DashboardScreen = () => {
     [deleteTile]
   );
 
-  const dashboard = dashboardData?.dashboards.find(
-    (d) => d.id === Number(dashboardId)
+  const onCreateTile = React.useCallback(
+    (col: number, row: number) => {
+      if (!dashboard) return;
+      createTileModal.open({
+        dashboardId: dashboard.id,
+        col,
+        row,
+      });
+    },
+    [createTileModal, dashboard]
   );
 
   const tiles: (Tile | undefined)[] = React.useMemo(() => {
@@ -89,99 +106,114 @@ const DashboardScreen = () => {
     );
   }
   return (
-    <div className="h-full flex flex-col">
+    <>
       {deleteModal}
-      <div className="p-2 flex justify-between">
-        <span className="text-2xl">{dashboard.name}</span>
-        <div className="flex items-center gap-2">
-          <Button onClick={() => setEditing(!editing)}>
-            {editing ? <IconEditOff /> : <IconEdit />}
-          </Button>
-          <Button
-            className="text-red-400"
-            onClick={() => onDeleteDashboard(dashboard.id)}
-          >
-            Delete
-          </Button>
+      <Modal {...createTileModal.props}>
+        <DashboardCreateTileDialog
+          onCancel={() => createTileModal.close()}
+          onConfirm={() => console.log("confirm")}
+        />
+      </Modal>
+
+      <div className="h-full flex flex-col">
+        <div className="p-2 flex justify-between">
+          <span className="text-2xl">{dashboard.name}</span>
+
+          <div className="flex items-center gap-2">
+            <Button onClick={() => setEditing(!editing)}>
+              {editing ? <IconEditOff /> : <IconEdit />}
+            </Button>
+
+            <Button
+              className="text-red-400"
+              onClick={() => onDeleteDashboard(dashboard.id)}
+            >
+              Delete
+            </Button>
+          </div>
+        </div>
+        <div
+          className={`w-full h-full bg-gray-800 grid grid-rows-4 justify-stretch`}
+        >
+          <div className="grid grid-cols-subgrid grid-flow-col col-span-6">
+            {tiles.slice(0, 6).map((t, index) => {
+              return (
+                <TileCard
+                  scope={{ tw: tw, getVariable: getVariable(t) }}
+                  col={index}
+                  row={1}
+                  key={t ? t.id + index : index}
+                  className={
+                    t && t.width > 1
+                      ? "w-full h-full col-span-2"
+                      : "w-full h-full"
+                  }
+                  editing={editing}
+                  tile={t}
+                  onEditClick={onTileEditClick}
+                  onDelete={onDeleteTile}
+                  onCreate={onCreateTile}
+                />
+              );
+            })}
+          </div>
+          <div className="grid grid-cols-subgrid col-span-6">
+            {tiles.slice(6, 12).map((t, index) => {
+              return (
+                <TileCard
+                  scope={{ tw: tw, getVariable: getVariable(t) }}
+                  col={index}
+                  row={2}
+                  key={t ? t.id + index : index}
+                  className="w-full h-full"
+                  editing={editing}
+                  tile={t}
+                  onEditClick={onTileEditClick}
+                  onDelete={onDeleteTile}
+                  onCreate={onCreateTile}
+                />
+              );
+            })}
+          </div>
+          <div className="grid grid-cols-subgrid col-span-6">
+            {tiles.slice(12, 18).map((t, index) => {
+              return (
+                <TileCard
+                  scope={{ tw: tw, getVariable: getVariable(t) }}
+                  col={index}
+                  row={3}
+                  key={t ? t.id + index : index}
+                  className="w-full h-full"
+                  editing={editing}
+                  tile={t}
+                  onEditClick={onTileEditClick}
+                  onDelete={onDeleteTile}
+                  onCreate={onCreateTile}
+                />
+              );
+            })}
+          </div>
+          <div className="grid grid-cols-subgrid col-span-6">
+            {tiles.slice(18, 24).map((t, index) => {
+              return (
+                <TileCard
+                  scope={{ tw: tw, getVariable: getVariable(t) }}
+                  col={index}
+                  row={4}
+                  key={t ? t.id + index : index}
+                  className="w-full h-full"
+                  editing={editing}
+                  tile={t}
+                  onEditClick={onTileEditClick}
+                  onDelete={onDeleteTile}
+                  onCreate={onCreateTile}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
-      <div
-        className={`w-full h-full bg-gray-600 grid grid-rows-4 justify-stretch`}
-      >
-        <div className="grid grid-cols-subgrid grid-flow-col col-span-6">
-          {tiles.slice(0, 6).map((t, index) => {
-            return (
-              <TileCard
-                scope={{ tw: tw, getVariable: getVariable(t) }}
-                col={index}
-                row={1}
-                key={t ? t.id + index : index}
-                className={
-                  t && t.width > 1
-                    ? "w-full h-full col-span-2"
-                    : "w-full h-full"
-                }
-                editing={editing}
-                tile={t}
-                onEditClick={onTileEditClick}
-                onDelete={onDeleteTile}
-              />
-            );
-          })}
-        </div>
-        <div className="grid grid-cols-subgrid col-span-6">
-          {tiles.slice(6, 12).map((t, index) => {
-            return (
-              <TileCard
-                scope={{ tw: tw, getVariable: getVariable(t) }}
-                col={index}
-                row={2}
-                key={t ? t.id + index : index}
-                className="w-full h-full"
-                editing={editing}
-                tile={t}
-                onEditClick={onTileEditClick}
-                onDelete={onDeleteTile}
-              />
-            );
-          })}
-        </div>
-        <div className="grid grid-cols-subgrid col-span-6">
-          {tiles.slice(12, 18).map((t, index) => {
-            return (
-              <TileCard
-                scope={{ tw: tw, getVariable: getVariable(t) }}
-                col={index}
-                row={3}
-                key={t ? t.id + index : index}
-                className="w-full h-full"
-                editing={editing}
-                tile={t}
-                onEditClick={onTileEditClick}
-                onDelete={onDeleteTile}
-              />
-            );
-          })}
-        </div>
-        <div className="grid grid-cols-subgrid col-span-6">
-          {tiles.slice(18, 24).map((t, index) => {
-            return (
-              <TileCard
-                scope={{ tw: tw, getVariable: getVariable(t) }}
-                col={index}
-                row={4}
-                key={t ? t.id + index : index}
-                className="w-full h-full"
-                editing={editing}
-                tile={t}
-                onEditClick={onTileEditClick}
-                onDelete={onDeleteTile}
-              />
-            );
-          })}
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 

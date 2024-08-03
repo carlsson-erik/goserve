@@ -37,6 +37,10 @@ const Tooltip: React.FC<TooltipProps> = ({
     }
   );
 
+  React.useEffect(() => {
+    update?.();
+  }, [update, visible]);
+
   const onVisible = React.useCallback(
     async (visible: boolean) => {
       setVisible(visible);

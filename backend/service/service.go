@@ -73,9 +73,7 @@ func (d DashboardService) Delete(id int) (*model.Dashboard, error) {
 	return &res, err
 }
 
-type TileService struct {
-	DB *sql.DB
-}
+type TileService DashboardService
 
 func (t TileService) Create(createData model.NewTile) (*model.Tile, error) {
 
@@ -190,9 +188,7 @@ func (t TileService) Delete(id int) (*model.Tile, error) {
 	return &res, err
 }
 
-type VariableService struct {
-	DB *sql.DB
-}
+type VariableService DashboardService
 
 func (v VariableService) Create(createData model.NewVariable) (*model.Variable, error) {
 
@@ -256,9 +252,7 @@ func (v VariableService) Delete(id int) (*model.Variable, error) {
 	return &res, err
 }
 
-type TemplateService struct {
-	DB *sql.DB
-}
+type TemplateService DashboardService
 
 func (v TemplateService) Create(createData model.NewTemplate) (*model.Template, error) {
 
@@ -305,23 +299,6 @@ func (v TemplateService) Update(updateData model.NewTemplate) (*model.Template, 
 		log.Printf("Update template error: %v", err)
 		return nil, err
 	}
-
-	variableService := VariableService{DB: v.DB}
-
-	var variables []*model.Variable
-
-	for _, variable := range updateData.Variables {
-		variable.TemplateID = &res.ID
-		res, err := variableService.Update(*variable)
-
-		if err != nil {
-			log.Printf("Update variable in template update error: %v", err)
-			return nil, err
-		}
-		variables = append(variables, res)
-	}
-
-	res.Variables = variables
 
 	return &res, err
 }

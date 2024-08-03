@@ -3,23 +3,23 @@ version: '3.9'
 
 name: goserve
 services:
-  app:
-    build: ./
-    environment:
-      DB_URL: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_DATABASE: v1
-    volumes:
-      - ./app:/app
-    ports:
-      - 8081:8081
-      - 3000:80
-    networks:
-      - goserve-network
-    depends_on:
-      - postgres
+  # app:
+  #   build: ./
+  #   environment:
+  #     DB_URL: postgres
+  #     DB_PORT: 5432
+  #     DB_USER: postgres
+  #     DB_PASSWORD: postgres
+  #     DB_DATABASE: v1
+  #   volumes:
+  #     - ./app:/app
+  #   ports:
+  #     - 8081:8081
+  #     - 3000:80
+  #   networks:
+  #     - goserve-network
+  #   depends_on:
+  #     - postgres
 
   postgres:
     image: postgres:latest
@@ -33,8 +33,12 @@ services:
     hostname: postgres
     ports:
       - 5432:5432
-    networks:
-      - goserve-network
+    # networks:
+    #   - goserve-network
 
-networks:
-  goserve-network:
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+
