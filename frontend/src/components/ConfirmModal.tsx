@@ -1,5 +1,5 @@
 import React from "react";
-import Modal from "./Modal";
+import Modal, { useModal } from "./Modal";
 import Dialog from "./Dialog";
 
 export interface ConfirmModalProps {
@@ -9,14 +9,16 @@ export interface ConfirmModalProps {
   onCancel: () => void;
 }
 
-const confirmModal: React.FC<ConfirmModalProps> = ({
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
   title,
   message,
   onConfirm,
   onCancel,
 }) => {
+  const modal = useModal();
+
   return (
-    <Modal>
+    <Modal {...modal.props}>
       <Dialog title={title} onConfirm={onConfirm} onCancel={onCancel}>
         {message}
       </Dialog>
@@ -30,7 +32,7 @@ const useConfirmModal = () => {
   const confirm = (message: string, title = "Confirm"): Promise<boolean> => {
     const promise = new Promise<boolean>((resolve) => {
       setModal(
-        confirmModal({
+        ConfirmModal({
           title,
           message,
           onConfirm: () => {

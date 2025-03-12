@@ -38,7 +38,6 @@ const TileCard: React.FC<TileProps> = ({
   className,
   editing,
   scope,
-  onEditClick,
   onCreate,
   onDelete,
 }) => {

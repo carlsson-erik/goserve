@@ -1,6 +1,7 @@
 package main
 
 import (
+	// "context"
 	"database/sql"
 	"fmt"
 	"goserve/db"
@@ -42,11 +43,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	dashboardService := service.DashboardService{DB: db}
-	templateService := service.TemplateService{DB: db}
-	tileService := service.TileService{DB: db}
-	variableService := service.VariableService{DB: db}
-
 	router := chi.NewRouter()
 
 	// Add CORS middleware around every request
@@ -56,6 +52,13 @@ func main() {
 		AllowCredentials: true,
 		Debug:            false,
 	}).Handler)
+
+	// router.Use(AuthenticationMiddleware)
+
+	dashboardService := service.DashboardService{DB: db}
+	templateService := service.TemplateService{DB: db}
+	tileService := service.TileService{DB: db}
+	variableService := service.VariableService{DB: db}
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: db, DashboardService: &dashboardService, TemplateService: &templateService, TileService: &tileService, VariableService: &variableService}}))
 
