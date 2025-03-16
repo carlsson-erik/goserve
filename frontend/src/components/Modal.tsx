@@ -1,13 +1,14 @@
 import React from "react";
 import { createPortal } from "react-dom";
 
-export interface ModalProps {
-  children: React.ReactNode;
+export interface ModalProps<T> {
+  children: (data: T) => React.ReactNode;
   open?: boolean;
+  data: T;
   close: () => void;
 }
 
-const Modal = (props: ModalProps) => {
+const Modal = <T,>(props: ModalProps<T>) => {
   if (!props.open) return null;
   return createPortal(
     <>
@@ -19,7 +20,7 @@ const Modal = (props: ModalProps) => {
         }}
       />
       <div className="absolute w-full z-10 h-full pointer-events-none flex justify-center items-center">
-        <div className="pointer-events-auto">{props.children}</div>
+        <div className="pointer-events-auto">{props.children(props.data)}</div>
       </div>
     </>,
     document.getElementById("modal-root") ?? document.body
@@ -31,7 +32,7 @@ export const useModal = <T,>() => {
   const [data, setData] = React.useState<T | undefined>();
 
   return {
-    props: { open, close: () => setOpen(false) },
+    props: { open, close: () => setOpen(false), data },
     open: (data: T) => {
       setData(data);
       setOpen(true);
