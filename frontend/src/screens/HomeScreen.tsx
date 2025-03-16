@@ -5,7 +5,6 @@ import SideBar from "../components/SideBar";
 import { useQuery } from "@apollo/client/react/hooks/useQuery";
 import { GET_TEMPLATES } from "../hooks/template/useTemplateQuery";
 import DashboardCreateScreen from "./dashboard/DashboardCreateScreen";
-import TileCreateScreen from "./tile/TileCreateScreen";
 import TemplateCreateScreen from "./template/TemplateCreateScreen";
 import {
   GET_DASHBOARDS,
@@ -29,10 +28,6 @@ export const HomeScreen = () => {
           <Route
             path={paths.dashboard.create}
             element={<DashboardCreateScreen />}
-          />
-          <Route
-            path={paths.dashboard.tile.create}
-            element={<TileCreateScreen />}
           />
           <Route path={paths.dashboard.id} element={<DashboardScreen />} />
           <Route

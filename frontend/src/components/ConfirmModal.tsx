@@ -19,9 +19,11 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
   return (
     <Modal {...modal.props}>
-      <Dialog title={title} onConfirm={onConfirm} onCancel={onCancel}>
-        {message}
-      </Dialog>
+      {() => (
+        <Dialog title={title} onConfirm={onConfirm} onCancel={onCancel}>
+          {message}
+        </Dialog>
+      )}
     </Modal>
   );
 };

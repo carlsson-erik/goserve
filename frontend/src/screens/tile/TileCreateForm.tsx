@@ -14,7 +14,12 @@ import {
 import { useForm } from "react-hook-form";
 import { getVariable } from "../../components/feature/dashboard/TileCard";
 
-const TileCreateScreen: React.FC = () => {
+export interface TileCreateFormProps {
+  col: number | undefined;
+  row: number | undefined;
+}
+
+const TileCreateForm: React.FC<TileCreateFormProps> = ({ col, row }) => {
   const { data: templates } = useQuery<GetTemplatesResult>(GET_TEMPLATES);
 
   const form = useForm<CreateTileData>({
@@ -32,7 +37,7 @@ const TileCreateScreen: React.FC = () => {
 
   const [error, setError] = React.useState<string | undefined>();
 
-  const { dashboardId, col, row } = useParams();
+  const { dashboardId } = useParams();
 
   const [createTile] = useCreateTile();
 
@@ -43,8 +48,8 @@ const TileCreateScreen: React.FC = () => {
       if (!template) return;
       const res = await createTile({
         name: data.name,
-        col: Number(col) ?? 1,
-        row: Number(row) ?? 1,
+        col: col ?? 1,
+        row: row ?? 1,
         dashboardId: Number(dashboardId) ?? 1,
         templateId: template.id,
         width: data.width,
@@ -164,4 +169,4 @@ const TileCreateScreen: React.FC = () => {
   );
 };
 
-export default TileCreateScreen;
+export default TileCreateForm;
