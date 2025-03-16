@@ -18,7 +18,7 @@ import DashboardCreateTileDialog from "../../components/dashboard/DashboardCreat
 import TileCard, {
   getVariable,
 } from "../../components/feature/dashboard/TileCard";
-
+import * as recharts from "recharts";
 const DashboardScreen = () => {
   const [editing, setEditing] = React.useState(true);
 
@@ -118,7 +118,6 @@ const DashboardScreen = () => {
           />
         )}
       </Modal>
-
       <div className="h-full flex flex-col">
         <div className="p-2 flex justify-between">
           <span className="text-2xl">{dashboard.name}</span>
@@ -143,7 +142,11 @@ const DashboardScreen = () => {
             {tiles.slice(0, 6).map((t, index) => {
               return (
                 <TileCard
-                  scope={{ tw: tw, getVariable: getVariable(t) }}
+                  scope={{
+                    tw: tw,
+                    getVariable: getVariable(t),
+                    recharts,
+                  }}
                   col={index}
                   row={1}
                   key={t ? t.id + index : index}
@@ -165,7 +168,7 @@ const DashboardScreen = () => {
             {tiles.slice(6, 12).map((t, index) => {
               return (
                 <TileCard
-                  scope={{ tw: tw, getVariable: getVariable(t) }}
+                  scope={{ tw: tw, getVariable: getVariable(t), recharts }}
                   col={index}
                   row={2}
                   key={t ? t.id + index : index}
@@ -183,7 +186,7 @@ const DashboardScreen = () => {
             {tiles.slice(12, 18).map((t, index) => {
               return (
                 <TileCard
-                  scope={{ tw: tw, getVariable: getVariable(t) }}
+                  scope={{ tw: tw, getVariable: getVariable(t), recharts }}
                   col={index}
                   row={3}
                   key={t ? t.id + index : index}
@@ -201,7 +204,7 @@ const DashboardScreen = () => {
             {tiles.slice(18, 24).map((t, index) => {
               return (
                 <TileCard
-                  scope={{ tw: tw, getVariable: getVariable(t) }}
+                  scope={{ tw: tw, getVariable: getVariable(t), recharts }}
                   col={index}
                   row={4}
                   key={t ? t.id + index : index}

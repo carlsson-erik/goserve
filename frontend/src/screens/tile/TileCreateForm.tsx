@@ -13,6 +13,7 @@ import {
 } from "../../hooks/template/useTemplateQuery";
 import { useForm } from "react-hook-form";
 import { getVariable } from "../../components/feature/dashboard/TileCard";
+import * as recharts from "recharts";
 
 export interface TileCreateFormProps {
   col: number | undefined;
@@ -109,6 +110,7 @@ const TileCreateForm: React.FC<TileCreateFormProps> = ({ col, row }) => {
         scope={{
           tw,
           getVariable: getVariable({ variables }),
+          recharts,
         }}
       >
         <div className="h-2/3 grid grid-cols-2 gap-4">

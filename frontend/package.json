@@ -27,6 +27,7 @@
     "react-live": "^4.1.6",
     "react-popper": "^2.3.0",
     "react-router-dom": "^6.23.0",
+    "recharts": "^2.15.1",
     "twind": "^0.16.19",
     "zod": "^3.23.8"
   },
