@@ -109,10 +109,14 @@ const DashboardScreen = () => {
     <>
       {deleteModal}
       <Modal {...createTileModal.props}>
-        <DashboardCreateTileDialog
-          onCancel={() => createTileModal.close()}
-          onConfirm={() => console.log("confirm")}
-        />
+        {(data) => (
+          <DashboardCreateTileDialog
+            col={data?.col}
+            row={data?.row}
+            onCancel={() => createTileModal.close()}
+            onConfirm={() => console.log("confirm")}
+          />
+        )}
       </Modal>
 
       <div className="h-full flex flex-col">
