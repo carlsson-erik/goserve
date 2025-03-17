@@ -18,6 +18,7 @@ import { Editor } from "@monaco-editor/react";
 import SlideContainer from "../../components/SlideContainer";
 import useConfirmModal from "../../components/ConfirmModal";
 import { getVariable } from "../../components/feature/dashboard/TileCard";
+import * as recharts from "recharts";
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
     
@@ -266,6 +267,7 @@ const TemplateCreateScreen = () => {
               value: "",
             })),
           }),
+          recharts,
         }}
       >
         <SlideContainer

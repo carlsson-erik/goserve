@@ -7,6 +7,7 @@ import { Tile } from "../../../hooks/dashboard/useDashboardQuery";
 import paths from "../../../utils/paths";
 import Button from "../../input/Button";
 import { Variable } from "../../../hooks/template/useCreateTemplate";
+import * as recharts from "recharts";
 
 export function getVariable(
   data?: Tile | { variables: Omit<Variable, "id">[] }
@@ -21,7 +22,11 @@ export function getVariable(
 export interface TileProps {
   col: number;
   row: number;
-  scope: { tw: TW; getVariable: (name: string) => string };
+  scope: {
+    tw: TW;
+    getVariable: (name: string) => string;
+    recharts: typeof recharts;
+  };
   className?: string;
   tile?: Tile;
   compiledData?: string;
@@ -78,9 +83,9 @@ const TileCard: React.FC<TileProps> = ({
       ) : (
         <div className="h-full p-4">
           {tile ? (
-            <div className="h-full rounded-3xl overflow-hidden flex justify-center bg-gray-700 border border-gray-800">
+            <div className="h-full rounded-3xl overflow-hidden bg-gray-700 border border-gray-800">
               <LiveProvider code={tile?.template.data} scope={scope}>
-                <LivePreview />
+                <LivePreview className="h-full" />
               </LiveProvider>
             </div>
           ) : null}
