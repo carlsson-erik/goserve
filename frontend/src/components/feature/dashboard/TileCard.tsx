@@ -45,7 +45,7 @@ const TileCard: React.FC<TileProps> = ({
 
   if (!dashboardId) return <IconLoader />;
 
-  console.log(tile?.variables);
+  // console.log(tile?.variables);
   return (
     <div className={tw(className, "relative w-full h-full")}>
       {editing ? (
