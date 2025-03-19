@@ -17,8 +17,8 @@ import { Editor } from "@monaco-editor/react";
 ("@monaco-editor/react");
 import SlideContainer from "../../components/SlideContainer";
 import useConfirmModal from "../../components/ConfirmModal";
-import { getVariable } from "../../components/feature/dashboard/TileCard";
 import * as recharts from "recharts";
+import { getVariable } from "../../hooks/useScope";
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
     

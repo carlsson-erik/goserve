@@ -145,6 +145,20 @@ func (r *mutationResolver) DeleteTile(ctx context.Context, id int) (*model.Tile,
 
 	return res, err
 }
+func (r *mutationResolver) CreateOrUpdateTiles(ctx context.Context, data []*model.NewTile) (int, error) {
+	for _, tileDataPointer := range data {
+
+		tileData := *tileDataPointer
+
+		if tileData.ID == nil {
+			r.TileService.Create(tileData)
+		} else {
+			r.TileService.Update(tileData)
+		}
+
+	}
+	return 1, nil
+}
 
 // Dashboards is the resolver for the dashboards field.
 func (r *queryResolver) Dashboards(ctx context.Context) ([]*model.Dashboard, error) {

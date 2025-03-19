@@ -20,7 +20,7 @@ INSERT INTO public.variable ("name","value","default","template_id")
 values ('url','https://youtube.com','example.com', 1);
 
 INSERT INTO public.tile ("name","row","col", "width", "height","template_id", "dashboard_id")
-values ('Youtube bookmark',0,0,2,1,1,1);
+values ('Youtube bookmark',8,0,6,6,1,1);
 
 INSERT INTO public.variable ("name","value","default","tile_id")
 values ('title','Youtube','Default title',1);
@@ -106,4 +106,4 @@ values('graph', '() => {
 }',2,1);
 
 INSERT INTO public.tile ("name","row","col", "width", "height","template_id", "dashboard_id")
-values ('Graph',1,3,2,1,2,1);
+values ('Graph',1,8,6,6,2,1);

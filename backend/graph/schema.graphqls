@@ -86,6 +86,7 @@ type Mutation {
   deleteDashboard(id: Int!): Dashboard!
   createTile(input: NewTile!): Tile!
   updateTile(input: NewTile!): Tile!
+  createOrUpdateTiles(input: [NewTile!]!) : Int!
   deleteTile(id: Int!): Tile!
 }
 

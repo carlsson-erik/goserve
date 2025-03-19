@@ -3,9 +3,7 @@ import paths from "../../utils/paths";
 import Button from "../../components/input/Button";
 import { useQuery } from "@apollo/client";
 import React from "react";
-import { IconEdit, IconEditOff } from "@tabler/icons-react";
 import useDeleteTile from "../../hooks/tile/useDeleteTile";
-import { tw } from "twind";
 import {
   GET_DASHBOARDS,
   GetDashboardsResult,
@@ -15,22 +13,41 @@ import useDeleteDashboard from "../../hooks/dashboard/useDeleteDashboard";
 import useConfirmModal from "../../components/ConfirmModal";
 import Modal, { useModal } from "../../components/Modal";
 import DashboardCreateTileDialog from "../../components/dashboard/DashboardCreateTileDialog";
-import TileCard, {
-  getVariable,
-} from "../../components/feature/dashboard/TileCard";
-import * as recharts from "recharts";
+import DashboardGrid from "./DashboardGrid";
+import { indexBy } from "ramda";
+import useCreateOrUpdateTiles from "../../hooks/tile/useCreateOrUpdateTiles";
+import { CreateTileData } from "../../hooks/tile/useCreateTile";
+
 const DashboardScreen = () => {
   const [editing, setEditing] = React.useState(true);
 
   const { dashboardId } = useParams();
 
-  const { data: dashboardData } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
+  const { data: dashboardData, refetch: refetchDashboard } =
+    useQuery<GetDashboardsResult>(GET_DASHBOARDS);
 
   const [confirmDelete, deleteModal] = useConfirmModal();
 
   const dashboard = dashboardData?.dashboards.find(
     (d) => d.id === Number(dashboardId)
   );
+
+  const [tilesCopy, setTilesCopy] = React.useState<Record<number, Tile>>({});
+
+  React.useEffect(() => {
+    if (!dashboard) return;
+
+    setTilesCopy(indexBy((t) => t.id, [...dashboard.tiles]));
+  }, [dashboard]);
+
+  const updateTile = React.useCallback((id: number, data: Partial<Tile>) => {
+    console.log("update", data);
+    setTilesCopy((value) => {
+      const tmp = { ...value };
+      tmp[id] = { ...value[id], ...data };
+      return tmp;
+    });
+  }, []);
 
   const createTileModal = useModal<{
     dashboardId: number;
@@ -39,12 +56,9 @@ const DashboardScreen = () => {
   }>();
 
   const [deleteDashboard] = useDeleteDashboard();
+  const [createOrUpdateTiles] = useCreateOrUpdateTiles();
 
   const [deleteTile] = useDeleteTile();
-
-  const onTileEditClick = React.useCallback((id: number) => {
-    console.log(id);
-  }, []);
 
   const onDeleteDashboard = React.useCallback(
     async (id: number) => {
@@ -56,6 +70,31 @@ const DashboardScreen = () => {
     },
     [confirmDelete, deleteDashboard]
   );
+
+  const onSaveTile = React.useCallback(async () => {
+    if (!dashboard) return;
+
+    const data: CreateTileData[] = Object.values(tilesCopy).map((t) => ({
+      id: t.id,
+      name: t.name,
+      col: t.col,
+      row: t.row,
+      width: t.width,
+      height: t.height,
+      dashboardId: dashboard.id,
+      templateId: t.template.id,
+      variables: (t.variables ?? []).map((v) => ({
+        id: v.id,
+        name: v.name,
+        value: v.value,
+        default: v.default,
+      })),
+    }));
+    console.log("save", data);
+    await createOrUpdateTiles(data);
+    await refetchDashboard();
+    setEditing(false);
+  }, [createOrUpdateTiles, dashboard, refetchDashboard, tilesCopy]);
 
   const onDeleteTile = React.useCallback(
     (id?: number) => {
@@ -77,23 +116,6 @@ const DashboardScreen = () => {
     },
     [createTileModal, dashboard]
   );
-
-  const tiles: (Tile | undefined)[] = React.useMemo(() => {
-    if (!dashboard) return [];
-    const numberOfTiles = dashboard.cols * dashboard.rows;
-
-    const tmpTiles = Array(numberOfTiles).fill(undefined);
-
-    if (dashboard.tiles.length > 0) {
-      setEditing(false);
-    }
-
-    dashboard.tiles.forEach((tile) => {
-      tmpTiles[tile.row * tile.col] = tile;
-    });
-
-    return tmpTiles;
-  }, [dashboard]);
 
   if (!dashboard || !dashboardId) {
     return (
@@ -121,104 +143,41 @@ const DashboardScreen = () => {
       <div className="h-full flex flex-col">
         <div className="p-2 flex justify-between">
           <span className="text-2xl">{dashboard.name}</span>
-
-          <div className="flex items-center gap-2">
-            <Button onClick={() => setEditing(!editing)}>
-              {editing ? <IconEditOff /> : <IconEdit />}
-            </Button>
-
+          <div className="flex gap-2">
             <Button
               className="text-red-400"
               onClick={() => onDeleteDashboard(dashboard.id)}
             >
               Delete
             </Button>
-          </div>
-        </div>
-        <div
-          className={`w-full h-full bg-gray-800 grid grid-rows-4 justify-stretch`}
-        >
-          <div className="grid grid-cols-subgrid grid-flow-col col-span-6">
-            {tiles.slice(0, 6).map((t, index) => {
-              return (
-                <TileCard
-                  scope={{
-                    tw: tw,
-                    getVariable: getVariable(t),
-                    recharts,
-                  }}
-                  col={index}
-                  row={1}
-                  key={t ? t.id + index : index}
-                  className={
-                    t && t.width > 1
-                      ? "w-full h-full col-span-2"
-                      : "w-full h-full"
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={(value) => {
+                  if (editing) {
+                    setTilesCopy(indexBy((t) => t.id, [...dashboard.tiles]));
                   }
-                  editing={editing}
-                  tile={t}
-                  onEditClick={onTileEditClick}
-                  onDelete={onDeleteTile}
-                  onCreate={onCreateTile}
-                />
-              );
-            })}
-          </div>
-          <div className="grid grid-cols-subgrid col-span-6">
-            {tiles.slice(6, 12).map((t, index) => {
-              return (
-                <TileCard
-                  scope={{ tw: tw, getVariable: getVariable(t), recharts }}
-                  col={index}
-                  row={2}
-                  key={t ? t.id + index : index}
-                  className="w-full h-full"
-                  editing={editing}
-                  tile={t}
-                  onEditClick={onTileEditClick}
-                  onDelete={onDeleteTile}
-                  onCreate={onCreateTile}
-                />
-              );
-            })}
-          </div>
-          <div className="grid grid-cols-subgrid col-span-6">
-            {tiles.slice(12, 18).map((t, index) => {
-              return (
-                <TileCard
-                  scope={{ tw: tw, getVariable: getVariable(t), recharts }}
-                  col={index}
-                  row={3}
-                  key={t ? t.id + index : index}
-                  className="w-full h-full"
-                  editing={editing}
-                  tile={t}
-                  onEditClick={onTileEditClick}
-                  onDelete={onDeleteTile}
-                  onCreate={onCreateTile}
-                />
-              );
-            })}
-          </div>
-          <div className="grid grid-cols-subgrid col-span-6">
-            {tiles.slice(18, 24).map((t, index) => {
-              return (
-                <TileCard
-                  scope={{ tw: tw, getVariable: getVariable(t), recharts }}
-                  col={index}
-                  row={4}
-                  key={t ? t.id + index : index}
-                  className="w-full h-full"
-                  editing={editing}
-                  tile={t}
-                  onEditClick={onTileEditClick}
-                  onDelete={onDeleteTile}
-                  onCreate={onCreateTile}
-                />
-              );
-            })}
+                  setEditing(!editing);
+                }}
+              >
+                {editing ? "cancel" : "edit"}
+              </Button>
+            </div>
+            {editing && (
+              <>
+                <Button onClick={onSaveTile} variant="primary">
+                  Save
+                </Button>
+                <Button onClick={() => onCreateTile(1, 1)}>+</Button>
+              </>
+            )}
           </div>
         </div>
+        <DashboardGrid
+          className="h-full"
+          tiles={tilesCopy}
+          onUpdateTile={updateTile}
+          editing={editing}
+        />
       </div>
     </>
   );

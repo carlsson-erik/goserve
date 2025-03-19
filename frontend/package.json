@@ -16,11 +16,13 @@
     "@popperjs/core": "^2.11.8",
     "@tabler/icons-react": "^3.3.0",
     "@types/node": "^22.0.0",
+    "@types/ramda": "^0.30.2",
     "dotenv": "^16.4.5",
     "gql.tada": "^1.7.5",
     "graphql": "^16.8.1",
     "monaco-editor": "^0.49.0",
     "neverthrow": "^6.2.2",
+    "ramda": "^0.30.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.5",
@@ -29,6 +31,7 @@
     "react-router-dom": "^6.23.0",
     "recharts": "^2.15.1",
     "twind": "^0.16.19",
+    "use-debounce": "^10.0.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {

@@ -59,15 +59,16 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateDashboard func(childComplexity int, input model.NewDashboard) int
-		CreateTemplate  func(childComplexity int, input model.NewTemplate) int
-		CreateTile      func(childComplexity int, input model.NewTile) int
-		DeleteDashboard func(childComplexity int, id int) int
-		DeleteTemplate  func(childComplexity int, id int) int
-		DeleteTile      func(childComplexity int, id int) int
-		UpdateDashboard func(childComplexity int, input model.NewDashboard) int
-		UpdateTemplate  func(childComplexity int, input model.NewTemplate) int
-		UpdateTile      func(childComplexity int, input model.NewTile) int
+		CreateDashboard     func(childComplexity int, input model.NewDashboard) int
+		CreateOrUpdateTiles func(childComplexity int, input []*model.NewTile) int
+		CreateTemplate      func(childComplexity int, input model.NewTemplate) int
+		CreateTile          func(childComplexity int, input model.NewTile) int
+		DeleteDashboard     func(childComplexity int, id int) int
+		DeleteTemplate      func(childComplexity int, id int) int
+		DeleteTile          func(childComplexity int, id int) int
+		UpdateDashboard     func(childComplexity int, input model.NewDashboard) int
+		UpdateTemplate      func(childComplexity int, input model.NewTemplate) int
+		UpdateTile          func(childComplexity int, input model.NewTile) int
 	}
 
 	Query struct {
@@ -115,6 +116,7 @@ type MutationResolver interface {
 	DeleteDashboard(ctx context.Context, id int) (*model.Dashboard, error)
 	CreateTile(ctx context.Context, input model.NewTile) (*model.Tile, error)
 	UpdateTile(ctx context.Context, input model.NewTile) (*model.Tile, error)
+	CreateOrUpdateTiles(ctx context.Context, input []*model.NewTile) (int, error)
 	DeleteTile(ctx context.Context, id int) (*model.Tile, error)
 }
 type QueryResolver interface {
@@ -194,6 +196,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateDashboard(childComplexity, args["input"].(model.NewDashboard)), true
+
+	case "Mutation.createOrUpdateTiles":
+		if e.complexity.Mutation.CreateOrUpdateTiles == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createOrUpdateTiles_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateOrUpdateTiles(childComplexity, args["input"].([]*model.NewTile)), true
 
 	case "Mutation.createTemplate":
 		if e.complexity.Mutation.CreateTemplate == nil {
@@ -566,6 +580,21 @@ func (ec *executionContext) field_Mutation_createDashboard_args(ctx context.Cont
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNNewDashboard2goserveᚋgraphᚋmodelᚐNewDashboard(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createOrUpdateTiles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.NewTile
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewTile2ᚕᚖgoserveᚋgraphᚋmodelᚐNewTileᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1533,6 +1562,61 @@ func (ec *executionContext) fieldContext_Mutation_updateTile(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateTile_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createOrUpdateTiles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createOrUpdateTiles(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateOrUpdateTiles(rctx, fc.Args["input"].([]*model.NewTile))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createOrUpdateTiles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createOrUpdateTiles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4876,6 +4960,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createOrUpdateTiles":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createOrUpdateTiles(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "deleteTile":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteTile(ctx, field)
@@ -5706,6 +5797,28 @@ func (ec *executionContext) unmarshalNNewTemplate2goserveᚋgraphᚋmodelᚐNewT
 func (ec *executionContext) unmarshalNNewTile2goserveᚋgraphᚋmodelᚐNewTile(ctx context.Context, v interface{}) (model.NewTile, error) {
 	res, err := ec.unmarshalInputNewTile(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewTile2ᚕᚖgoserveᚋgraphᚋmodelᚐNewTileᚄ(ctx context.Context, v interface{}) ([]*model.NewTile, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.NewTile, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNNewTile2ᚖgoserveᚋgraphᚋmodelᚐNewTile(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNNewTile2ᚖgoserveᚋgraphᚋmodelᚐNewTile(ctx context.Context, v interface{}) (*model.NewTile, error) {
+	res, err := ec.unmarshalInputNewTile(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNNewVariable2ᚕᚖgoserveᚋgraphᚋmodelᚐNewVariableᚄ(ctx context.Context, v interface{}) ([]*model.NewVariable, error) {
