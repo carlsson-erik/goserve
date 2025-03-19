@@ -91,20 +91,8 @@ const DashboardGrid: React.FC<DashboardGridProps> = ({
         <div>RowHeight: {rowHeight}</div>
         <div>CursorX: {cursorX}</div>
         <div>CursorY: {cursorY}</div>
-        <div>hehj</div>
       </div>
-      {/* {Array.from({ length: gridCol * gridRow }).map((_, i) => (
-        <div
-          key={i}
-          className="absolute border border-white/10"
-          style={{
-            top: Math.floor(i / gridCol) * rowHeight,
-            left: (i % gridCol) * colWidth,
-            height: rowHeight,
-            width: colWidth,
-          }}
-        ></div>
-      ))} */}
+
       {Object.values(tiles).map((t) => (
         <DraggableCard
           draggable={editing}
