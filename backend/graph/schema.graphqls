@@ -40,7 +40,6 @@ input NewVariable {
   default: String
   template_id: Int
   tile_id: Int
-
 }
 
 input NewTemplate{
@@ -75,6 +74,16 @@ input NewTile {
   variables: [NewVariable!]!
 }
 
+type User {
+  id: Int!
+  name: String!
+  email: String!
+  username: String!
+  password: String!
+  role: String!
+  AccessToken: String!
+}
+
 
 
 type Mutation {
@@ -92,4 +101,5 @@ type Mutation {
 type Query {
   dashboards: [Dashboard!]!
   templates: [Template!]!
+  user: User
 }

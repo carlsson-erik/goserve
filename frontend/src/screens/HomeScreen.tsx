@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import { useState } from "react";
 import paths from "../utils/paths";
 import DashboardScreen from "./dashboard/DashboardScreen";
 import SideBar from "../components/SideBar";
@@ -10,35 +11,50 @@ import {
   GET_DASHBOARDS,
   GetDashboardsResult,
 } from "../hooks/dashboard/useDashboardQuery";
+import LoginScreen from "./account/LoginScreen";
 
 export const HomeScreen = () => {
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+
   const { data: dashboards } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
 
   const { data: templates } = useQuery(GET_TEMPLATES);
 
   return (
-    <div className="w-full h-full flex items-stretch overflow-hidden">
-      <SideBar
-        className="shrink-0"
-        dashboards={dashboards?.dashboards}
-        templates={templates?.templates}
-      />
-      <div className="grow">
-        <Routes>
-          <Route
-            path={paths.dashboard.create}
-            element={<DashboardCreateScreen />}
+    <>
+      {loggedIn ? (
+        <div className="w-full h-full flex items-stretch overflow-hidden">
+          <SideBar
+            className="shrink-0"
+            dashboards={dashboards?.dashboards}
+            templates={templates?.templates}
           />
-          <Route path={paths.dashboard.id} element={<DashboardScreen />} />
-          <Route
-            path={paths.template.create}
-            element={<TemplateCreateScreen />}
-          />
-          <Route path={paths.template.id} element={<TemplateCreateScreen />} />
+          <div className="grow">
+            <Routes>
+              <Route
+                path={paths.dashboard.create}
+                element={<DashboardCreateScreen />}
+              />
+              <Route path={paths.dashboard.id} element={<DashboardScreen />} />
+              <Route
+                path={paths.template.create}
+                element={<TemplateCreateScreen />}
+              />
+              <Route
+                path={paths.template.id}
+                element={<TemplateCreateScreen />}
+              />
 
-          <Route path={"*"} element={<DashboardScreen />} />
-        </Routes>
-      </div>
-    </div>
+              <Route path={"*"} element={<DashboardScreen />} />
+            </Routes>
+          </div>
+        </div>
+      ) : (
+        <div className="flex justify-center items-center h-full">
+          <LoginScreen 
+            onLogin={() => setLoggedIn(true)}/>
+        </div>
+      )}
+    </>
   );
 };
