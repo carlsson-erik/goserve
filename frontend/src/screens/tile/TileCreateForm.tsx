@@ -12,8 +12,8 @@ import {
   Template,
 } from "../../hooks/template/useTemplateQuery";
 import { useForm } from "react-hook-form";
-import { getVariable } from "../../components/feature/dashboard/TileCard";
 import * as recharts from "recharts";
+import { getVariable } from "../../hooks/useScope";
 
 export interface TileCreateFormProps {
   col: number | undefined;
