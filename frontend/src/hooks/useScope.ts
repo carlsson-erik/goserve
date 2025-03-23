@@ -2,6 +2,7 @@ import { tw } from "twind";
 import * as recharts from "recharts";
 import { Tile } from "./dashboard/useDashboardQuery";
 import { Variable } from "./template/useCreateTemplate";
+import React from "react";
 
 export function getVariable(
   data?: Tile | { variables: Omit<Variable, "id">[] }
@@ -18,8 +19,9 @@ export interface Scope {
   recharts: typeof recharts;
 }
 
-const useScope = (tile: Tile) => {
-  return { tw, getVariable: getVariable(tile), recharts } as Scope;
+const useScope = (tile: Tile | { variables: Omit<Variable, "id">[] }) => {
+  const getVariableMemo = React.useMemo(() => getVariable(tile), [tile]);
+  return { tw, getVariable: getVariableMemo, recharts } as Scope;
 };
 
 export default useScope;

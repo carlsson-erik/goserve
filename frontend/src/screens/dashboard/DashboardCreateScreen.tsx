@@ -5,7 +5,7 @@ import DashboardCreateForm, {
 import useCreateDashboard from "../../hooks/dashboard/useCreateDashboard";
 
 const DashboardCreateScreen = () => {
-  const [createDashboard, { loading }] = useCreateDashboard();
+  const [createDashboard] = useCreateDashboard();
 
   const onSubmit = (data: DashboardCreateData) => {
     createDashboard({ name: data.name });
