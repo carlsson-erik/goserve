@@ -25,7 +25,7 @@ const Button: React.FC<ButtonProps> = ({
       {...props}
       className={
         props.className +
-        " px-2 py-1 bg-gray-950 border rounded w-fit border-gray-700 hover:bg-gray-800 text-gray-200"
+        " px-3 py-1.5 bg-gray-950 border rounded w-fit border-gray-700 hover:bg-gray-800 text-gray-200"
       }
     >
       {loading ? "loading" : children}

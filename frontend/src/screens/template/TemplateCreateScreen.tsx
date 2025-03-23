@@ -2,7 +2,6 @@ import React from "react";
 import { LivePreview, LiveProvider } from "react-live";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/input/Button";
-import { tw } from "twind";
 import paths from "../../utils/paths";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,10 +14,9 @@ import useUpdateTemplate from "../../hooks/template/useUpdateTemplate";
 import useDeleteTemplate from "../../hooks/template/useDeleteTemplate";
 import { Editor } from "@monaco-editor/react";
 ("@monaco-editor/react");
-import SlideContainer from "../../components/SlideContainer";
+import SplitePanel from "../../components/SplitPanel";
 import useConfirmModal from "../../components/ConfirmModal";
-import * as recharts from "recharts";
-import { getVariable } from "../../hooks/useScope";
+import useScope from "../../hooks/useScope";
 const DefaultCode = `() => {
     const [count, setCount] = React.useState(0)
     
@@ -72,6 +70,15 @@ const TemplateCreateScreen = () => {
   });
 
   const variables = form.watch("variables");
+
+  const scope = useScope({
+    variables: variables.map((v) => ({
+      default: v.default,
+      name: v.name,
+      value: v.default ?? "",
+    })),
+  });
+
   const code = form.watch("data");
 
   const { append, remove, fields } = useFieldArray({
@@ -85,7 +92,7 @@ const TemplateCreateScreen = () => {
         const res = await updateTemplate({
           name: formData.name,
           data: formData.data,
-          width: formData.height,
+          width: formData.width,
           height: formData.height,
           variables: formData.variables.map((v) => ({
             name: v.name,
@@ -108,8 +115,8 @@ const TemplateCreateScreen = () => {
       const res = await createTemplate({
         name: formData.name,
         data: formData.data,
-        width: formData.height,
-        height: formData.height,
+        width: 5 * width,
+        height: 5,
         variables: formData.variables.map((v) => ({
           name: v.name,
           value: "",
@@ -128,7 +135,7 @@ const TemplateCreateScreen = () => {
         })
       );
     },
-    [createTemplate, error, navigate, template, updateTemplate]
+    [createTemplate, error, navigate, template, updateTemplate, width]
   );
 
   const [getConfirm, ConfirmModal] = useConfirmModal();
@@ -158,15 +165,14 @@ const TemplateCreateScreen = () => {
         <div className="h-24">
           <h1>{template ? "Update template" : "Create template"}</h1>
         </div>
-        <FormField error={form.formState.errors.name?.message}>
-          <input
-            className="mb-1"
-            type="text"
-            placeholder="Name..."
-            {...form.register("name")}
-          />
+        <FormField
+          className="space-y-1"
+          error={form.formState.errors.name?.message}
+        >
+          <div>Name</div>
+          <input type="text" placeholder="Name..." {...form.register("name")} />
         </FormField>
-        <div className="h-3/5">
+        <div className="mt-4 h-3/5">
           <Editor
             className="h-full"
             defaultLanguage="typescript"
@@ -179,7 +185,10 @@ const TemplateCreateScreen = () => {
         </div>
         <div className="mt-2 flex flex-col gap-2">
           {fields.map((_, index) => (
-            <div key={index} className="flex gap-2 overflow-hidden">
+            <div
+              key={index}
+              className="flex gap-2 items-center overflow-hidden"
+            >
               <FormField
                 className="overflow-hidden"
                 error={form.formState.errors.variables?.[index]?.name?.message}
@@ -224,7 +233,7 @@ const TemplateCreateScreen = () => {
 
   const rightSide = () => {
     return (
-      <div className="w-full">
+      <div className="p-4 w-full">
         <div className="mt-8 flex justify-between">
           <div className="h-16 flex gap-2">
             <Button className="h-full aspect-[1]" onClick={() => setWidth(1)}>
@@ -242,7 +251,7 @@ const TemplateCreateScreen = () => {
           </div>
         </div>
         <span>{error}</span>
-        <div className="h-full flex justify-center items-center">
+        <div className="mt-4 h-full flex justify-center items-center">
           <LivePreview
             className="h-48 border rounded bg-gray-700"
             style={{ aspectRatio: width }}
@@ -258,23 +267,13 @@ const TemplateCreateScreen = () => {
       {/* <Editor /> */}
       <LiveProvider
         code={code}
-        scope={{
-          tw,
-          getVariable: getVariable({
-            variables: variables.map((v) => ({
-              name: v.name,
-              default: v.default,
-              value: "",
-            })),
-          }),
-          recharts,
-        }}
+        scope={scope as unknown as Record<string, unknown>}
       >
-        <SlideContainer
+        <SplitePanel
           className="h-full px-4"
           panels={[
-            { element: leftSlide(), minWidth: 0.2, maxWidth: 0.7 },
-            { element: rightSide() },
+            { element: leftSlide(), defaultWidth: 0.5, minWidth: 0.1 },
+            { element: rightSide(), defaultWidth: 0.5, minWidth: 0.1 },
           ]}
         />
       </LiveProvider>
