@@ -39,8 +39,14 @@ const DashboardGrid: React.FC<DashboardGridProps> = ({
   const getGridPos = React.useCallback(
     (clientX: number, clientY: number) => {
       const pos = [
-        Math.floor((clientX - (gridRef.current?.offsetLeft ?? 0)) / colWidth),
-        Math.floor((clientY - (gridRef.current?.offsetTop ?? 0)) / rowHeight),
+        Math.max(
+          0,
+          Math.floor((clientX - (gridRef.current?.offsetLeft ?? 0)) / colWidth)
+        ),
+        Math.max(
+          0,
+          Math.floor((clientY - (gridRef.current?.offsetTop ?? 0)) / rowHeight)
+        ),
       ] as const;
       return pos;
     },
