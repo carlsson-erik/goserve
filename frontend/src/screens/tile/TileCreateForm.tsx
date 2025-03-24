@@ -13,21 +13,25 @@ import {
 } from "../../hooks/template/useTemplateQuery";
 import { useForm } from "react-hook-form";
 import * as recharts from "recharts";
-import { getVariable } from "../../hooks/useScope";
+import useScope, { getVariable } from "../../hooks/useScope";
 
 export interface TileCreateFormProps {
   col: number | undefined;
   row: number | undefined;
+  onCancel: () => void;
+  onSubmit: () => void;
 }
 
-const TileCreateForm: React.FC<TileCreateFormProps> = ({ col, row }) => {
+const TileCreateForm: React.FC<TileCreateFormProps> = ({
+  col,
+  row,
+  onCancel,
+  onSubmit,
+}) => {
   const { data: templates } = useQuery<GetTemplatesResult>(GET_TEMPLATES);
 
   const form = useForm<CreateTileData>({
-    defaultValues: {
-      width: 2,
-      height: 1,
-    },
+    defaultValues: {},
   });
 
   const variables = form.watch("variables");
@@ -53,8 +57,8 @@ const TileCreateForm: React.FC<TileCreateFormProps> = ({ col, row }) => {
         row: row ?? 1,
         dashboardId: Number(dashboardId) ?? 1,
         templateId: template.id,
-        width: data.width,
-        height: 1,
+        width: 5,
+        height: 5,
         variables: (template.variables ?? []).map((t, index) => ({
           name: t.name,
           value: data.variables[index].value ?? t.default ?? "",
@@ -68,10 +72,19 @@ const TileCreateForm: React.FC<TileCreateFormProps> = ({ col, row }) => {
         return;
       }
 
-      navigate(generatePath(paths.dashboard.id, { dashboardId }));
+      // navigate(generatePath(paths.dashboard.id, { dashboardId }));
+      onSubmit();
     },
-    [col, createTile, dashboardId, navigate, row, template]
+    [col, createTile, dashboardId, onSubmit, row, template]
   );
+
+  const scope = useScope({
+    variables: (template?.variables ?? []).map((t, index) => ({
+      name: t.name,
+      value: variables[index]?.value ?? t.default ?? "",
+      default: "",
+    })),
+  });
 
   if (!templates) {
     return <div>Loading...</div>;
@@ -83,7 +96,18 @@ const TileCreateForm: React.FC<TileCreateFormProps> = ({ col, row }) => {
         <span>Please Select a template</span>
         <div className="p-2 border max-h-80 overflow-y-auto overflow-x-hidden rounded bg-gray-800 flex flex-col gap-2 items-center justify-stretch">
           {templates.templates.map((t) => (
-            <Button onClick={() => setTemplate(t)} className="w-full">
+            <Button
+              onClick={() => {
+                setTemplate(t);
+                form.reset({
+                  templateId: t.id,
+                  col: col,
+                  row: row,
+                  variables: t.variables ?? [],
+                });
+              }}
+              className="w-full"
+            >
               {t.name}
             </Button>
           ))}
@@ -95,8 +119,9 @@ const TileCreateForm: React.FC<TileCreateFormProps> = ({ col, row }) => {
     );
   }
 
+  console.log(variables);
   return (
-    <div className="p-2 h-full flex flex-col overflow-hidden">
+    <div className="p-2 bg-gray-800 h-[30rem] flex flex-col">
       {/* <Editor /> */}
       <div className="flex gap-2">
         {templates.templates.map((t) => (
@@ -107,13 +132,9 @@ const TileCreateForm: React.FC<TileCreateFormProps> = ({ col, row }) => {
       </div>
       <LiveProvider
         code={template?.data}
-        scope={{
-          tw,
-          getVariable: getVariable({ variables }),
-          recharts,
-        }}
+        scope={scope as unknown as Record<string, unknown>}
       >
-        <div className="h-2/3 grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <form onSubmit={form.handleSubmit(onCreate)}>
             <div className="h-24">
               <h1>Create Tile</h1>
@@ -137,29 +158,10 @@ const TileCreateForm: React.FC<TileCreateFormProps> = ({ col, row }) => {
             </div>
           </form>
           <div>
-            <div className="mt-8 flex justify-between">
-              <div className="h-16 flex gap-2">
-                <Button
-                  className="h-full aspect-[1]"
-                  onClick={() => form.setValue("width", 1)}
-                >
-                  1x1
-                </Button>
-                <Button
-                  className="h-full aspect-[2]"
-                  onClick={() => form.setValue("width", 2)}
-                >
-                  1x2
-                </Button>
-              </div>
-              <Button onClick={form.handleSubmit(onCreate)} variant="primary">
-                Create
-              </Button>
-            </div>
             <span>{error}</span>
             <div className="h-full flex justify-center items-center">
               <LivePreview
-                className="h-48 border rounded bg-gray-700"
+                className="h-full border rounded bg-gray-700"
                 style={{ aspectRatio: width }}
               />
             </div>
@@ -167,6 +169,12 @@ const TileCreateForm: React.FC<TileCreateFormProps> = ({ col, row }) => {
           <LiveError />
         </div>
       </LiveProvider>
+      <div className="h-full flex justify-end items-end gap-4">
+        <Button onClick={onCancel}>Cancel</Button>
+        <Button onClick={form.handleSubmit(onCreate)} variant="primary">
+          Create
+        </Button>
+      </div>
     </div>
   );
 };

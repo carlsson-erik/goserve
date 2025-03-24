@@ -4,7 +4,6 @@ import DraggableCard, { Drag } from "./DraggableCard";
 import { Tile } from "../../hooks/dashboard/useDashboardQuery";
 import { useThrottledCallback } from "use-debounce";
 import TileCard from "../../components/feature/dashboard/TileCard";
-import paths from "../../utils/paths";
 const MIN_GRID_SIZE = 20;
 
 export interface DashboardGridProps {
@@ -21,17 +20,21 @@ const DashboardGrid: React.FC<DashboardGridProps> = ({
   onUpdateTile,
 }) => {
   const gridRef = React.useRef<HTMLDivElement>(null);
+  console.log(gridRef.current);
 
-  const width = gridRef.current?.clientWidth ?? 0;
-  const height = gridRef.current?.clientHeight ?? 0;
-  const [cursorX, setCursorX] = React.useState(0);
-  const [cursorY, setCursorY] = React.useState(0);
+  const colWidth = React.useMemo(() => {
+    if (!gridRef.current) return 0;
+    const width = gridRef.current.clientWidth;
+    const gridCol = Math.floor(width / MIN_GRID_SIZE);
+    return width / gridCol;
+  }, [gridRef.current]);
 
-  const gridCol = Math.floor(width / MIN_GRID_SIZE);
-  const gridRow = Math.floor(height / MIN_GRID_SIZE);
-
-  const colWidth = width / gridCol;
-  const rowHeight = height / gridRow;
+  const rowHeight = React.useMemo(() => {
+    if (!gridRef.current) return 0;
+    const height = gridRef.current.clientHeight;
+    const gridRow = Math.floor(height / MIN_GRID_SIZE);
+    return height / gridRow;
+  }, [gridRef.current]);
 
   const getGridPos = React.useCallback(
     (clientX: number, clientY: number) => {
@@ -50,6 +53,7 @@ const DashboardGrid: React.FC<DashboardGridProps> = ({
         drag.e.clientX - drag.offsetX,
         drag.e.clientY - drag.offsetY
       );
+      console.log("drag");
 
       onUpdateTile(id, { col: col, row: row });
     },
@@ -71,26 +75,11 @@ const DashboardGrid: React.FC<DashboardGridProps> = ({
 
   const onResizeThrottle = useThrottledCallback(onResize, 50);
 
-  React.useEffect(() => {}, []);
-
   return (
-    <div
-      ref={gridRef}
-      onMouseMove={(e) => {
-        setCursorX(e.clientX - (gridRef.current?.offsetLeft ?? 0));
-        setCursorY(e.clientY - (gridRef.current?.offsetTop ?? 0));
-      }}
-      className={tw(className, "relative border")}
-    >
+    <div ref={gridRef} className={tw(className, "relative border")}>
       <div className="absolute bottom-0 right-0">
-        <div>Width: {width}px</div>
-        <div>height: {height}px</div>
-        <div>gridCol: {gridCol}</div>
-        <div>gridRow: {gridRow}</div>
         <div>ColWidth: {colWidth}</div>
         <div>RowHeight: {rowHeight}</div>
-        <div>CursorX: {cursorX}</div>
-        <div>CursorY: {cursorY}</div>
       </div>
 
       {Object.values(tiles).map((t) => (
@@ -108,12 +97,12 @@ const DashboardGrid: React.FC<DashboardGridProps> = ({
           onResizeEnd={(event) => onResizeThrottle(t.id, event)}
         >
           <div className="h-full">
-            {editing && (
-              <a className="absolute top-1 right-1" href={paths.template.id}>
-                Edit
-              </a>
-            )}
-            <TileCard tile={t} className="w-full h-full" />
+            <TileCard
+              editing={editing}
+              onUpdate={onUpdateTile}
+              tile={t}
+              className="w-full h-full"
+            />
           </div>
         </DraggableCard>
       ))}

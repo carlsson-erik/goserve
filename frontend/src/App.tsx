@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { HomeScreen } from "./screens/HomeScreen";
 import Navbar from "./components/Navbar";
+import tailwindConfig from "../tailwind.config";
+import { Configuration, setup } from "twind";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const url = API_URL ? API_URL : `${window.location.protocol}`;
@@ -17,6 +19,8 @@ const client = new ApolloClient({
     },
   },
 });
+
+setup(tailwindConfig as unknown as Configuration);
 
 export const FetchContext = React.createContext(client);
 

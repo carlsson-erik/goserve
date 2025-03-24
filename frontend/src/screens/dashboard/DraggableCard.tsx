@@ -25,20 +25,20 @@ export interface DraggableCardProps {
 }
 
 const DraggableCard: React.FC<DraggableCardProps> = ({
-  className,
+  draggable,
+  height,
+  resizeable,
+  width,
   x,
   y,
-  width,
-  height,
   children,
-  draggable,
-  resizeable,
+  className,
   onDrag,
-  onDragStart,
   onDragEnd,
+  onDragStart,
   onResize,
-  onResizeStart,
   onResizeEnd,
+  onResizeStart,
 }) => {
   const [offsetX, setOffsetX] = React.useState(0);
   const [offsetY, setOffsetY] = React.useState(0);
@@ -52,6 +52,34 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
 
   return (
     <div
+      draggable
+      onDrag={(e) => {
+        if (!draggable) return;
+        onDrag?.({
+          e,
+          offsetX: offsetX,
+          offsetY: offsetY,
+        });
+      }}
+      onDragStart={(e) => {
+        if (!draggable) return;
+        const [x, y] = getOffset(e);
+        setOffsetX(x);
+        setOffsetY(y);
+        onDragStart?.({
+          e,
+          offsetX: offsetX,
+          offsetY: offsetY,
+        });
+      }}
+      onDragEnd={(e) => {
+        if (!draggable) return;
+        onDragEnd?.({
+          e,
+          offsetX: offsetX,
+          offsetY: offsetY,
+        });
+      }}
       style={{
         left: x,
         top: y,
@@ -64,30 +92,6 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
       {draggable && (
         <div
           draggable
-          onDrag={(e) => {
-            onDrag?.({
-              e,
-              offsetX: offsetX,
-              offsetY: offsetY,
-            });
-          }}
-          onDragStart={(e) => {
-            const [x, y] = getOffset(e);
-            setOffsetX(x);
-            setOffsetY(y);
-            onDragStart?.({
-              e,
-              offsetX: offsetX,
-              offsetY: offsetY,
-            });
-          }}
-          onDragEnd={(e) => {
-            onDragEnd?.({
-              e,
-              offsetX: offsetX,
-              offsetY: offsetY,
-            });
-          }}
           className="w-full h-8 absolute top-0 bg-white/50 hover:bg-white/70 cursor-grab"
         ></div>
       )}
@@ -95,6 +99,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
         <div
           draggable
           onDrag={(e) => {
+            e.stopPropagation();
             onResize?.({
               e,
               offsetX: offsetX,
@@ -102,6 +107,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
             });
           }}
           onDragStart={(e) => {
+            e.stopPropagation();
             const [x, y] = getOffset(e);
             setOffsetX(x);
             setOffsetY(y);
@@ -112,6 +118,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
             });
           }}
           onDragEnd={(e) => {
+            e.stopPropagation();
             onResizeEnd?.({
               e,
               offsetX: offsetX,

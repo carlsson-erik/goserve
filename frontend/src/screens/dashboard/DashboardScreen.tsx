@@ -12,14 +12,14 @@ import {
 import useDeleteDashboard from "../../hooks/dashboard/useDeleteDashboard";
 import useConfirmModal from "../../components/ConfirmModal";
 import Modal, { useModal } from "../../components/Modal";
-import DashboardCreateTileDialog from "../../components/dashboard/DashboardCreateTileDialog";
 import DashboardGrid from "./DashboardGrid";
 import { indexBy } from "ramda";
 import useCreateOrUpdateTiles from "../../hooks/tile/useCreateOrUpdateTiles";
 import { CreateTileData } from "../../hooks/tile/useCreateTile";
+import TileCreateForm from "../tile/TileCreateForm";
 
 const DashboardScreen = () => {
-  const [editing, setEditing] = React.useState(true);
+  const [editing, setEditing] = React.useState(false);
 
   const { dashboardId } = useParams();
 
@@ -132,11 +132,11 @@ const DashboardScreen = () => {
       {deleteModal}
       <Modal {...createTileModal.props}>
         {(data) => (
-          <DashboardCreateTileDialog
+          <TileCreateForm
             col={data?.col}
             row={data?.row}
-            onCancel={() => createTileModal.close()}
-            onConfirm={() => console.log("confirm")}
+            onCancel={createTileModal.close}
+            onSubmit={createTileModal.close}
           />
         )}
       </Modal>
