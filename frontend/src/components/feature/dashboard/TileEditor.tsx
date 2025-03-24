@@ -5,6 +5,7 @@ import useScope from "../../../hooks/useScope";
 import { tw } from "twind";
 import Button from "../../input/Button";
 import { indexBy } from "ramda";
+import { capitalizeFirstLetter } from "../../../utils/text";
 
 export interface TileEditorProps {
   tile: Tile;
@@ -62,14 +63,14 @@ const TileEditor: React.FC<TileEditorProps> = ({
   const scope = useScope({ variables: Object.values(formData) });
 
   return (
-    <div className="p-4 bg-gray-800">
+    <div className="p-6 bg-gray-800 border-gray-700 rounded-lg border">
       <div className={tw("grid grid-cols-2 gap-8", className)}>
         <div>
-          <div className="mb-8">Variables</div>
+          <div className="mb-8 text-lg">Variables</div>
           <div className="flex flex-col gap-4">
             {Object.values(formData).map((v) => (
               <div className="flex flex-col gap-1 items-stretch">
-                <div>{v.name} </div>
+                <div>{capitalizeFirstLetter(v.name)} </div>
                 <input
                   className="grow"
                   type="text"
@@ -83,6 +84,9 @@ const TileEditor: React.FC<TileEditorProps> = ({
                 />
               </div>
             ))}
+            {Object.entries(formData).length == 0 && (
+              <div> No variables available. Add variables to the template.</div>
+            )}
           </div>
         </div>
         <div className="h-full">
@@ -91,13 +95,15 @@ const TileEditor: React.FC<TileEditorProps> = ({
             scope={scope as unknown as Record<string, unknown>}
           >
             <LiveError />
-            <LivePreview className="border bg-gray-900 h-full" />
+            <LivePreview className="border border-gray-600 rounded bg-gray-900 h-full" />
           </LiveProvider>
         </div>
       </div>
-      <div className="mt-4 flex justify-end gap-4">
+      <div className="mt-8 flex justify-end gap-2">
         <Button onClick={onCancel}>Cancel</Button>
-        <Button onClick={onSave}>Save</Button>
+        <Button variant="primary" onClick={onSave}>
+          Save
+        </Button>
       </div>
     </div>
   );
