@@ -42,8 +42,8 @@ input NewVariable {
   tile_id: Int
 }
 
-input NewTemplate{
-  id : Int
+input NewTemplate {
+  id: Int
   name: String!
   data: String!
   width: Int
@@ -75,16 +75,15 @@ input NewTile {
 }
 
 type User {
-  id: Int!
+  id: ID!
   name: String!
   email: String!
-  username: String!
-  password: String!
-  role: String!
-  AccessToken: String!
 }
 
-
+type AuthPayload {
+  token: String!
+  user: User!
+}
 
 type Mutation {
   createTemplate(input: NewTemplate!): Template!
@@ -96,10 +95,10 @@ type Mutation {
   createTile(input: NewTile!): Tile!
   updateTile(input: NewTile!): Tile!
   deleteTile(id: Int!): Tile!
+  login(email: String!, password: String!): AuthPayload
 }
 
 type Query {
   dashboards: [Dashboard!]!
   templates: [Template!]!
-  user: User
 }
