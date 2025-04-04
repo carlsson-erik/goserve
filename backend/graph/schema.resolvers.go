@@ -11,6 +11,7 @@ import (
 	"goserve/graph/model"
 	"goserve/service"
 	"log"
+	"time"
 
 	"github.com/go-jet/jet/v2/postgres"
 )
@@ -146,6 +147,40 @@ func (r *mutationResolver) DeleteTile(ctx context.Context, id int) (*model.Tile,
 	return res, err
 }
 
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, name string, email string, username string, password string, role string) (*model.User, error) {
+	todaysDate := time.Now()
+
+	insertQuery := Users.INSERT(Users.MutableColumns).MODEL(model.User{Name: name,
+		Email:     email,
+		Username:  username,
+		Password:  password,
+		Role:      role,
+		CreatedAt: todaysDate.String(),
+		UpdatedAt: todaysDate.String()}).RETURNING(Users.AllColumns)
+
+	newUser := model.User{}
+
+	err := insertQuery.Query(r.DB, &newUser)
+
+	if err != nil {
+		log.Printf("Insert user failed: %v", err)
+		return nil, err
+	}
+
+	return &newUser, err
+}
+
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, name *string, email *string, username *string, password *string, role *string) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+}
+
+// DeleteUser is the resolver for the deleteUser field.
+func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
+	panic(fmt.Errorf("not implemented: DeleteUser - deleteUser"))
+}
+
 // Dashboards is the resolver for the dashboards field.
 func (r *queryResolver) Dashboards(ctx context.Context) ([]*model.Dashboard, error) {
 	res, err := r.DashboardService.All()
@@ -163,6 +198,23 @@ func (r *queryResolver) Templates(ctx context.Context) ([]*model.Template, error
 	res, err := r.TemplateService.All()
 
 	return res, err
+}
+
+// Users is the resolver for the users field.
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	panic(fmt.Errorf("not implemented: Users - users"))
+}
+
+// User is the resolver for the user field.
+func (r *queryResolver) User(ctx context.Context, username string) (*model.User, error) {
+	query := Users.SELECT(Users.AllColumns).WHERE(Users.Username.EQ(postgres.String(username)))
+	res := model.User{}
+	err := query.Query(r.DB, &res)
+	if err != nil {
+		log.Printf("Get user error: %v", err)
+		return nil, err
+	}
+	return &res, err
 }
 
 // Variables is the resolver for the variables field.

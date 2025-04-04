@@ -10,6 +10,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/rs/cors v1.11.0
 	github.com/vektah/gqlparser/v2 v2.5.11
+	golang.org/x/crypto v0.20.0
 )
 
 require (

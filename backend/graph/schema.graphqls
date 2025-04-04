@@ -75,15 +75,16 @@ input NewTile {
 }
 
 type User {
-  id: ID!
+  id: ID
   name: String!
   email: String!
+  username: String!
+  password: String!
+  role: String!
+  createdAt: String!
+  updatedAt: String!
 }
 
-type AuthPayload {
-  token: String!
-  user: User!
-}
 
 type Mutation {
   createTemplate(input: NewTemplate!): Template!
@@ -95,10 +96,14 @@ type Mutation {
   createTile(input: NewTile!): Tile!
   updateTile(input: NewTile!): Tile!
   deleteTile(id: Int!): Tile!
-  login(email: String!, password: String!): AuthPayload
+  createUser(name: String!, email: String!, username: String!, password: String!, role: String!): User!
+  updateUser(id: ID!, name: String, email: String, username: String, password: String, role: String): User!
+  deleteUser(id: ID!): Boolean!
 }
 
 type Query {
   dashboards: [Dashboard!]!
   templates: [Template!]!
+  users: [User!]!
+  user(username: String!): User
 }

@@ -12,6 +12,6 @@ type Variable struct {
 	Name       string
 	Value      *string
 	Default    *string
-	TemplateID int32
-	TileID     int32
+	TemplateID *int32
+	TileID     *int32
 }

@@ -14,5 +14,6 @@ func UseSchema(schema string) {
 	SchemaMigrations = SchemaMigrations.FromSchema(schema)
 	Template = Template.FromSchema(schema)
 	Tile = Tile.FromSchema(schema)
+	Users = Users.FromSchema(schema)
 	Variable = Variable.FromSchema(schema)
 }

@@ -1,13 +1,19 @@
+import { useQuery } from '@apollo/client';
 import { useState } from 'react';
+import { GET_USERS } from '../../hooks/Authentication/useUsersQuery';
 
 const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showLogin, setShowLogin] = useState(true);
 
+  const { data: users } = useQuery(GET_USERS, {variables: { username } });
+
   const handleLogin = () => {
     // Handle login logic here
     console.log('Logging in with', username, password);
+
+    console.log('Users:', users);
     onLogin();
   };
 
