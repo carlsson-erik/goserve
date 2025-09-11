@@ -19,7 +19,7 @@ func MigrateDB() {
 
 	m, err := migrate.New(
 		"file://db/migrations",
-		"postgres://postgres:postgres@"+db_url+":"+db_port+"/"+db_database+"")
+		"postgres://postgres:postgres@"+db_url+":"+db_port+"/"+db_database+"?sslmode=disable")
 	if err != nil {
 		log.Printf("Failed migration to db: DB_URL: %v, DB_PORT: %v, DB_DATABASE: %v", db_url, db_port, db_database)
 		log.Fatal(err)
