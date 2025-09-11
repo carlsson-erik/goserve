@@ -21,7 +21,7 @@ func MigrateDB() {
 	time.Sleep(2 * time.Second)
 
 	dsn := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		"postgres://%s:%s@%s:%s/%s",
 		db_user,
 		db_password,
 		db_url,
