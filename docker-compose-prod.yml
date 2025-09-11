@@ -19,16 +19,13 @@ services:
     ports:
       - 8081:8081
     # environment:
-      # DB_URL: ${DB_URL}
-      # DB_PORT: ${DB_PORT}
-      # DB_USER: ${DB_USER}
-      # DB_PASSWORD: ${DB_PASSWORD}
-      # DB_DATABASE: ${DB_DATABASE}
+    #   DB_URL: ${DB_URL}
+    #   DB_PORT: ${DB_PORT}
+    #   DB_USER: ${DB_USER}
+    #   DB_PASSWORD: ${DB_PASSWORD}
+    #   DB_DATABASE: ${DB_DATABASE}
     # depends_on:
       # - postgres
-    networks:
-      - backend_network
-      - frontend_network
 
   frontend:
     build: 
@@ -43,12 +40,6 @@ services:
     #   VITE_API_URL: localhost:8081
     depends_on:
       - backend
-    networks:
-      - frontend_network
 
 volumes:
   postgres_data:
-
-networks:
-  backend_network:
-  frontend_network:
