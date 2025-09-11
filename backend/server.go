@@ -36,12 +36,12 @@ func main() {
 
 	dbsql, err := sql.Open("postgres", connectString)
 
-	db.MigrateDB(dbsql)
-
 	if err != nil {
 		fmt.Println(connectString)
 		log.Fatal(err)
 	}
+
+	db.MigrateDB(dbsql, dbName)
 
 	router := chi.NewRouter()
 
