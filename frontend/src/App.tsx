@@ -8,7 +8,7 @@ import { Configuration, setup } from "twind";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const url = API_URL ? API_URL : `${window.location.protocol}`;
-console.log(import.meta.env.VITE_APP_TITLE, API_URL);
+console.log(import.meta.env.VITE_APP_TITLE, API_URL ?? "no API_URL");
 console.log(url);
 const client = new ApolloClient({
   uri: url + "/query",

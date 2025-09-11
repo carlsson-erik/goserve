@@ -68,7 +68,7 @@ const SplitePanel: React.FC<SlideContainerProps> = ({ panels, className }) => {
         rightPanelRef.style.width = newRightWidth.toString() + "px";
       }
     },
-    []
+    [panels]
   );
 
   React.useEffect(() => {

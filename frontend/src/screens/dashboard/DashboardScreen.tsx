@@ -3,7 +3,6 @@ import paths from "../../utils/paths";
 import Button from "../../components/input/Button";
 import { useQuery } from "@apollo/client";
 import React from "react";
-import useDeleteTile from "../../hooks/tile/useDeleteTile";
 import {
   GET_DASHBOARDS,
   GetDashboardsResult,
@@ -58,7 +57,7 @@ const DashboardScreen = () => {
   const [deleteDashboard] = useDeleteDashboard();
   const [createOrUpdateTiles] = useCreateOrUpdateTiles();
 
-  const [deleteTile] = useDeleteTile();
+  // const [deleteTile] = useDeleteTile();
 
   const onDeleteDashboard = React.useCallback(
     async (id: number) => {
@@ -96,14 +95,14 @@ const DashboardScreen = () => {
     setEditing(false);
   }, [createOrUpdateTiles, dashboard, refetchDashboard, tilesCopy]);
 
-  const onDeleteTile = React.useCallback(
-    (id?: number) => {
-      if (!id) return;
+  // const onDeleteTile = React.useCallback(
+  //   (id?: number) => {
+  //     if (!id) return;
 
-      deleteTile(id);
-    },
-    [deleteTile]
-  );
+  //     deleteTile(id);
+  //   },
+  //   [deleteTile]
+  // );
 
   const onCreateTile = React.useCallback(
     (col: number, row: number) => {
@@ -153,6 +152,7 @@ const DashboardScreen = () => {
             <div className="flex items-center gap-2">
               <Button
                 onClick={(value) => {
+                  console.log(value);
                   if (editing) {
                     setTilesCopy(indexBy((t) => t.id, [...dashboard.tiles]));
                   }

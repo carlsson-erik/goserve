@@ -1,8 +1,7 @@
 import React from "react";
 import { LiveError, LivePreview, LiveProvider } from "react-live";
-import { Link, generatePath, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Button from "../../components/input/Button";
-import { tw } from "twind";
 import useCreateTile, { CreateTileData } from "../../hooks/tile/useCreateTile";
 import paths from "../../utils/paths";
 import { useQuery } from "@apollo/client";
@@ -12,8 +11,7 @@ import {
   Template,
 } from "../../hooks/template/useTemplateQuery";
 import { useForm } from "react-hook-form";
-import * as recharts from "recharts";
-import useScope, { getVariable } from "../../hooks/useScope";
+import useScope from "../../hooks/useScope";
 
 export interface TileCreateFormProps {
   col: number | undefined;
@@ -46,7 +44,7 @@ const TileCreateForm: React.FC<TileCreateFormProps> = ({
 
   const [createTile] = useCreateTile();
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const onCreate = React.useCallback(
     async (data: CreateTileData) => {
