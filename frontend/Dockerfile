@@ -1,5 +1,12 @@
 FROM node:18.19.1 AS frontend_build
 COPY . .
+
+ARG VITE_APP_TITLE
+ENV VITE_APP_TITLE=$VITE_APP_TITLE
+
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 RUN npm install --force
 RUN npm run build 
 

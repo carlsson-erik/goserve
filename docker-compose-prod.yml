@@ -31,12 +31,16 @@ services:
       - frontend_network
 
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      # args:
+      #   VITE_APP_TITLE: developmentt
+      #   VITE_API_URL: http://backend:8081
     ports:
       - 3000:80
-    environment:
-      VITE_APP_TITLE: development
-      VITE_API_URL: localhost:8081
+    # environment:
+    #   VITE_APP_TITLE: development
+    #   VITE_API_URL: localhost:8081
     depends_on:
       - backend
     networks:
