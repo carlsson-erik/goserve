@@ -24,8 +24,8 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_DATABASE: ${DB_DATABASE}
-    depends_on:
-      - postgres
+    # depends_on:
+      # - postgres
     networks:
       - backend_network
       - frontend_network
