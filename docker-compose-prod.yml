@@ -18,12 +18,12 @@ services:
     build: ./backend
     ports:
       - 8081:8081
-    environment:
-      DB_URL: ${DB_URL}
-      DB_PORT: ${DB_PORT}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_DATABASE: ${DB_DATABASE}
+    # environment:
+      # DB_URL: ${DB_URL}
+      # DB_PORT: ${DB_PORT}
+      # DB_USER: ${DB_USER}
+      # DB_PASSWORD: ${DB_PASSWORD}
+      # DB_DATABASE: ${DB_DATABASE}
     # depends_on:
       # - postgres
     networks:
