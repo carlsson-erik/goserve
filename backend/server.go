@@ -2,6 +2,7 @@ package main
 
 import (
 	// "context"
+
 	"database/sql"
 	"fmt"
 	"goserve/db"
@@ -25,8 +26,6 @@ func main() {
 	// 	// log.Fatal(err)
 	// }
 
-	db.MigrateDB()
-
 	host := os.Getenv("DB_URL")
 	dbPort := os.Getenv("DB_PORT")
 	user := os.Getenv("DB_USER")
@@ -35,7 +34,9 @@ func main() {
 
 	connectString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, dbPort, user, password, dbName)
 
-	db, err := sql.Open("postgres", connectString)
+	dbsql, err := sql.Open("postgres", connectString)
+
+	db.MigrateDB(dbsql)
 
 	if err != nil {
 		fmt.Println(connectString)
@@ -54,12 +55,12 @@ func main() {
 
 	// router.Use(AuthenticationMiddleware)
 
-	dashboardService := service.DashboardService{DB: db}
-	templateService := service.TemplateService{DB: db}
-	tileService := service.TileService{DB: db}
-	variableService := service.VariableService{DB: db}
+	dashboardService := service.DashboardService{DB: dbsql}
+	templateService := service.TemplateService{DB: dbsql}
+	tileService := service.TileService{DB: dbsql}
+	variableService := service.VariableService{DB: dbsql}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: db, DashboardService: &dashboardService, TemplateService: &templateService, TileService: &tileService, VariableService: &variableService}}))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: dbsql, DashboardService: &dashboardService, TemplateService: &templateService, TileService: &tileService, VariableService: &variableService}}))
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)
