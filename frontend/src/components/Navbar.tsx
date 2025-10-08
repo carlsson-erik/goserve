@@ -17,16 +17,7 @@ const Navbar = () => {
       <Link to={paths.root} className="p-2 font-medium text-2xl text-gray-100">
         <span>Go Serve</span>
       </Link>
-      <div className="flex items-center">
-        <Tooltip content="Edit dashboard">
-          <EditTilesButton onEditModeChange={handleEditModeChange} />
-        </Tooltip>
-        <Link to={paths.dashboard.about}>
-          <button className="text-gray-100 hover:bg-gray-600 p-2">
-            {editMode ? <p>Edit</p> : <p>About</p>}
-          </button>
-        </Link>
-      </div>
+      <div className="flex items-center"></div>
     </div>
   );
 };

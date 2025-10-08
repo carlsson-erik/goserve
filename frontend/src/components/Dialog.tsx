@@ -8,14 +8,19 @@ export interface DialogProps {
   onCancel: () => void;
 }
 
-const Dialog: React.FC<DialogProps> = (props) => {
+const Dialog: React.FC<DialogProps> = ({
+  onCancel,
+  onConfirm,
+  children,
+  title,
+}) => {
   return (
     <div className="bg-gray-900 rounded min-w-64 border border-gray-700">
-      <div className="p-2 bg-gray-900">{props.title}</div>
-      <div className="p-2 bg-gray-800">{props.children}</div>
+      <div className="p-2 bg-gray-900">{title}</div>
+      <div className="p-2 bg-gray-800">{children}</div>
       <div className="p-2 flex gap-4 flex-row-reverse">
-        <Button onClick={props.onConfirm}>Confirm</Button>
-        <Button onClick={props.onCancel}>Cancel</Button>
+        <Button onClick={onConfirm}>Confirm</Button>
+        <Button onClick={onCancel}>Cancel</Button>
       </div>
     </div>
   );

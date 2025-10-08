@@ -2,6 +2,7 @@ package main
 
 import (
 	// "context"
+
 	"database/sql"
 	"fmt"
 	"goserve/db"
@@ -14,19 +15,16 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
-	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
 func main() {
-	err := godotenv.Load()
+	// err := godotenv.Load()
 
-	if err != nil {
-		log.Println("No env file found. Skipping...")
-		// log.Fatal(err)
-	}
-
-	db.MigrateDB()
+	// if err != nil {
+	// 	log.Println("No env file found. Skipping..")
+	// 	// log.Fatal(err)
+	// }
 
 	host := os.Getenv("DB_URL")
 	dbPort := os.Getenv("DB_PORT")
@@ -36,12 +34,14 @@ func main() {
 
 	connectString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, dbPort, user, password, dbName)
 
-	db, err := sql.Open("postgres", connectString)
+	dbsql, err := sql.Open("postgres", connectString)
 
 	if err != nil {
 		fmt.Println(connectString)
 		log.Fatal(err)
 	}
+
+	db.MigrateDB(dbsql, dbName)
 
 	router := chi.NewRouter()
 
@@ -55,12 +55,12 @@ func main() {
 
 	// router.Use(AuthenticationMiddleware)
 
-	dashboardService := service.DashboardService{DB: db}
-	templateService := service.TemplateService{DB: db}
-	tileService := service.TileService{DB: db}
-	variableService := service.VariableService{DB: db}
+	dashboardService := service.DashboardService{DB: dbsql}
+	templateService := service.TemplateService{DB: dbsql}
+	tileService := service.TileService{DB: dbsql}
+	variableService := service.VariableService{DB: dbsql}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: db, DashboardService: &dashboardService, TemplateService: &templateService, TileService: &tileService, VariableService: &variableService}}))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: dbsql, DashboardService: &dashboardService, TemplateService: &templateService, TileService: &tileService, VariableService: &variableService}}))
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)

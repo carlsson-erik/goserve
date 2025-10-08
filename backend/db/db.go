@@ -1,27 +1,31 @@
 package db
 
 import (
+	"database/sql"
 	"log"
-	"os"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func MigrateDB() {
-	db_url := os.Getenv("DB_URL")
-	db_port := os.Getenv("DB_PORT")
-	db_database := os.Getenv("DB_DATABASE")
+func MigrateDB(db *sql.DB, database string) {
 
 	time.Sleep(2 * time.Second)
 
-	m, err := migrate.New(
-		"file://db/migrations",
-		"postgres://postgres:postgres@"+db_url+":"+db_port+"/"+db_database+"?sslmode=disable")
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+
 	if err != nil {
-		log.Printf("Failed migration to db: DB_URL: %v, DB_PORT: %v, DB_DATABASE: %v", db_url, db_port, db_database)
+		log.Printf("error %s", err)
+	}
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://db/migrations",
+		database, driver)
+	// m.Up() // or m.Steps(2) if you want to explicitly set the number of migrations to run
+
+	if err != nil {
 		log.Fatal(err)
 	}
 

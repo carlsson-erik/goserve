@@ -1,5 +1,4 @@
-/** @type {import('tailwindcss').Config} */
-
+import type { Config } from "tailwindcss";
 const colors = {
   gray: {
     950: "#121212",
@@ -66,4 +65,4 @@ export default {
     },
   },
   plugins: [],
-};
+} satisfies Config;

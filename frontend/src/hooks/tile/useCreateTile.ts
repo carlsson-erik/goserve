@@ -6,6 +6,7 @@ import { Variable } from "../template/useCreateTemplate";
 import { err, ok } from "neverthrow";
 
 export interface CreateTileData {
+  id?: number;
   name: string;
   dashboardId: number;
   row: number;

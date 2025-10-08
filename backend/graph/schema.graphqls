@@ -95,6 +95,7 @@ type Mutation {
   deleteDashboard(id: Int!): Dashboard!
   createTile(input: NewTile!): Tile!
   updateTile(input: NewTile!): Tile!
+  createOrUpdateTiles(input: [NewTile!]!) : Int!
   deleteTile(id: Int!): Tile!
   createUser(name: String!, email: String!, username: String!, password: String!, role: String!): User!
   updateUser(id: Int!, name: String, email: String, username: String, password: String, role: String): User!
