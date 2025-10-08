@@ -156,8 +156,8 @@ func (r *mutationResolver) CreateUser(ctx context.Context, name string, email st
 		Username:  username,
 		Password:  password,
 		Role:      role,
-		CreatedAt: todaysDate.String(),
-		UpdatedAt: todaysDate.String()}).RETURNING(Users.AllColumns)
+		CreatedAt: todaysDate.Format(time.RFC3339),
+		UpdatedAt: todaysDate.Format(time.RFC3339)}).RETURNING(Users.AllColumns)
 
 	newUser := model.User{}
 

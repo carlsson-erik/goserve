@@ -21,10 +21,12 @@ export interface CreateUserResult {
 
 const useUser = () => {
     const getUser = async () => {
+        // Add implementation or return statement here
+        return null;
     };
 
     const createUser = async () => {
-        const [createTileGQL, other] = useMutation<CreateUserResult>(
+        const [CreateUserResult, other] = useMutation<CreateUserResult>(
             graphql(`
                 mutation CreateUser($name: String!, $email: String!, $username: String!, $password: String!, $role: String!) {
                     createUser(input: { name: $name, email: $email, username: $username, password: $password, role: $role }) {
@@ -39,6 +41,7 @@ const useUser = () => {
                     }
                 }
             `)
+        );
     };
 
     const updateUser = async () => {

@@ -12,21 +12,20 @@ const CreateUser = () => {
 
   const { createUser } = useUser();
   const CreateUser = async () => {
-    createUser({
-      variables: {
-        name,
-        email,
-        username,
-        password,
-        role,
-      },
-    })
-      .then((response: CreateUserResult) => {
-        console.log("User created");
-      })
-      .catch((error: any) => {
-        console.error("Error creating user:", error);
+    try {
+       await createUser({
+        variables: {
+          name,
+          email,
+          username,
+          password,
+          role,
+        },
       });
+      console.log("User created successfully:", response.data.createUser);
+    } catch (error) {
+      console.error("Error creating user:", error);
+    }
   };
 
   const handleCreateUser = () => {

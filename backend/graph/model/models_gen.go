@@ -74,14 +74,14 @@ type Tile struct {
 }
 
 type User struct {
-	ID        *string `json:"id,omitempty"`
-	Name      string  `json:"name"`
-	Email     string  `json:"email"`
-	Username  string  `json:"username"`
-	Password  string  `json:"password"`
-	Role      string  `json:"role"`
-	CreatedAt string  `json:"createdAt"`
-	UpdatedAt string  `json:"updatedAt"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Role      string `json:"role"`
+	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
 }
 
 type Variable struct {

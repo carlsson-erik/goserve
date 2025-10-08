@@ -75,7 +75,7 @@ input NewTile {
 }
 
 type User {
-  id: ID
+  id: Int!
   name: String!
   email: String!
   username: String!
@@ -97,8 +97,8 @@ type Mutation {
   updateTile(input: NewTile!): Tile!
   deleteTile(id: Int!): Tile!
   createUser(name: String!, email: String!, username: String!, password: String!, role: String!): User!
-  updateUser(id: ID!, name: String, email: String, username: String, password: String, role: String): User!
-  deleteUser(id: ID!): Boolean!
+  updateUser(id: Int!, name: String, email: String, username: String, password: String, role: String): User!
+  deleteUser(id: Int!): Boolean!
 }
 
 type Query {
