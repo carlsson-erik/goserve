@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client';
 import { useState } from 'react';
 import { GET_USERS } from '../../hooks/Authentication/useUsersQuery';
+import AuthService from '../../Services/authservice';
 
 const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
   const [username, setUsername] = useState('');
@@ -9,9 +10,12 @@ const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
 
   const { data: users } = useQuery(GET_USERS, {variables: { username } });
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Handle login logic here
     console.log('Logging in with', username, password);
+
+    const response = await AuthService.login(username, password);
+    console.log('Response:', response);
 
     console.log('Users:', users);
     onLogin();

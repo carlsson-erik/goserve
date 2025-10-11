@@ -15,16 +15,17 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
+	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
 func main() {
-	// err := godotenv.Load()
+	err := godotenv.Load()
 
-	// if err != nil {
-	// 	log.Println("No env file found. Skipping..")
-	// 	// log.Fatal(err)
-	// }
+	if err != nil {
+		log.Println("No env file found. Skipping..")
+		// log.Fatal(err)
+	}
 
 	host := os.Getenv("DB_URL")
 	dbPort := os.Getenv("DB_PORT")

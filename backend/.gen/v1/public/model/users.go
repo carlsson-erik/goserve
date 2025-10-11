@@ -7,10 +7,6 @@
 
 package model
 
-import (
-	"time"
-)
-
 type Users struct {
 	ID        int32 `sql:"primary_key"`
 	Name      string
@@ -18,6 +14,6 @@ type Users struct {
 	Username  string
 	Password  string
 	Role      string
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
+	CreatedAt string
+	UpdatedAt string
 }

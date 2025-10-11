@@ -25,7 +25,8 @@ async function login(email: string, password: string) {
 }
 
 
-const AuthService = () => {
+const AuthService =  {
+  login
 };
 
 export default AuthService;

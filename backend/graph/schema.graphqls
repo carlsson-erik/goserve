@@ -107,4 +107,7 @@ type Query {
   templates: [Template!]!
   users: [User!]!
   user(username: String!): User
+  getUserByUsername(username: String!): User
+  getUserByEmail(email: String!): User
+  getUserById(id: Int!): User
 }
