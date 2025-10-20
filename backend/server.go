@@ -18,6 +18,13 @@ import (
 	"github.com/rs/cors"
 )
 
+func GetEnv(key, fallback string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return fallback
+}
+
 func main() {
 	// err := godotenv.Load()
 
@@ -26,11 +33,11 @@ func main() {
 	// 	// log.Fatal(err)
 	// }
 
-	host := os.Getenv("DB_URL")
-	dbPort := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_DATABASE")
+	host := GetEnv("DB_URL", "localhost")
+	dbPort := GetEnv("DB_PORT", "5432")
+	user := GetEnv("DB_USER", "postgres")
+	password := GetEnv("DB_PASSWORD", "postgres")
+	dbName := GetEnv("DB_DATABASE", "v1")
 
 	connectString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, dbPort, user, password, dbName)
 
