@@ -219,14 +219,14 @@ func (r *queryResolver) Templates(ctx context.Context) ([]*model.Template, error
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	var res []*model.User
-	query := Users.SELECT(Users.AllColumns).FROM(Users)
-	err := query.Query(r.DB, &res)
+	res, err := r.UserService.All()
+
 	if err != nil {
-		log.Printf("Get users error: %v", err)
+		log.Printf("Get Users error: %v", err)
 		return nil, err
 	}
-	return res, nil
+
+	return res, err
 }
 
 // User is the resolver for the user field.

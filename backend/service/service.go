@@ -347,3 +347,63 @@ func (v TemplateService) Delete(id int) (*model.Template, error) {
 
 	return &res, err
 }
+
+type UserService DashboardService
+
+func (v UserService) Create(createData model.User) (*model.User, error) {
+
+	var res model.User
+	return &res, nil
+}
+
+func (v UserService) Update(updateData model.User) (*model.User, error) {
+
+	var res model.User
+
+	return &res, nil
+}
+
+func (v UserService) All() ([]*model.User, error) {
+	var res []*model.User
+
+	getQuery := Users.SELECT(Users.AllColumns).FROM(Users)
+
+	err := getQuery.Query(v.DB, &res)
+
+	if err != nil {
+		log.Printf("Get templates error: %v", err)
+		return nil, err
+	}
+
+	return res, err
+}
+
+func (v UserService) Get(id int) (*model.User, error) {
+	var res *model.User
+
+	getQuery := Users.SELECT(Users.AllColumns).WHERE(Users.ID.EQ(postgres.Int64(int64(id))))
+
+	err := getQuery.Query(v.DB, &res)
+
+	if err != nil {
+		log.Printf("Get user error: %v", err)
+		return nil, err
+	}
+
+	return res, err
+}
+
+func (v UserService) Delete(id int) (*model.User, error) {
+	var res model.User
+
+	deleteQuery := Users.DELETE().WHERE(Users.ID.EQ(postgres.Int64(int64(id)))).RETURNING(Users.AllColumns)
+
+	err := deleteQuery.Query(v.DB, &res)
+
+	if err != nil {
+		log.Printf("Delete user error: %v", err)
+		return nil, err
+	}
+
+	return &res, err
+}

@@ -60,8 +60,16 @@ func main() {
 	templateService := service.TemplateService{DB: dbsql}
 	tileService := service.TileService{DB: dbsql}
 	variableService := service.VariableService{DB: dbsql}
+	userService := service.UserService{DB: dbsql}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: dbsql, DashboardService: &dashboardService, TemplateService: &templateService, TileService: &tileService, VariableService: &variableService}}))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		DB:               dbsql,
+		DashboardService: &dashboardService,
+		TemplateService:  &templateService,
+		TileService:      &tileService,
+		VariableService:  &variableService,
+		UserService:      &userService,
+	}}))
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)

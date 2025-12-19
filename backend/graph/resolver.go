@@ -15,4 +15,5 @@ type Resolver struct {
 	TemplateService  *service.TemplateService
 	TileService      *service.TileService
 	VariableService  *service.VariableService
+	UserService      *service.UserService
 }
