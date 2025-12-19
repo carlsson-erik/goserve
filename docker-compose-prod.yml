@@ -34,7 +34,7 @@ services:
         VITE_APP_TITLE: ${VITE_APP_TITLE}
         VITE_API_URL: ${VITE_API_URL}
     ports:
-      - 3000:80
+      - 3002:80
     # environment:
     #   VITE_APP_TITLE: development
     #   VITE_API_URL: localhost:8081
