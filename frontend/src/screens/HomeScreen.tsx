@@ -12,9 +12,11 @@ import {
   GetDashboardsResult,
 } from "../hooks/dashboard/useDashboardQuery";
 import LoginScreen from "./account/LoginScreen";
+import CreateUser from "./account/CreateUser";
 
 export const HomeScreen = () => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [showingLogin, setShowingLogin] = useState<boolean>(true);
 
   const { data: dashboards } = useQuery<GetDashboardsResult>(GET_DASHBOARDS);
 
@@ -51,8 +53,17 @@ export const HomeScreen = () => {
         </div>
       ) : (
         <div className="flex justify-center items-center h-full">
-          <LoginScreen 
-            onLogin={() => setLoggedIn(true)}/>
+          {showingLogin ? (
+            <LoginScreen
+              onLogin={() => setLoggedIn(true)}
+              onSwitchToSignup={() => setShowingLogin(false)}
+            />
+          ) : (
+            <CreateUser
+              onUserCreated={() => setLoggedIn(true)}
+              onSwitchToLogin={() => setShowingLogin(true)}
+            />
+          )}
         </div>
       )}
     </>

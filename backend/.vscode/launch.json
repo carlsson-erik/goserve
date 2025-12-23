@@ -1,20 +1,20 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Launch Server",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}/server.go",
-            "cwd": "${workspaceFolder}/",
-            "env": {
-                "DB_URL": "localhost",
-                "DB_PORT": "5432",
-                "DB_USER": "postgres",
-                "DB_PASSWORD": "postgres",
-                "DB_DATABASE": "v1"
-            }
-        },
-    ],
-}⏎  
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Server",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/server.go",
+      "cwd": "${workspaceFolder}/",
+      "env": {
+        "DB_URL": "localhost",
+        "DB_PORT": "5432",
+        "DB_USER": "postgres",
+        "DB_PASSWORD": "postgres",
+        "DB_DATABASE": "v1",
+      },
+    },
+  ],
+}
