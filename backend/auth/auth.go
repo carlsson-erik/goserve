@@ -3,6 +3,7 @@ package auth
 import (
 	"errors"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -38,6 +39,25 @@ func HashPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hashedPassword), nil
+}
+
+func IsBCryptHash(value string) bool {
+	if len(value) != 60 {
+		return false
+	}
+	return strings.HasPrefix(value, "$2a$") || strings.HasPrefix(value, "$2b$") || strings.HasPrefix(value, "$2y$")
+}
+
+func HashPasswordForStorage(password string) (string, error) {
+	if password == "" {
+		return "", errors.New("password must not be empty")
+	}
+
+	if IsBCryptHash(password) {
+		return password, nil
+	}
+
+	return HashPassword(password)
 }
 
 func CompareHashAndPassword(hashedPassword string, password string) bool {

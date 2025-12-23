@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	. "goserve/.gen/v1/public/table"
+	"goserve/auth"
 	"goserve/graph/model"
 	"goserve/service"
 	"log"
@@ -167,18 +168,24 @@ func (r *mutationResolver) DeleteTile(ctx context.Context, id int) (*model.Tile,
 func (r *mutationResolver) CreateUser(ctx context.Context, name string, email string, username string, password string, role string) (*model.User, error) {
 	todaysDate := time.Now()
 
+	hashedPassword, err := auth.HashPasswordForStorage(password)
+	if err != nil {
+		log.Printf("Hash password failed: %v", err)
+		return nil, err
+	}
+
 	newUser := model.User{
 		Name:      name,
 		Email:     email,
 		Username:  username,
-		Password:  password,
+		Password:  hashedPassword,
 		Role:      role,
 		CreatedAt: todaysDate.Format(time.RFC3339),
 		UpdatedAt: todaysDate.Format(time.RFC3339)}
 
 	insertQuery := Users.INSERT(Users.MutableColumns).MODEL(newUser).RETURNING(Users.AllColumns)
 
-	err := insertQuery.Query(r.DB, &newUser)
+	err = insertQuery.Query(r.DB, &newUser)
 
 	if err != nil {
 		log.Printf("Insert user failed: %v", err)
