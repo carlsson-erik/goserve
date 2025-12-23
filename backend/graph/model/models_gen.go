@@ -10,6 +10,11 @@ type Dashboard struct {
 	Tiles []*Tile `json:"tiles"`
 }
 
+type LoginResponse struct {
+	Token string `json:"token"`
+	User  *User  `json:"user"`
+}
+
 type Mutation struct {
 }
 

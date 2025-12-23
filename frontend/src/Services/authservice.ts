@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const LOGIN_MUTATION = `
-  mutation Login($email: String!, $password: String!) {
+const LOGIN_QUERY = `
+  query Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       token
       user {
@@ -13,29 +13,13 @@ const LOGIN_MUTATION = `
   }
 `;
 
-const GET_USER_BY_EMAIL = `
-  query GetUserByEmail($email: String!) {
-    getUserByEmail(email: $email) {
-      id
-      name
-      email
-      password
-    }
-  }
-`;
-
 const apiUrl = import.meta.env.VITE_API_URL as string | undefined;
 const graphqlUrl = apiUrl ? `${apiUrl.replace(/\/$/, "")}/query` : "/query";
 
 async function login(email: string, password: string) {
-  // const response = await axios.post(graphqlUrl, {
-  //   query: LOGIN_MUTATION,
-  //   variables: { email, password },
-  // });
-
   const response = await axios.post(graphqlUrl, {
-    query: GET_USER_BY_EMAIL,
-    variables: { email: email },
+    query: LOGIN_QUERY,
+    variables: { email: email, password: password },
   });
 
   console.log(response.data);

@@ -85,6 +85,11 @@ type User {
   updatedAt: String!
 }
 
+type LoginResponse {
+  token: String!
+  user: User!
+}
+
 
 type Mutation {
   createTemplate(input: NewTemplate!): Template!
@@ -110,4 +115,5 @@ type Query {
   getUserByUsername(username: String!): User
   getUserByEmail(email: String!): User
   getUserById(id: Int!): User
+  login(email: String!, password: String!): LoginResponse!
 }

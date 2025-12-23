@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	. "goserve/.gen/v1/public/table"
 	"goserve/auth"
@@ -238,7 +239,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, username string) (*model.User, error) {
-	var res *model.User
+	var res model.User
 	query := Users.SELECT(Users.AllColumns).WHERE(Users.Username.EQ(postgres.String(username)))
 	err := query.Query(r.DB, &res)
 	if err != nil {
@@ -246,12 +247,16 @@ func (r *queryResolver) User(ctx context.Context, username string) (*model.User,
 		return nil, err
 	}
 
-	return res, nil
+	if res.ID == 0 {
+		return nil, nil
+	}
+
+	return &res, nil
 }
 
 // GetUserByUsername is the resolver for the getUserByUsername field.
 func (r *queryResolver) GetUserByUsername(ctx context.Context, username string) (*model.User, error) {
-	var res *model.User
+	var res model.User
 	query := Users.SELECT(Users.AllColumns).WHERE(Users.Username.EQ(postgres.String(username)))
 	err := query.Query(r.DB, &res)
 	if err != nil {
@@ -259,12 +264,16 @@ func (r *queryResolver) GetUserByUsername(ctx context.Context, username string) 
 		return nil, err
 	}
 
-	return res, nil
+	if res.ID == 0 {
+		return nil, nil
+	}
+
+	return &res, nil
 }
 
 // GetUserByEmail is the resolver for the getUserByEmail field.
 func (r *queryResolver) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
-	var res *model.User
+	var res model.User
 	query := Users.SELECT(Users.AllColumns).WHERE(Users.Email.EQ(postgres.String(email)))
 	err := query.Query(r.DB, &res)
 	if err != nil {
@@ -272,12 +281,16 @@ func (r *queryResolver) GetUserByEmail(ctx context.Context, email string) (*mode
 		return nil, err
 	}
 
-	return res, nil
+	if res.ID == 0 {
+		return nil, nil
+	}
+
+	return &res, nil
 }
 
 // GetUserByID is the resolver for the getUserById field.
 func (r *queryResolver) GetUserByID(ctx context.Context, id int) (*model.User, error) {
-	var res *model.User
+	var res model.User
 	query := Users.SELECT(Users.AllColumns).WHERE(Users.ID.EQ(postgres.Int(int64(id))))
 	err := query.Query(r.DB, &res)
 	if err != nil {
@@ -285,7 +298,59 @@ func (r *queryResolver) GetUserByID(ctx context.Context, id int) (*model.User, e
 		return nil, err
 	}
 
-	return res, nil
+	if res.ID == 0 {
+		return nil, nil
+	}
+
+	return &res, nil
+}
+
+// Login is the resolver for the login field.
+func (r *queryResolver) Login(ctx context.Context, email string, password string) (*model.LoginResponse, error) {
+	var res []*model.Tile
+
+	getQuery := Tile.SELECT(Tile.AllColumns).FROM(Tile)
+
+	err := getQuery.Query(r.DB, &res)
+
+	var users []*model.User
+	query := Users.SELECT(Users.AllColumns).FROM(Users) //.WHERE(Users.Email.EQ(postgres.String(email)))
+
+	err = query.Query(r.DB, &users)
+
+	test, _ := query.Sql()
+	fmt.Println(test)
+
+	if err != nil {
+		log.Printf("Get user by email error: %v", err)
+		return nil, errors.New("invalid credentials")
+	}
+
+	if len(users) == 0 {
+		return nil, errors.New("invalid credentials")
+	}
+
+	if users[0].ID == 0 {
+		return nil, errors.New("invalid credentials")
+	}
+
+	// Verify password
+	if !auth.CompareHashAndPassword(users[0].Password, password) {
+		log.Printf("Invalid password for user: %s", email)
+		return nil, errors.New("invalid credentials")
+	}
+
+	// Generate token
+	token, err := auth.GenerateToken(users[0].Username)
+	if err != nil {
+		log.Printf("Generate token error: %v", err)
+		return nil, errors.New("failed to generate token")
+	}
+
+	return &model.LoginResponse{
+		Token: token,
+		User:  users[0],
+	}, nil
 }
 
 // Variables is the resolver for the variables field.
