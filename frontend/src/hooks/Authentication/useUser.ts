@@ -42,6 +42,10 @@ const useUser = () => {
         return null;
     };
 
+   const loginUser = async () => {
+      return await null;
+   };
+
     const createUser = async (variables: { variables: { name: string; email: string; username: string; password: string; role: string } }) => {
         return await createUserMutation(variables);
     };
@@ -51,6 +55,7 @@ const useUser = () => {
 
     return {
         getUser,
+        loginUser,
         createUser,
         updateUser,
     };

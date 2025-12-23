@@ -6,12 +6,11 @@ import Navbar from "./components/Navbar";
 import tailwindConfig from "../tailwind.config";
 import { Configuration, setup } from "twind";
 
-const API_URL = import.meta.env.VITE_API_URL;
-const url = API_URL ? API_URL : `${window.location.protocol}`;
-console.log(import.meta.env.VITE_APP_TITLE, API_URL ?? "no API_URL");
-console.log(url);
+const apiUrl = import.meta.env.VITE_API_URL as string | undefined;
+const graphqlUrl = apiUrl ? `${apiUrl.replace(/\/$/, "")}/query` : "/query";
+
 const client = new ApolloClient({
-  uri: url + "/query",
+  uri: graphqlUrl,
   cache: new InMemoryCache(),
   defaultOptions: {
     watchQuery: {
