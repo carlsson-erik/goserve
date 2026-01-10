@@ -18,14 +18,14 @@ const CreateUser = ({ onUserCreated, onSwitchToLogin }: CreateUserProps) => {
 
   const handleCreateUser = async () => {
     try {
-      console.log("Creating user with", name, email, username, password, role);
+      console.log("Creating user")
       await createUser({
         variables: {
           name,
           email,
           username,
           password,
-          role,
+          role: "user",
         },
       });
       console.log("User created successfully:");
@@ -82,17 +82,6 @@ const CreateUser = ({ onUserCreated, onSwitchToLogin }: CreateUserProps) => {
               onChange={(e) => setPassword(e.target.value)}
               className="block w-full border rounded-md p-1 mt-1 bg-black"
             />
-          </label>
-          <label className="block mb-2 text-white">
-            Role:
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="block w-full border rounded-md p-1 mt-1 bg-black"
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
           </label>
           <div className="login-buttons">
             <button

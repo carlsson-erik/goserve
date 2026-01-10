@@ -87,8 +87,7 @@ func ValidateToken(tokenString string) (*Claims, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if !token.Valid {
+	if !token.Valid || token.Method != jwt.SigningMethodHS256 {
 		return nil, errors.New("invalid token")
 	}
 

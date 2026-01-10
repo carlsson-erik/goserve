@@ -46,6 +46,14 @@ type NewTile struct {
 	Variables   []*NewVariable `json:"variables"`
 }
 
+type NewUser struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
+}
+
 type NewVariable struct {
 	ID         *int    `json:"id,omitempty"`
 	Name       string  `json:"name"`
@@ -83,7 +91,6 @@ type User struct {
 	Name      string `json:"name"`
 	Email     string `json:"email"`
 	Username  string `json:"username"`
-	Password  string `json:"password"`
 	Role      string `json:"role"`
 	CreatedAt string `json:"createdAt"`
 	UpdatedAt string `json:"updatedAt"`

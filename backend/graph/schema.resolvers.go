@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	jetmodel "goserve/.gen/v1/public/model"
 	. "goserve/.gen/v1/public/table"
 	"goserve/auth"
 	"goserve/graph/model"
@@ -166,23 +167,25 @@ func (r *mutationResolver) DeleteTile(ctx context.Context, id int) (*model.Tile,
 }
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, name string, email string, username string, password string, role string) (*model.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
 	todaysDate := time.Now()
 
-	hashedPassword, err := auth.HashPasswordForStorage(password)
+	hashedPassword, err := auth.HashPasswordForStorage(input.Password)
 	if err != nil {
 		log.Printf("Hash password failed: %v", err)
 		return nil, err
 	}
 
-	newUser := model.User{
-		Name:      name,
-		Email:     email,
-		Username:  username,
+	// Use the Jet-generated database model which includes the password field
+	newUser := jetmodel.Users{
+		Name:      input.Name,
+		Email:     input.Email,
+		Username:  input.Username,
 		Password:  hashedPassword,
-		Role:      role,
+		Role:      input.Role, // Use the role parameter passed from the mutation
 		CreatedAt: todaysDate.Format(time.RFC3339),
-		UpdatedAt: todaysDate.Format(time.RFC3339)}
+		UpdatedAt: todaysDate.Format(time.RFC3339),
+	}
 
 	insertQuery := Users.INSERT(Users.MutableColumns).MODEL(newUser).RETURNING(Users.AllColumns)
 
@@ -193,7 +196,16 @@ func (r *mutationResolver) CreateUser(ctx context.Context, name string, email st
 		return nil, err
 	}
 
-	return &newUser, err
+	// Convert to GraphQL model (without password field for security)
+	return &model.User{
+		ID:        int(newUser.ID),
+		Name:      newUser.Name,
+		Email:     newUser.Email,
+		Username:  newUser.Username,
+		Role:      newUser.Role,
+		CreatedAt: newUser.CreatedAt,
+		UpdatedAt: newUser.UpdatedAt,
+	}, nil
 }
 
 // UpdateUser is the resolver for the updateUser field.
@@ -307,49 +319,47 @@ func (r *queryResolver) GetUserByID(ctx context.Context, id int) (*model.User, e
 
 // Login is the resolver for the login field.
 func (r *queryResolver) Login(ctx context.Context, email string, password string) (*model.LoginResponse, error) {
-	var res []*model.Tile
+	// Query into Jet's model (matches DB column names)
+	var jetUser jetmodel.Users
+	query := Users.SELECT(Users.AllColumns).WHERE(Users.Email.EQ(postgres.String(email)))
 
-	getQuery := Tile.SELECT(Tile.AllColumns).FROM(Tile)
-
-	err := getQuery.Query(r.DB, &res)
-
-	var users []*model.User
-	query := Users.SELECT(Users.AllColumns).FROM(Users) //.WHERE(Users.Email.EQ(postgres.String(email)))
-
-	err = query.Query(r.DB, &users)
-
-	test, _ := query.Sql()
-	fmt.Println(test)
-
+	err := query.Query(r.DB, &jetUser)
 	if err != nil {
 		log.Printf("Get user by email error: %v", err)
 		return nil, errors.New("invalid credentials")
 	}
 
-	if len(users) == 0 {
-		return nil, errors.New("invalid credentials")
-	}
-
-	if users[0].ID == 0 {
+	if jetUser.ID == 0 {
 		return nil, errors.New("invalid credentials")
 	}
 
 	// Verify password
-	if !auth.CompareHashAndPassword(users[0].Password, password) {
+	if !auth.CompareHashAndPassword(jetUser.Password, password) {
 		log.Printf("Invalid password for user: %s", email)
 		return nil, errors.New("invalid credentials")
 	}
 
 	// Generate token
-	token, err := auth.GenerateToken(users[0].Username)
+	token, err := auth.GenerateToken(jetUser.Username)
 	if err != nil {
 		log.Printf("Generate token error: %v", err)
 		return nil, errors.New("failed to generate token")
 	}
 
+	// Convert Jet model to gqlgen model
+	user := &model.User{
+		ID:        int(jetUser.ID),
+		Name:      jetUser.Name,
+		Email:     jetUser.Email,
+		Username:  jetUser.Username,
+		Role:      jetUser.Role,
+		CreatedAt: jetUser.CreatedAt,
+		UpdatedAt: jetUser.UpdatedAt,
+	}
+
 	return &model.LoginResponse{
 		Token: token,
-		User:  users[0],
+		User:  user,
 	}, nil
 }
 

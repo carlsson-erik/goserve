@@ -74,12 +74,19 @@ input NewTile {
   variables: [NewVariable!]!
 }
 
+input NewUser {
+  name: String!
+  email: String!
+  username: String!
+  password: String!
+  role: String!
+}
+
 type User {
   id: Int!
   name: String!
   email: String!
   username: String!
-  password: String!
   role: String!
   createdAt: String!
   updatedAt: String!
@@ -102,7 +109,7 @@ type Mutation {
   updateTile(input: NewTile!): Tile!
   createOrUpdateTiles(input: [NewTile!]!) : Int!
   deleteTile(id: Int!): Tile!
-  createUser(name: String!, email: String!, username: String!, password: String!, role: String!): User!
+  createUser(input: NewUser!): User!
   updateUser(id: Int!, name: String, email: String, username: String, password: String, role: String): User!
   deleteUser(id: Int!): Boolean!
 }
